@@ -1,0 +1,28 @@
+{
+	"name":"openthc/pipe",
+	"description":"OpenTHC RCE API Proxy Service",
+	"license":"proprietary",
+	"autoload": {
+		"psr-4": {
+			"Pipe\\": "./lib"
+		}
+	},
+	"require": {
+		"php": ">=5.6.0",
+		"ext-curl": "*",
+		"ext-date": "*",
+		"ext-json": "*",
+		"ext-mcrypt": "*",
+		"ext-PDO": "*",
+		"ext-session": "*",
+		"ext-sockets": "*",
+		"doctrine/orm": "^2.5",
+		"edoceo/radix": "dev-master",
+		"giggsey/libphonenumber-for-php": "8.0.0",
+		"slim/slim": "3.10.0",
+		"slim/twig-view": "2.4.0",
+		"twig/twig": "2.4.8"
+	},
+	"require-dev": {
+	}
+}
