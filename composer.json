@@ -24,5 +24,6 @@
 		"twig/twig": "2.4.8"
 	},
 	"require-dev": {
+		"behat/behat": "3.4.3"
 	}
 }
