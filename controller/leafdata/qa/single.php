@@ -7,17 +7,17 @@ $RES = new Response_JSON();
 
 $rbe = \RCE::factory($_SESSION['rbe']);
 
-$res = $rbe->inventory()->one($ARG['guid']);
-if (empty($res)) {
+$obj = $rbe->qa()->one($ARG['guid']);
+if (empty($obj)) {
 	return $RES->withJSON(array(
 		'status' => 'failure',
-		'detail' => 'Lot not found',
+		'detail' => 'QA Result not found',
 	), 404);
 }
 
-$res = RBE_LeafData::de_fuck($res);
+$obj = RBE_LeafData::de_fuck($obj);
 
 return $RES->withJSON(array(
 	'status' => 'success',
-	'result' => $res,
+	'result' => $obj,
 ));
