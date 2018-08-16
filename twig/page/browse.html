@@ -1,0 +1,209 @@
+{% extends "layout/html.html" %}
+
+{% block body %}
+
+<h1>Pipe Interface</h1>
+<p>Browse the object-interfaces available via the <em>pipe</em> service</p>
+
+<div class="mb-4">
+<h2>Auth</h2>
+<ul class="list-group">
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/auth">/auth</a></div>
+	<div>Authenticate</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+		<span class="badge badge-success">METRC</span>
+	</div>
+</li>
+</ul>
+</div>
+
+<div class="mb-4">
+
+<h2>Configuration Data</h2>
+<p>The Config module will allow you to load various core-data from the RCE.</p>
+
+<ul class="list-group">
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/config/company">/company</a> - Your Company Information</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+	</div>
+</li>
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/config/contact">/contact</a> - Contacts, Drivers, Employees</div>
+	<div>
+		<span class="badge badge-success">LeafData</span>
+	</div>
+</li>
+
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/config/license-type">/license-type</a> - List all License Information</div>
+	<div><span class="badge badge-success">BioTrack</span></div>
+</li>
+
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/config/license">/license</a> - Your License Information</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+	</div>
+</li>
+
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/config/product/type">/product/type</a> - System Defined Product Type Details</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+		<span class="badge badge-success">METRC</span>
+	</div>
+</li>
+
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/config/product">/product</a> - Product Details</div>
+	<div>
+		<span class="badge badge-warning">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+	</div>
+</li>
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/config/strain">/zone</a> - Strains and strain details</div>
+	<div>
+		<span class="badge badge-warning">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+		<span class="badge badge-success">METRC</span>
+	</div>
+</li>
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/config/vehicle">/vehicle</a> Vehicles</div>
+	<div>
+		<span class="badge badge-success">BioTrack<span>
+	</div>
+</li>
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/config/zone">/zone</a> - an Area or Room or Zone</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+		<span class="badge badge-success">METRC</span>
+	</div>
+</li>
+</ul>
+</div>
+
+
+<div class="mb-4">
+
+<h2>Crop / Plants</h2>
+<p>Plants, Plants in Rooms, Harvest (wet-collect) and Cure (dry-collect) operations.</p>
+
+<ul class="list-group">
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div> <a href="/plant">/plant</a> - Plant Details</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+		<span class="badge badge-success">METRC</span>
+	</div>
+</li>
+</ul>
+</div>
+
+
+<div class="mb-4">
+
+<h2>Inventory / Lots</h2>
+<p>Bulk Materials, Conversion, Production Lots, Conversion (again), Packaged Lots</p>
+
+<ul class="list-group">
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/lot">/lot</a> - Inventory Lot Details</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+		<span class="badge badge-success">METRC</span>
+	</div>
+</li>
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/waste">/waste</a> - Inventory Waste and Disposal Details</div>
+	<div>
+		<span class="badge badge-success">LeafData</span>
+	</div>
+</li>
+</ul>
+</div>
+
+
+<div class="mb-4">
+
+<h2>Quality Assurance</h2>
+<p>QA Samples and Results</p>
+
+<ul class="list-group">
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/qa">/qa</a> - Inventory QA Samples and Results</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+		<span class="badge badge-warning">METRC</span>
+	</div>
+</li>
+</ul>
+</div>
+
+<div class="mb-4">
+
+<h2>Transfers / Wholesale Sales</h2>
+<p>Transfers, Manifests, Incoming (and Commit) and Outgoing (and Accept)</p>
+
+<ul class="list-group">
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/transfer/outgoing">/transfer/outgoing</a> - Transfers of Sales</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+		<span class="badge badge-warning">METRC</span>
+	</div>
+</li>
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/transfer/incoming">/transfer/incoming</a> - Transfers of Materials to Accept</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+		<span class="badge badge-warning">METRC</span>
+	</div>
+</li>
+</ul>
+</div>
+
+
+<div class="mb-4">
+
+<h2>Retail Sales</h2>
+<p>...</p>
+
+<ul class="list-group">
+<li class="list-group-item d-flex justify-content-between align-items-center">
+	<div><a href="/sale">/sale</a> - Retail Sales List</div>
+	<div>
+		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-success">LeafData</span>
+		<span class="badge badge-success">METRC</span>
+	</div>
+</li>
+</ul>
+</div>
+
+{% endblock %}
+
+{% block foot_script %}
+
+<script>
+$(function() {
+  // ?
+});
+</script>
+
+{% endblock %}

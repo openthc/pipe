@@ -128,18 +128,13 @@ $app->get('/browse', function($REQ, $RES, $ARG) {
 */
 $app->group('/config', function() {
 
-	$this->get('', function($REQ, $RES, $ARG) {
-		$this->view->render($RES, 'page/config.html');
-	});
-
 	// Company
 	$this->group('/company', function() {
 
 		// GET default
-		$this->get('', function($REQ, $RES, $ARG) {
-			$f = sprintf('%s/controller/%s/company/search.php', APP_ROOT, $_SESSION['rbe-base']);
-			require_once($f);
-			return $RES;
+		$this->any('', function($REQ, $RES, $ARG) {
+			$RES = new Response_From_File();
+			return $RES->execute(sprintf('%s/config/company/search.php', $_SESSION['rbe-base']), $ARG);
 		});
 
 	});
@@ -165,9 +160,9 @@ $app->group('/config', function() {
 	});
 
 	// Contact / Users / Employees
-	$app->get('/contact', function($REQ, $RES, $ARG) {
+	$this->get('/contact', function($REQ, $RES, $ARG) {
 		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/contact/search.php', $_SESSION['rbe-base']), $ARG);
+		return $RES->execute(sprintf('%s/config/contact/search.php', $_SESSION['rbe-base']), $ARG);
 	});
 
 	//	$this->post('/{guid:[0-9a-f]+}/', function($REQ, $RES, $ARG) {
@@ -267,9 +262,8 @@ $app->group('/config', function() {
 $app->group('/plant', function() {
 
 	$this->get('', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/plant-select.php', APP_ROOT, $_SESSION['rbe-base']);
-		require_once($f);
-		return $RES;
+		$RES = new Response_From_File();
+		return $RES->execute(sprintf('%s/plant/search.php', $_SESSION['rbe-base']), $ARG);
 	});
 
 	//$this->post('', function($REQ, $RES, $ARG) {
@@ -277,15 +271,13 @@ $app->group('/plant', function() {
 	//});
 
 	$this->get('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/plant-single.php', APP_ROOT, $_SESSION['rbe-base']);
-		require_once($f);
-		return $RES;
+		$RES = new Response_From_File();
+		return $RES->execute(sprintf('%s/plant/single.php', $_SESSION['rbe-base']), $ARG);
 	});
 
 	$this->post('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/plant-update.php', APP_ROOT, $_SESSION['rbe-base']);
-		require_once($f);
-		return $RES;
+		$RES = new Response_From_File();
+		return $RES->execute(sprintf('%s/plant/update.php', $_SESSION['rbe-base']), $ARG);
 	});
 
 	//$this->post('/{guid:[0-9a-f]+}/collect', function($REQ, $RES, $ARG) {
@@ -389,7 +381,7 @@ $app->group('/qa', function() {
 
 
 // Transport Group
-$app->group('/transfer', function() {
+$app->group('/transfer/outgoing', function() {
 
 	$this->get('', function($REQ, $RES, $ARG) {
 		$f = sprintf('%s/controller/%s/transfer-search.php', APP_ROOT, $_SESSION['rbe-base']);
@@ -422,6 +414,16 @@ $app->group('/transfer', function() {
 //	});
 
 })->add('App\Middleware\RCE')->add('App\Middleware\Session');
+
+$app->group('/transfer/incoming', function() {
+
+	$this->get('', function($REQ, $RES, $ARG) {
+		$RES = new Response_From_File();
+		return $RES->execute(sprintf('%s/transfer/incoming/search.php', $_SESSION['rbe-base']), $ARG);
+	});
+
+});
+
 
 
 // Retail Sales
