@@ -9,16 +9,17 @@ require_once(dirname(dirname(__FILE__)) . '/boot.php');
 // header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN'], true);
 // header('Access-Control-Allow-Credentials: true');
 
-
-// Create App Container
-$con = new \Slim\Container(array(
+// Slim Configuration
+$cfg = array(
 	'debug' => true,
 	'settings' => array(
 		'addContentLengthHeader' => false,
-		'determineRouteBeforeAppMiddleware' => true,
 		'displayErrorDetails' => true,
 	),
-));
+);
+
+// Create App Container
+$con = new \Slim\Container($cfg);
 
 
 // Load Slim View
@@ -42,10 +43,12 @@ $con['view'] = function($c0) {
 
 };
 
+
 // Tell Container to use a Magic Response object
 //$container['response'] = function($c0) {
 //
 //};
+
 
 // 404 Handler
 $con['notFoundHandler'] = function($c) {
@@ -58,29 +61,6 @@ $con['notFoundHandler'] = function($c) {
 	};
 };
 
-//$con['errorHandler'] = function($c) {
-//	return function ($REQ, $RES) {
-//		die("\nerrorHandler\n");
-//		//return $RES->withJSON(array(
-//		//	'status' => 'failure',
-//		//	'detail' => 'Not Found',
-//		//), 404);
-//	};
-//};
-//
-//$con['phpErrorHandler'] = function($c) {
-//	return function ($REQ, $RES) {
-//		die("\nphpErrorHandler\n");
-//		//return $RES->withJSON(array(
-//		//	'status' => 'failure',
-//		//	'detail' => 'Not Found',
-//		//), 404);
-//	};
-//};
-
-//unset($con['errorHandler']);
-//unset($con['notFoundHandler']);
-//unset($con['phpErrorHandler']);
 
 $app = new \Slim\App($con);
 
@@ -106,14 +86,6 @@ $app->group('/auth', function() {
 
 })->add('App\Middleware\Session');
 
-//// Home Request
-//$app->get('/test', function($REQ, $RES, $ARG) {
-
-//});
-//
-//$app->post('/test', function($REQ, $RES, $ARG) {
-//	require_once(APP_ROOT . '/view/test-eval.php');
-//});
 
 /**
 	A Very Simple Object Browser
@@ -358,12 +330,12 @@ $app->group('/qa', function() {
 		return $RES->execute(sprintf('%s/qa/single.php', $_SESSION['rbe-base']), $ARG);
 	});
 	//->add(function($REQ, $RES, $ncb) {
-    //
+	//
 	//	// guid
 	//	$ri = $REQ->getAttribute('routeInfo');
 	//	$_GET['code'] = $ri[2]['guid'];
 	//	$_GET['code'] = trim($_GET['code']);
-    //
+	//
 	//	if (empty($_GET['code'])) {
 	//		return $RES->withJSON(array(
 	//			'status' => 'failure',
@@ -380,7 +352,7 @@ $app->group('/qa', function() {
 })->add('App\Middleware\RCE')->add('App\Middleware\Session');
 
 
-// Transport Group
+// Transfer Group
 $app->group('/transfer/outgoing', function() {
 
 	$this->get('', function($REQ, $RES, $ARG) {
@@ -473,21 +445,27 @@ $app->group('/waste', function() {
 
 
 /**
-	Passthru Handlers simply rewrite and log all requests/responses
+	Stem Handlers simply log all requests/responses
 */
-$app->group('/passthru', function() {
+$app->group('/stem', function() {
 
-	//$this->post('/biotrack')
-
-	$this->map([ 'GET', 'POST' ], '/leafdata', function($REQ, $RES, $ARG) {
-		return require_once(APP_ROOT . '/controller/leafdata-passthru/passthru.php');
+	$this->get('', function($REQ, $RES, $ARG) {
+		return $this->view->render($RES, 'page/stem.html', array());
 	});
 
-	//$this->post('/metrc')
+	$this->post('/biotrack', function($REQ, $RES, $ARG) {
+		return require_once(APP_ROOT . '/controller/stem/biotrack.php');
+	});
+
+	$this->map([ 'GET', 'POST' ], '/leafdata/{path:.*}', function($REQ, $RES, $ARG) {
+		return require_once(APP_ROOT . '/controller/stem/leafdata.php');
+	});
+
+	$this->map([ 'GET', 'POST' ], '/metrc/{path:.*}', function($REQ, $RES, $ARG) {
+		return require_once(APP_ROOT . '/controller/stem/metrc.php');
+	});
 
 })
-->add('App\Middleware\RCE')
-->add('App\Middleware\Session')
 //->add('App\Middleware\Log\HTTP')
 ;
 

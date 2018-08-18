@@ -1,0 +1,30 @@
+{% extends "layout/html.html" %}
+
+{% block body %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism-okaidia.min.css" integrity="sha256-+8ReLFz1xaTiP3T0xcJVWrHneeFwCnJUJwvcM0L+Ufw=" crossorigin="anonymous" />
+
+<h1>Pipe Stem</h1>
+
+<p>
+The <em>Pipe-Stem</em> component is a heavy logging pass-thru proxy like service for a cannabis regulatory compliance engine.
+</p>
+
+<p>
+Once you have configured a pass-thru target then you will simply make requests to this configured end-point.
+</p>
+
+<pre><code class="language-bash">
+curl \
+	--request POST \
+	--header &quot;as-necessary&quot; \
+	--data-binary &quot;as-necessary&quot; \
+	https://pipe.openthc.com/stem/abcd1234
+</code></pre>
+
+<p>You must register with this system to get a defined end-point.</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.js" integrity="sha256-jc6y1s/Y+F+78EgCT/lI2lyU7ys+PFYrRSJ6q8/R8+o=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/plugins/normalize-whitespace/prism-normalize-whitespace.min.js" integrity="sha256-31Ef0tfMJHz4mcBYno6PKR2Iz5qPHPJLxIzej2AGl6c=" crossorigin="anonymous"></script>
+
+{% endblock %}

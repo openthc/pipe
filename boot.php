@@ -27,6 +27,7 @@ spl_autoload_register(function($c) {
 require_once('/opt/com.openthc.com/lib/php.php');
 require_once(APP_ROOT . '/vendor/autoload.php');
 require_once(APP_ROOT . '/lib/RCE.php');
+require_once(APP_ROOT . '/lib/RCE_HTTP.php');
 
 class App
 {
