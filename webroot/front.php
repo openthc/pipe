@@ -114,9 +114,8 @@ $app->group('/config', function() {
 	$this->group('/license', function() {
 
 		$this->get('', function($REQ, $RES, $ARG) {
-			$f = sprintf('%s/controller/%s/config/license/search.php', APP_ROOT, $_SESSION['rbe-base']);
-			$RES = require_once($f);
-			return $RES;
+			$RES = new Response_From_File();
+			return $RES->execute(sprintf('%s/config/license/search.php', $_SESSION['rbe-base']), $ARG);
 		});
 
 		$this->get('/{guid}', function($REQ, $RES, $ARG) {
@@ -131,7 +130,7 @@ $app->group('/config', function() {
 
 	});
 
-	// Contact / Users / Employees
+	// Contact / Users / Drivers / Employees
 	$this->get('/contact', function($REQ, $RES, $ARG) {
 		$RES = new Response_From_File();
 		return $RES->execute(sprintf('%s/config/contact/search.php', $_SESSION['rbe-base']), $ARG);
@@ -142,25 +141,31 @@ $app->group('/config', function() {
 	//		return $RES;
 	//	});
 
+	// Products
+
 	// Search
 	$this->get('/product', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/config-product-search.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
+		$RES = new Response_From_File();
+		return $RES->execute(sprintf('%s/config/product/search.php', $_SESSION['rbe-base']), $ARG);
 	})
 		//->add('App\Middleware\Output\CSV')
 		//->add('App\Middleware\Output\CSV')
 		;
 
-
 	// Product Type
 	$this->get('/product-type', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/config/product-type.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
+		$RES = new Response_From_File();
+		return $RES->execute(sprintf('%s/config/product-type.php', $_SESSION['rbe-base']), $ARG);
 	});
 
-	// Products
+
+	// Create
+	//$this->post('/product', function($REQ, $RES, $ARG) {
+	//	$f = sprintf('%s/controller/%s/config-product-create.php', APP_ROOT, $_SESSION['rbe-base']);
+	//	$RES = require_once($f);
+	//	return $RES;
+	//});
+
 	// Single
 	$this->get('/product/{guid}', function($REQ, $RES, $ARG) {
 		$f = sprintf('%s/controller/%s/config-product-single.php', APP_ROOT, $_SESSION['rbe-base']);
@@ -168,19 +173,12 @@ $app->group('/config', function() {
 		return $RES;
 	});
 
-	// Create
-	$this->post('/product', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/config-product-create.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
-	});
-
 	// Modify
-	$this->post('/product/{guid}', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/config-product-update.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
-	});
+	//$this->post('/product/{guid}', function($REQ, $RES, $ARG) {
+	//	$f = sprintf('%s/controller/%s/config-product-update.php', APP_ROOT, $_SESSION['rbe-base']);
+	//	$RES = require_once($f);
+	//	return $RES;
+	//});
 
 	// Delete
 	$this->delete('/product/{guid}', function($REQ, $RES, $ARG) {
@@ -189,7 +187,19 @@ $app->group('/config', function() {
 		return $RES;
 	});
 
-	// Vehicle
+	/*
+		Strain
+	*/
+	// Search
+	$this->get('/strain', function($REQ, $RES, $ARG) {
+		$RES = new Response_From_File();
+		return $RES->execute(sprintf('%s/config/strain/search.php', $_SESSION['rbe-base']), $ARG);
+	});
+
+	/*
+		Vehicle
+	*/
+	// Search
 	$this->get('/vehicle', function($REQ, $RES, $ARG) {
 		//$f = sprintf('%s/controller/%s/vehicle/search.php', APP_ROOT, $_SESSION['rbe-base']);
 		//$RES = require_once($f);

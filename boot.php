@@ -29,6 +29,14 @@ require_once(APP_ROOT . '/vendor/autoload.php');
 require_once(APP_ROOT . '/lib/RCE.php');
 require_once(APP_ROOT . '/lib/RCE_HTTP.php');
 
+function _exit_501($RES)
+{
+	return $RES->withJSON(array(
+		'status' => 'failure',
+		'detail' => 'Not Implemented',
+	), 501, JSON_PRETTY_PRINT);
+}
+
 class App
 {
 	static function log() { }
