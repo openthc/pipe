@@ -57,7 +57,7 @@ if (empty($res['error'])) {
 	$good++;
 }
 
-$RES = new Response_JSON();
+
 return $RES->withJson(array(
 	'status' => 'success',
 	'result' => intval($good / $want * 100),

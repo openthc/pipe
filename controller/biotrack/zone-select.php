@@ -3,7 +3,6 @@
 	List of All Rooms
 */
 
-$RES = new Response_JSON();
 
 $rbe = RCE::factory($_SESSION['rbe']);
 
@@ -33,7 +32,7 @@ if (!empty($res['plant_room'])) {
 
 // Unify Ouput According to OpenTHC Specification
 
-$RES = $RES->withJSON(array(
+return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $ret,
 ));

@@ -54,7 +54,7 @@ foreach ($res['result'] as $x) {
 
 }
 
-$RES = new Response_JSON();
+
 return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $ret,

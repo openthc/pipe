@@ -5,7 +5,6 @@
 
 use Edoceo\Radix;
 
-$RES = new Response_JSON();
 
 $ret = array(
 	'status' => 'failure',
@@ -85,4 +84,4 @@ if (!empty($_GET['type'])) {
 
 $ret['status'] = 'success';
 
-$RES = $RES->withJSON($ret);
+return $RES->withJSON($ret);

@@ -3,7 +3,6 @@
 	List of Retail Sales
 */
 
-$RES = new Response_JSON();
 
 $rbe = RCE::factory($_SESSION['rbe']);
 
@@ -12,7 +11,7 @@ $res = $rbe->sync_sale(array(
 	'max' => intval($_GET['max']),
 ));
 
-$RES = $RES->withJSON(array(
+return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $res['sale'],
 ));

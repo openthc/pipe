@@ -184,8 +184,7 @@ $app->group('/sale', function() {
 	});
 
 	$this->post('', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/retail/create.php', $_SESSION['rbe-base']), $ARG);
+		return _from_rce_file('retail/create.php', $RES, $ARG);
 	});
 
 	$this->get('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {

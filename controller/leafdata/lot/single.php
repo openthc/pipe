@@ -3,7 +3,6 @@
 
 */
 
-$RES = new Response_JSON();
 
 $rbe = \RCE::factory($_SESSION['rbe']);
 

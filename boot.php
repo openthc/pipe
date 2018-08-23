@@ -44,9 +44,6 @@ function _from_rce_file($f, $RES, $ARG)
 
 	return $r;
 
-	// $RES = new \Response_From_File();
-	//return $RES->execute(sprintf('%s/, $_SESSION['rbe-base']), $ARG);
-
 };
 
 function _exit_501($RES)
@@ -108,36 +105,4 @@ class License
 		);
 	}
 
-}
-
-class Response_From_File extends Slim\Http\Response
-{
-	function execute($f, $ARG=null)
-	{
-		$f = trim($f, '/');
-		$f = sprintf('%s/controller/%s', APP_ROOT, $f);
-		if (!is_file($f)) {
-			return $this->withJSON(array(
-				'status' => 'failure',
-				'detail' => 'Not Found',
-				'_f' => $f,
-			), 404);
-		}
-		$r = require_once($f);
-		return $r;
-	}
-}
-
-
-class Response_JSON extends Slim\Http\Response
-{
-	function withJSON($data, $code=200, $opts=null)
-	{
-		if (empty($opts)) {
-			$opts = JSON_PRETTY_PRINT;
-		}
-
-		return parent::withJSON($data, $code, $opts);
-
-	}
 }

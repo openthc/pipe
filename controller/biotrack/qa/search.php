@@ -3,7 +3,6 @@
 	List of QA Samples
 */
 
-$RES = new Response_JSON();
 
 $rbe = RCE::factory($_SESSION['rbe']);
 
@@ -14,7 +13,7 @@ $res = $rbe->sync_inventory_qa_sample(array(
 
 // Unify Ouput According to OpenTHC Specification
 
-$RES = $RES->withJSON(array(
+return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $res['inventory_qa_sample'],
 ));

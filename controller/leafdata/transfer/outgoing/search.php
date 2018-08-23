@@ -30,7 +30,7 @@ foreach ($src_list as $src) {
 	$out_list[] = $out;
 }
 
-$RES = new Response_JSON();
+
 return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $out_list,
