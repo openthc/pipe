@@ -24,10 +24,30 @@ spl_autoload_register(function($c) {
 
 }, true, false);
 
-require_once('/opt/com.openthc.com/lib/php.php');
 require_once(APP_ROOT . '/vendor/autoload.php');
 require_once(APP_ROOT . '/lib/RCE.php');
 require_once(APP_ROOT . '/lib/RCE_HTTP.php');
+
+function _from_rce_file($f, $RES, $ARG)
+{
+	$f = trim($f, '/');
+	$f = sprintf('%s/controller/%s/%s', APP_ROOT, $_SESSION['rbe-base'], $f);
+	if (!is_file($f)) {
+		return $RES->withJSON(array(
+			'status' => 'failure',
+			'detail' => 'Not Found',
+			'_f' => $f,
+		), 404);
+	}
+
+	$r = require_once($f);
+
+	return $r;
+
+	// $RES = new \Response_From_File();
+	//return $RES->execute(sprintf('%s/, $_SESSION['rbe-base']), $ARG);
+
+};
 
 function _exit_501($RES)
 {
@@ -36,6 +56,15 @@ function _exit_501($RES)
 		'detail' => 'Not Implemented',
 	), 501, JSON_PRETTY_PRINT);
 }
+
+function _hash_obj($o)
+{
+	_ksort_r($o);
+	$hash = sha1(json_encode($o));
+	return $hash;
+}
+
+
 
 class App
 {
@@ -54,6 +83,9 @@ class App_Metric
 	function timing() { }
 }
 
+/**
+	A Faker cause some of the RBE tools depend on this
+*/
 class License
 {
 	static function findByCode($x)
@@ -65,6 +97,17 @@ class License
 			'guid' => $x,
 		);
 	}
+
+	static function findByGUID($x)
+	{
+		//var_dump($x);
+		//exit;
+		return array(
+			'code' => $x,
+			'guid' => $x,
+		);
+	}
+
 }
 
 class Response_From_File extends Slim\Http\Response
