@@ -5,7 +5,7 @@
 	@todo Maybe look at pulling all licenses and grouping by UBI (in WA) or Name?
 */
 
-return $this->withJSON(array(
+return $RES->withJSON(array(
 	'status' => 'failure',
 	'detail' => 'Company Interface not supported for LeafData [CCS#012]',
 ), 404);
