@@ -23,6 +23,12 @@ class Open
 			return $this->renderForm($REQ, $RES, $ARG);
 			break;
 		case 'POST':
+			switch ($_POST['a']) {
+			case 'set-license':
+				$_SESSION['rbe-auth']['license'] = $_POST['license'];
+				return $RES->withRedirect('/browse');
+				break;
+			}
 			return $this->connect($REQ, $RES, $ARG);
 			break;
 		}
@@ -62,6 +68,10 @@ class Open
 
 		$this->_createDatabase();
 
+		if (!empty($_GET['r'])) {
+			return $RES->withRedirect($_GET['r']);
+		}
+
 		return $RES;
 	}
 
@@ -74,6 +84,14 @@ class Open
 
 		$data = array();
 		$data['rbe_list'] = $rbe_data;
+		$data['rbe_code'] = $_SESSION['rbe']['code'];
+		$data['rbe_meta_company'] = $_SESSION[''];
+		$data['rbe_meta_license'] = $_SESSION['rbe-auth']['license'];
+		$data['rbe_meta_vendor_api_key'] = $_SESSION['rbe-auth']['vendor-key'];
+		$data['rbe_meta_client_api_key'] = $_SESSION['rbe-auth']['client-key'];
+		if (empty($data['rbe_meta_client_api_key'])) {
+			$data['rbe_meta_client_api_key'] = $_SESSION['rbe-auth']['secret'];
+		}
 
 		return $this->_c->view->render($RES, 'page/auth-form.html', $data);
 
@@ -269,32 +287,30 @@ class Open
 	private function _createDatabase()
 	{
 
-		$sql_hash = md5(json_encode($_POST));
+		$_SESSION['sql-hash'] = md5(json_encode($_POST));
 
-		$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $sql_hash);
+		$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);
 		if (!is_file($sql_file)) {
 
 			// Create Database
 			SQL::init('sqlite:' . $sql_file);
-			SQL::query('CREATE TABLE cfg_app (key TEXT PRIMARY KEY, val TEXT)');
-			SQL::query('CREATE TABLE cfg_product (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE cfg_strain (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE cfg_zone (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-
+			SQL::query('CREATE TABLE _config (key TEXT PRIMARY KEY, val TEXT)');
+			SQL::query("CREATE TABLE _log_audit (cts not null default (strftime('%s','now')), code, meta TEXT)");
+			SQL::query("CREATE TABLE _log_alert (cts not null default (strftime('%s','now')), code, meta TEXT)");
+			SQL::query("CREATE TABLE _log_delta (cts not null default (strftime('%s','now')), code, meta TEXT)");
+			SQL::query('CREATE TABLE contact (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
+			SQL::query('CREATE TABLE license (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE lot (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE plant (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
+			SQL::query('CREATE TABLE product (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE qa (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
+			SQL::query('CREATE TABLE strain (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE transfer (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE waste (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
+			SQL::query('CREATE TABLE zone (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 
-			SQL::query("CREATE TABLE log_alert (cts not null default (strftime('%s','now')), code, meta TEXT)");
-			SQL::query("CREATE TABLE log_delta (cts not null default (strftime('%s','now')), code, meta TEXT)");
-			SQL::query("CREATE TABLE log_event (cts not null default (strftime('%s','now')), code, meta TEXT)");
-
-			SQL::query('INSERT INTO cfg_app VALUES (?, ?)', array('Created', date(\DateTime::RFC3339)));
-			SQL::query('INSERT INTO log_event (code, meta) VALUES (?, ?)', array('App Created', date(\DateTime::RFC3339)));
-
-			$_SESSION['sql-hash'] = $sql_hash;
+			SQL::query('INSERT INTO _config VALUES (?, ?)', array('Created', date(\DateTime::RFC3339)));
+			SQL::query('INSERT INTO _log_audit (code, meta) VALUES (?, ?)', array('App Created', date(\DateTime::RFC3339)));
 
 		}
 
