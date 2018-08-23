@@ -1,12 +1,103 @@
 <?php
 /**
-	List all the Product
+	Return a List of Products
 	In LeafData it's called an Inventory Type
 */
 
+use Edoceo\Radix\DB\SQL;
+
+$obj_name = 'product';
+
+$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);
+SQL::init('sqlite:' . $sql_file);
+
+$dt0 = $_SERVER['REQUEST_TIME'];
+$sql = sprintf("SELECT val FROM cfg_app WHERE key = 'sync-{$obj_name}-time'");
+$dt1 = intval(SQL::fetch_one($sql));
+$age = $dt0 - $dt1;
+if ($age >= 240) {
+
+	$sql = "SELECT guid, hash FROM cfg_{$obj_name}";
+	$res_cached = SQL::fetch_mix($sql);
+
+	$rbe = \RCE::factory($_SESSION['rbe']);
+
+	$res_source = $rbe->inventory_type()->all();
+	if ('success' != $res_source['status']) {
+		return $RES->withJSON(array(
+			'status' => 'failure',
+			'detail' => $rbe->formatError($res_source),
+		), 500);
+	}
+
+	$res_source = $res_source['result']['data'];
+
+} else {
+
+	// From Cache
+	$res_cached = array();
+	$res_source = array();
+
+	$sql = "SELECT hash, meta FROM cfg_{$obj_name}";
+	$res = SQL::fetch_all($sql);
+
+	foreach ($res as $rec) {
+
+		$x = json_decode($rec['meta'], true);
+		$x['hash'] = $rec['hash'];
+
+		$res_cached[ $x['global_id'] ] = $x['hash'];
+		$res_source[] = $x;
+	}
+
+}
+
 $ret = array();
 
-$rbe = \RCE::factory($_SESSION['rbe']);
+foreach ($res_source as $src) {
+
+	if (empty($src['hash'])) {
+		$src['hash'] = _hash_obj($src);
+	}
+
+	$rec = array(
+		'name' => trim($src['name']),
+		'guid' => $src['global_id'],
+		'hash' => $src['hash'],
+		'type' => sprintf('%s/%s', $src['type'], $src['intermediate_type']),
+		//'code' => trim($src['external_id']),
+	);
+
+	if ($rec['hash'] != $res_cached[ $rec['guid'] ]) {
+
+		$rec['_source'] = $src;
+		$rec['_updated'] = 1;
+
+		unset($src['hash']);
+
+		$sql = "INSERT OR REPLACE INTO cfg_{$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
+		$arg = array(
+			':guid' => $src['global_id'],
+			':hash' => $rec['hash'],
+			':meta' => json_encode($src),
+		);
+
+		SQL::query($sql, $arg);
+
+	}
+
+	$ret[] = $rec;
+
+}
+
+$arg = array("sync-{$obj_name}-time", time());
+SQL::query("INSERT OR REPLACE INTO cfg_app (key, val) VALUES (?, ?)", $arg);
+
+return $RES->withJSON(array(
+	'status' => 'success',
+	'result' => $ret,
+));
+
 
 //$rls = new RBE_LeafData_Sync($rbe);
 //$rlsp = new RBE_LeafData_Sync_Product($rls, $rbe);
@@ -29,10 +120,6 @@ while ($page_cur <= $page_max) {
 		$x = RBE_LeafData::de_fuck($x);
 
 		$rec = array();
-		$rec['guid'] = $x['global_id'];
-		$rec['name'] = $x['name'];
-		$rec['type'] = sprintf('%s/%s', $x['type'], $x['intermediate_type']);
-		$rec['strain'] = array('guid' => $x['global_strain_id']);
 		$rec['package'] = array(
 			'size' => floatval($x['net_weight']),
 			'unit' => $x['uom'],
@@ -49,12 +136,6 @@ while ($page_cur <= $page_max) {
 
 //$REQ = $REQ->withAttribute('status', 'success');
 //$REQ = $REQ->withAttribute('result', $ret);
-
-$RES = new Response_JSON();
-return $RES->withJSON(array(
-	'status' => 'success',
-	'result' => $ret,
-));
 
 function _product_type_verify($rec)
 {
