@@ -10,47 +10,16 @@ require_once(dirname(dirname(__FILE__)) . '/boot.php');
 // header('Access-Control-Allow-Credentials: true');
 
 // Slim Configuration
-$cfg = array(
-	'debug' => true,
-	'settings' => array(
-		'addContentLengthHeader' => false,
-		'displayErrorDetails' => true,
-	),
-);
+$app = new \OpenTHC\App(array('debug' => true));
 
-// Create App Container
-$con = new \Slim\Container($cfg);
-
-
-// Load Slim View
-$con['view'] = function($c0) {
-
-	$path = APP_ROOT . '/twig';
-	$args = array(
-		//'cache' => '/tmp',
-		'debug' => true,
-	);
-
-	$view = new Slim\Views\Twig($path, $args);
-	$view->addExtension(new Twig_Extension_Debug());
-
-	$tfm = new Twig_Filter('markdown', function($x) {
-		return _markdown($x);
-	}, array('is_safe' => array('html')));
-	$view->getEnvironment()->addFilter($tfm);
-
-	return $view;
-
-};
-
-
-// Tell Container to use a Magic Response object
-//$container['response'] = function($c0) {
-//
-//};
+//// Tell Container to use a Magic Response object
+////$container['response'] = function($c0) {
+////
+////};
 
 
 // 404 Handler
+$con = $app->getContainer();
 $con['notFoundHandler'] = function($c) {
 	return function ($REQ, $RES) {
 		return $RES->withJSON(array(
@@ -60,9 +29,6 @@ $con['notFoundHandler'] = function($c) {
 		), 404);
 	};
 };
-
-
-$app = new \Slim\App($con);
 
 
 /**
@@ -91,153 +57,19 @@ $app->group('/auth', function() {
 	A Very Simple Object Browser
 */
 $app->get('/browse', function($REQ, $RES, $ARG) {
-	return $this->view->render($RES, 'page/browse.html', array());
+
+	$data = array();
+	$data['rbe_auth'] = $_SESSION['rbe-auth'];
+	$data['rbe_meta_license'] = $_SESSION['rbe-auth']['license'];
+
+	return $this->view->render($RES, 'page/browse.html', $data);
 })->add('App\Middleware\RCE')->add('App\Middleware\Session');
 
 
 /**
 	Config Stuff
 */
-$app->group('/config', function() {
-
-	// Company
-	$this->group('/company', function() {
-
-		// GET default
-		$this->any('', function($REQ, $RES, $ARG) {
-			$RES = new Response_From_File();
-			return $RES->execute(sprintf('%s/config/company/search.php', $_SESSION['rbe-base']), $ARG);
-		});
-
-	});
-
-	$this->group('/license', function() {
-
-		$this->get('', function($REQ, $RES, $ARG) {
-			$RES = new Response_From_File();
-			return $RES->execute(sprintf('%s/config/license/search.php', $_SESSION['rbe-base']), $ARG);
-		});
-
-		$this->get('/{guid}', function($REQ, $RES, $ARG) {
-			$f = sprintf('%s/controller/%s/config/license/single.php', APP_ROOT, $_SESSION['rbe-base']);
-			$RES = require_once($f);
-			return $RES;
-		});
-
-		//$this->get('/company', function() {
-		//	die('List Licenses by Company?');
-		//});
-
-	});
-
-	// Contact / Users / Drivers / Employees
-	$this->get('/contact', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/config/contact/search.php', $_SESSION['rbe-base']), $ARG);
-	});
-
-	//	$this->post('/{guid:[0-9a-f]+}/', function($REQ, $RES, $ARG) {
-	//		require_once(APP_ROOT . '/v2016/contacts/update.php');
-	//		return $RES;
-	//	});
-
-	// Products
-
-	// Search
-	$this->get('/product', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/config/product/search.php', $_SESSION['rbe-base']), $ARG);
-	})
-		//->add('App\Middleware\Output\CSV')
-		//->add('App\Middleware\Output\CSV')
-		;
-
-	// Product Type
-	$this->get('/product-type', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/config/product-type.php', $_SESSION['rbe-base']), $ARG);
-	});
-
-
-	// Create
-	//$this->post('/product', function($REQ, $RES, $ARG) {
-	//	$f = sprintf('%s/controller/%s/config-product-create.php', APP_ROOT, $_SESSION['rbe-base']);
-	//	$RES = require_once($f);
-	//	return $RES;
-	//});
-
-	// Single
-	$this->get('/product/{guid}', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/config-product-single.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
-	});
-
-	// Modify
-	//$this->post('/product/{guid}', function($REQ, $RES, $ARG) {
-	//	$f = sprintf('%s/controller/%s/config-product-update.php', APP_ROOT, $_SESSION['rbe-base']);
-	//	$RES = require_once($f);
-	//	return $RES;
-	//});
-
-	// Delete
-	$this->delete('/product/{guid}', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/config-product-delete.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
-	});
-
-	/*
-		Strain
-	*/
-	// Search
-	$this->get('/strain', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/config/strain/search.php', $_SESSION['rbe-base']), $ARG);
-	});
-
-	/*
-		Vehicle
-	*/
-	// Search
-	$this->get('/vehicle', function($REQ, $RES, $ARG) {
-		//$f = sprintf('%s/controller/%s/vehicle/search.php', APP_ROOT, $_SESSION['rbe-base']);
-		//$RES = require_once($f);
-		return $RES->withJSON(array('status' => 'failure', 'detail' => 'Not Implemented'), 500);
-	});
-
-	// For Areas/Rooms/Zones
-	$this->get('/zone', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/zone/search.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
-	});
-	$this->get('/zone/{guid}', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/zone/select.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
-	});
-
-	$this->post('/zone', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/zone/create.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
-	});
-
-	$this->post('/zone/{guid}', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/zone/update.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
-	});
-
-	$this->delete('/zone/{guid}', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/zone/delete.php', APP_ROOT, $_SESSION['rbe-base']);
-		require_once($f);
-		return $RES;
-	});
-
-
-})->add('App\Middleware\RCE')->add('App\Middleware\Session');
+$app->group('/config', 'App\Module\Config')->add('App\Middleware\RCE')->add('App\Middleware\Session');
 
 
 // Plants
@@ -363,49 +195,43 @@ $app->group('/qa', function() {
 
 
 // Transfer Group
-$app->group('/transfer/outgoing', function() {
+$app->group('/transfer', function() {
 
-	$this->get('', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/transfer-search.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
+	$this->get('/outgoing', function($REQ, $RES, $ARG) {
+		$RES = new Response_From_File();
+		return $RES->execute(sprintf('%s/transfer/outgoing/search.php', $_SESSION['rbe-base']), $ARG);
 	});
 
-	$this->get('/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/transfer-single.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
-	});
+	//$this->get('/outgoing/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
+	//	$f = sprintf('%s/controller/%s/transfer-single.php', APP_ROOT, $_SESSION['rbe-base']);
+	//	$RES = require_once($f);
+	//	return $RES;
+	//});
 
-	$this->post('/{guid:[\w\.]+}/accept', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/transfer-accept.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
-	});
+	//$this->post('/outgoing/{guid:[\w\.]+}/accept', function($REQ, $RES, $ARG) {
+	//	$f = sprintf('%s/controller/%s/transfer-accept.php', APP_ROOT, $_SESSION['rbe-base']);
+	//	$RES = require_once($f);
+	//	return $RES;
+	//});
 
-//	$this->get('/export', function($REQ, $RES, $ARG) {
-//		die('Search Transfers Inbound');
-//	});
-//
-//	$this->get('/import', function($REQ, $RES, $ARG) {
-//		die('Search Transfers Outbound');
-//	});
-//
-//	$this->get('/reject', function($REQ, $RES, $ARG) {
-//		die('Search Transfers Outbound');
-//	});
-
-})->add('App\Middleware\RCE')->add('App\Middleware\Session');
-
-$app->group('/transfer/incoming', function() {
-
-	$this->get('', function($REQ, $RES, $ARG) {
+	/*
+		Incoming Transfers
+	*/
+	$this->get('/incoming', function($REQ, $RES, $ARG) {
 		$RES = new Response_From_File();
 		return $RES->execute(sprintf('%s/transfer/incoming/search.php', $_SESSION['rbe-base']), $ARG);
 	});
 
-});
 
+	/*
+		Rejected Transfers
+	*/
+	$this->get('/rejected', function($REQ, $RES, $ARG) {
+		$RES = new Response_From_File();
+		return $RES->execute(sprintf('%s/transfer/rejected/search.php', $_SESSION['rbe-base']), $ARG);
+	});
+
+})->add('App\Middleware\RCE')->add('App\Middleware\Session');
 
 
 // Retail Sales
