@@ -5,7 +5,7 @@
 
 namespace App\Module;
 
-class Config
+class Lot
 {
 	protected $_container;
 
@@ -27,12 +27,12 @@ class Config
 			return _from_rce_file('lot/search.php', $RES, $ARG);
 		});
 
-		//	$this->post('/', function($REQ, $RES, $ARG) {
+		//	$a->post('/', function($REQ, $RES, $ARG) {
 		//		die('Create Inventory');
 		//	});
 		//
 		//	// Combine Inventory to a new Type
-		//	$this->post('/combine', function($REQ, $RES, $ARG) {
+		//	$a->post('/combine', function($REQ, $RES, $ARG) {
 		//		return $RES->withJson(array(
 		//			'ulid' => ULID::generate(), // '1234567890123456',
 		//			'weight' => 123.45,
@@ -42,7 +42,7 @@ class Config
 		//	});
 		//
 		//	// Convert Inventory to a new Type
-		//	$this->post('/convert', function($REQ, $RES, $ARG) {
+		//	$a->post('/convert', function($REQ, $RES, $ARG) {
 		//		return $RES->withJson(array(
 		//			'code' => '123456',
 		//			'weight' => '',
@@ -56,17 +56,17 @@ class Config
 		//
 
 		// View Item
-		$this->get('/{guid}', function($REQ, $RES, $ARG) {
+		$a->get('/{guid}', function($REQ, $RES, $ARG) {
 			return _from_rce_file('lot/single.php', $RES, $ARG);
 		});
 
 		//	// Update Item
-		//	$this->post('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
+		//	$a->post('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
 		//		die('Update Inventory Item');
 		//	});
 		//
 		//	// Delete Item
-		//	$this->delete('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
+		//	$a->delete('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
 		//		// First send a 202, Pending
 		//		// Second send a 204, Deleted/No Content
 		//		die('Update Inventory Item');

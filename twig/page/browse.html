@@ -5,6 +5,7 @@
 <h1>Pipe Interface</h1>
 <p>Browse the object-interfaces available via the <em>pipe</em> service</p>
 
+
 <div class="mb-4">
 <h2>Auth</h2>
 <ul class="list-group">
@@ -20,8 +21,24 @@
 </ul>
 </div>
 
-<div class="mb-4">
 
+<div class="mb-4">
+<h2>Selected License</h2>
+<form action="/auth/open" method="post">
+<div class="form-group">
+<div class="input-group">
+	<input class="form-control" name="license" value="{{ rbe_meta_license }}">
+	<div class="input-group-append">
+		<button class="btn btn-outline-secondary" name="a" value="set-license"><i class="fa fa-save"></i></button>
+	</div>
+</div>
+<span class="form-text">These systems require a license for many, if not all API calls, see /license for possible values.</span>
+</div>
+</form>
+</div>
+
+
+<div class="mb-4">
 <h2>Configuration Data</h2>
 <p>The Config module will allow you to load various core-data from the RCE.</p>
 
@@ -30,6 +47,8 @@
 	<div><a href="/config/company">/company</a> - Your Company Information</div>
 	<div>
 		<span class="badge badge-success">BioTrack</span>
+		<span class="badge badge-danger">LeafData</span>
+		<span class="badge badge-danger">METRC</span>
 	</div>
 </li>
 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -66,7 +85,7 @@
 	</div>
 </li>
 <li class="list-group-item d-flex justify-content-between align-items-center">
-	<div><a href="/config/strain">/zone</a> - Strains and strain details</div>
+	<div><a href="/config/strain">/strain</a> - Strains and strain details</div>
 	<div>
 		<span class="badge badge-warning">BioTrack</span>
 		<span class="badge badge-success">LeafData</span>
@@ -92,7 +111,6 @@
 
 
 <div class="mb-4">
-
 <h2>Crop / Plants</h2>
 <p>Plants, Plants in Rooms, Harvest (wet-collect) and Cure (dry-collect) operations.</p>
 
@@ -110,7 +128,6 @@
 
 
 <div class="mb-4">
-
 <h2>Inventory / Lots</h2>
 <p>Bulk Materials, Conversion, Production Lots, Conversion (again), Packaged Lots</p>
 
@@ -134,7 +151,6 @@
 
 
 <div class="mb-4">
-
 <h2>Quality Assurance</h2>
 <p>QA Samples and Results</p>
 
@@ -151,7 +167,6 @@
 </div>
 
 <div class="mb-4">
-
 <h2>Transfers / Wholesale Sales</h2>
 <p>Transfers, Manifests, Incoming (and Commit) and Outgoing (and Accept)</p>
 
@@ -185,9 +200,8 @@
 
 
 <div class="mb-4">
-
 <h2>Retail Sales</h2>
-<p>...</p>
+<p>Individual Sales Transaction Records</p>
 
 <ul class="list-group">
 <li class="list-group-item d-flex justify-content-between align-items-center">
