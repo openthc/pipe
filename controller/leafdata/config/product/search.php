@@ -6,18 +6,20 @@
 
 use Edoceo\Radix\DB\SQL;
 
+$ret_code = 304;
+
 $obj_name = 'product';
 
 $sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);
 SQL::init('sqlite:' . $sql_file);
 
 $dt0 = $_SERVER['REQUEST_TIME'];
-$sql = sprintf("SELECT val FROM cfg_app WHERE key = 'sync-{$obj_name}-time'");
+$sql = sprintf("SELECT val FROM _config WHERE key = 'sync-{$obj_name}-time'");
 $dt1 = intval(SQL::fetch_one($sql));
 $age = $dt0 - $dt1;
 if ($age >= 240) {
 
-	$sql = "SELECT guid, hash FROM cfg_{$obj_name}";
+	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
 	$rbe = \RCE::factory($_SESSION['rbe']);
@@ -38,7 +40,7 @@ if ($age >= 240) {
 	$res_cached = array();
 	$res_source = array();
 
-	$sql = "SELECT hash, meta FROM cfg_{$obj_name}";
+	$sql = "SELECT hash, meta FROM {$obj_name}";
 	$res = SQL::fetch_all($sql);
 
 	foreach ($res as $rec) {
@@ -75,7 +77,7 @@ foreach ($res_source as $src) {
 
 		unset($src['hash']);
 
-		$sql = "INSERT OR REPLACE INTO cfg_{$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
+		$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
 		$arg = array(
 			':guid' => $src['global_id'],
 			':hash' => $rec['hash'],
@@ -91,52 +93,18 @@ foreach ($res_source as $src) {
 }
 
 $arg = array("sync-{$obj_name}-time", time());
-SQL::query("INSERT OR REPLACE INTO cfg_app (key, val) VALUES (?, ?)", $arg);
+SQL::query("INSERT OR REPLACE INTO _config (key, val) VALUES (?, ?)", $arg);
 
 return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $ret,
-));
+), $ret_code, JSON_PRETTY_PRINT);
 
 
-//$rls = new RBE_LeafData_Sync($rbe);
-//$rlsp = new RBE_LeafData_Sync_Product($rls, $rbe);
-//$res = $rlsp->all();
-
-$page_cur = 1;
-$page_max = 1;
-
-while ($page_cur <= $page_max) {
-
-	$res = $rbe->inventory_type()->all(array('page' => $page_cur));
-
-	// Triple Retry?
-	if ('success' != $res['status']) {
-		syslog(LOG_ERR, $this->_rbe->formatError($res));
-	}
-
-	foreach ($res['result']['data'] as $x) {
-
-		$x = RBE_LeafData::de_fuck($x);
-
-		$rec = array();
-		$rec['package'] = array(
-			'size' => floatval($x['net_weight']),
-			'unit' => $x['uom'],
-		);
-		$rec['created_at'] = $x['created_at'];
-		//$rec['_src'] = $x;
-		$rec = _product_type_verify($rec);
-		$ret[] = $rec;
-	}
-
-	$page_cur++;
-	$page_max = $res['result']['last_page'];
-}
-
-//$REQ = $REQ->withAttribute('status', 'success');
-//$REQ = $REQ->withAttribute('result', $ret);
-
+/**
+	Determine if the value-pair is correct from a hard-coded map
+	@return modified input data-array, with _warn attribute (maybe)
+*/
 function _product_type_verify($rec)
 {
 	//if (empty($rec['type'])) {

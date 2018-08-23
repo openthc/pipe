@@ -5,9 +5,9 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$obj_name = 'lot';
-
 $ret_code = 304;
+
+$obj_name = 'lot';
 
 $sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);
 SQL::init('sqlite:' . $sql_file);

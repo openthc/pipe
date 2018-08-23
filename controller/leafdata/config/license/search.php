@@ -77,6 +77,7 @@ foreach ($res_source as $src) {
 		'guid' => $src['global_id'],
 		'hash' => $src['hash'],
 		'phone' => $src['phone'],
+		'company' => $src['certificate_number'],
 		'address' => array(
 			'line1' => $src['address1'],
 			'line2' => $src['address2'],
