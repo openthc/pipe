@@ -93,7 +93,7 @@ class Open
 			$data['rbe_meta_client_api_key'] = $_SESSION['rbe-auth']['secret'];
 		}
 
-		return $this->_c->view->render($RES, 'page/auth-form.html', $data);
+		return $this->_c->view->render($RES, 'page/auth.html', $data);
 
 	}
 

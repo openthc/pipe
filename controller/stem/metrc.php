@@ -24,8 +24,8 @@ $rce_host = parse_url($rce_base, PHP_URL_HOST);
 
 
 // Auth
-$RES = _do_auth($RES);
-if (200 != $RES->getStatus()) {
+$RES = _req_auth($RES);
+if (200 != $RES->getStatusCode()) {
 	return $RES;
 }
 
@@ -42,14 +42,14 @@ if (!$sql_good) {
 
 
 // Resolve Path
-$src_path = $_SERVER['REQUEST_URI']; // Contains Query String
-$src_path = str_replace('/stem/metrc/', null, $src_path);
+$req_path = $_SERVER['REQUEST_URI']; // Contains Query String
+$req_path = str_replace('/stem/metrc', null, $req_path);
 
-switch ($src_path) {
+// A cheap-ass, incomplete filter
+switch ($req_path) {
 case '/harvests/v1/active':
 case '/harvests/v1/onhold':
 case '/harvests/v1/inactive':
-case '/items/v1/categories':
 case '/packages/v1/active':
 case '/patients/v1/active':
 case '/plantbatches/v1/active':
@@ -61,6 +61,7 @@ case '/sales/v1/receipts':
 		// Fatal?
 		return $RES->withJSON(array(
 			'status' => 'failure',
+			'origin' => 'openthc',
 			'detail' => 'The License Number parameter must be supplied',
 		), 400, JSON_PRETTY_PRINT);
 	}
@@ -68,11 +69,9 @@ case '/sales/v1/receipts':
 	break;
 }
 
-$src_json = file_get_contents('php://input');
-
-$req_path = $rce_base . '/' . $src_path;
-
-$rce_http = new RCE_HTTP();
+$rce_http = new RCE_HTTP(array(
+	'base_uri' => $rce_base
+));
 
 
 // Forward
@@ -80,8 +79,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
 case 'GET':
 
 	$req = new GuzzleHttp\Psr7\Request('GET', $req_path);
-	$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
 	$req = $req->withHeader('host', $rce_host);
+	$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
 
 	$res = $rce_http->send($req);
 
@@ -90,8 +89,10 @@ case 'GET':
 case 'POST':
 
 	$req = new GuzzleHttp\Psr7\Request('POST', $req_path);
-	$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
 	$req = $req->withHeader('host', $rce_host);
+	$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
+
+	$src_json = file_get_contents('php://input');
 
 	$res = $rce_http->send($req, array('json' => $src_json));
 
@@ -100,9 +101,10 @@ case 'POST':
 
 // var_dump($res);
 $code = ($res ? $res->getStatusCode() : 500);
-$body = ($res ? $res->getBody()->__toString() : null);
+$body = ($res ? $res->getBody() : null);
 
 $RES = $RES->withStatus($code);
+$RES = $RES->withHeader('content-type', $res->getHeader('content-type'));
 $RES = $RES->write($body);
 
 return $RES;
@@ -111,19 +113,19 @@ return $RES;
 /**
 	Authentication Validator
 */
-function _do_auth($RES)
+function _req_auth($RES)
 {
 	$auth = $_SERVER['HTTP_AUTHORIZATION'];
 
 	if (empty($auth)) {
-		_exit_json(array(
+		return $RES->withJSON(array(
 			'status' => 'failure',
 			'detail' => 'Invalid Auth [CSM#030]',
 		), 400);
 	}
 
 	if (!preg_match('/^Basic\s+(.+)$/', $auth, $m)) {
-		_exit_json(array(
+		return $RES->withJSON(array(
 			'status' => 'failure',
 			'detail' => 'Invalid Auth [CSM#037]',
 		), 400);

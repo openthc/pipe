@@ -29,17 +29,23 @@ class RCE_HTTP extends \GuzzleHttp\Client
 
 	}
 
-	function __construct()
+	function __construct($opt = null)
 	{
 		$chs = $this->_makeClientHandlerStack();
 
-		parent::__construct(array(
+		$cfg = array(
 			'handler' => $chs,
 			'headers' => array(
 				'user-agent' => 'OpenTHC/420.18.230 (Pipe-Stem)',
 			),
 			'http_errors' => false
-		));
+		);
+
+		if (is_array($opt)) {
+			$cfg = array_merge($cfg, $opt);
+		}
+
+		parent::__construct($cfg);
 
 	}
 

@@ -8,8 +8,9 @@
 $rbe = \RCE::factory($_SESSION['rbe']);
 
 // /items/v1/categories
-$res = $rbe->packageList('active');
-print_r($res);
+$res = $rbe->itemList('active');
+//$res = $rbe->packageList('active');
+
 
 foreach ($res['result'] as $x) {
 

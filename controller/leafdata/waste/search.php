@@ -1,6 +1,7 @@
 <?php
 /**
-	Return List of QA Result Data
+	Return a List of Waste objects
+	LeafData calls this a Disposal
 */
 
 
@@ -8,7 +9,6 @@ $rbe = \RCE::factory($_SESSION['rbe']);
 
 $res = $rbe->disposal()->all();
 
-$RES = new Response_JSON();
 return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $res['result']['data'],

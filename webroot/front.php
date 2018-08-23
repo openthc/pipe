@@ -43,9 +43,7 @@ $app->group('/auth', function() {
 
 	//$this->get('', 'App\Controller\Ping');
 	$this->get('/ping', function($REQ, $RES, $ARG) {
-		$f = sprintf('%s/controller/%s/ping.php', APP_ROOT, $_SESSION['rbe-base']);
-		$RES = require_once($f);
-		return $RES;
+		return _from_rce_file('ping.php', $RES, $ARG);
 	})->add('App\Middleware\RCE');
 
 	$this->any('/shut', 'App\Controller\Auth\Shut');

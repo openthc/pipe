@@ -1,6 +1,6 @@
 <?php
 /**
-
+	Return a List of Outgoing Transfer Objects
 */
 
 

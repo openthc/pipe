@@ -1,7 +1,13 @@
 <?php
 /**
-	Return List of QA Result Data
+	Return a List of QA Result Data
 */
+
+use Edoceo\Radix\DB\SQL;
+
+$ret_code = 200;
+
+$obj_name = 'qa';
 
 
 $rbe = \RCE::factory($_SESSION['rbe']);
