@@ -211,13 +211,11 @@ $app->group('/sale', function() {
 $app->group('/waste', function() {
 
 	$this->get('', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/waste/search.php', $_SESSION['rbe-base']), $ARG);
+		return _from_rce_file('waste/search.php', $RES, $ARG);
 	});
 
 	$this->get('/{guid}', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/waste/single.php', $_SESSION['rbe-base']), $ARG);
+		return _from_rce_file('waste/single.php', $RES, $ARG);
 	});
 
 })->add('App\Middleware\RCE')->add('App\Middleware\Session');
