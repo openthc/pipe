@@ -1,48 +1,38 @@
 <?php
 /**
 	Stem pass-thru handler for METRC systems
+	Accept the Request, Sanatize It, Process Response and Sanatize Objects
 
 	To use the Passthru Configure this as the URL Base
 
 	https://pipe.openthc.com/stem/metrc
 
 	Forward to:
-	protected $_rbe_base = 'https://sandbox-api-ca.metrc.com/api/v1';
-	protected $_rbe_host = 'traceability.lcb.wa.gov';
+		https://sandbox-api-ca.metrc.com/api/v1
 
 	Return Sanatized Response
 */
 
 use Edoceo\Radix\DB\SQL;
 
-$rce_host = 'https://sandbox-api-ca.metrc.com';
-//$rce_host = 'http://localhost:8080';
-//if (!empty($_SERVER['HTTP_OPENTHC_RCE'])) {
+$rce_base = 'https://sandbox-api-ca.metrc.com';
+//$rce_base = 'http://localhost:8080';
+//if (!empty($_SERVER['HTTP_OPENTHC_RCE_BASE'])) {
+//	$rce_base = $_SERVER['HTTP_OPENTHC_RCE_BASE'];
 //}
+$rce_host = parse_url($rce_base, PHP_URL_HOST);
 
 
 // Auth
-$auth = $_SERVER['HTTP_AUTHORIZATION'];
-
-if (empty($auth)) {
-	_exit_json(array(
-		'status' => 'failure',
-		'detail' => 'Invalid Auth [CSM#030]',
-	), 400);
+$RES = _do_auth($RES);
+if (200 != $RES->getStatus()) {
+	return $RES;
 }
 
-if (!preg_match('/^Basic\s+(.+)$/', $auth, $m)) {
-	_exit_json(array(
-		'status' => 'failure',
-		'detail' => 'Invalid Auth [CSM#037]',
-	), 400);
-}
 
-//$auth = base64_decode($auth);
-
-
-// Database for Logging
-$sql_file = sprintf('%s/var/stem-metric-%08x.sqlite', APP_ROOT, crc32($auth));
+// Database
+$sql_hash = crc32($_SERVER['HTTP_AUTHORIZATION']);
+$sql_file = sprintf('%s/var/stem-metric-%08x.sqlite', APP_ROOT, $sql_hash);
 $sql_good = is_file($sql_file);
 
 SQL::init('sqlite:' . $sql_file);
@@ -52,30 +42,48 @@ if (!$sql_good) {
 
 
 // Resolve Path
-//$src_path = basename($_SERVER['SCRIPT_URL']); // OR REQUEST_URI ??
 $src_path = $_SERVER['REQUEST_URI']; // Contains Query String
 $src_path = str_replace('/stem/metrc/', null, $src_path);
 
+switch ($src_path) {
+case '/harvests/v1/active':
+case '/harvests/v1/onhold':
+case '/harvests/v1/inactive':
+case '/items/v1/categories':
+case '/packages/v1/active':
+case '/patients/v1/active':
+case '/plantbatches/v1/active':
+case '/plants/v1/vegetative':
+case '/rooms/v1/active':
+case '/sales/v1/receipts':
+
+	if (empty($_GET['licenseNumber'])) {
+		// Fatal?
+		return $RES->withJSON(array(
+			'status' => 'failure',
+			'detail' => 'The License Number parameter must be supplied',
+		), 400, JSON_PRETTY_PRINT);
+	}
+
+	break;
+}
+
 $src_json = file_get_contents('php://input');
 
-$req_path = $rce_host . '/' . $src_path;
+$req_path = $rce_base . '/' . $src_path;
 
-//if (!empty($_SERVER['QUERY_STRING'])) {
-//	$req_path.= '?' . $_SERVER['QUERY_STRING'];
-//}
-
-$rce = new RCE_HTTP();
+$rce_http = new RCE_HTTP();
 
 
-// echo $req_path;
+// Forward
 switch ($_SERVER['REQUEST_METHOD']) {
 case 'GET':
 
 	$req = new GuzzleHttp\Psr7\Request('GET', $req_path);
 	$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
-	$req = $req->withHeader('host', 'sandbox-api-ca.metrc.com');
+	$req = $req->withHeader('host', $rce_host);
 
-	$res = $rce->send($req);
+	$res = $rce_http->send($req);
 
 	break;
 
@@ -83,17 +91,43 @@ case 'POST':
 
 	$req = new GuzzleHttp\Psr7\Request('POST', $req_path);
 	$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
-	$req = $req->withHeader('host', 'sandbox-api-ca.metrc.com');
+	$req = $req->withHeader('host', $rce_host);
 
-	$res = $rce->send($req, array('json' => $src_json));
+	$res = $rce_http->send($req, array('json' => $src_json));
 
 	break;
 }
 
 // var_dump($res);
-$code = ($res ? $res->getStatusCode() : 0);
+$code = ($res ? $res->getStatusCode() : 500);
 $body = ($res ? $res->getBody()->__toString() : null);
 
-_exit_json($body, $code);
+$RES = $RES->withStatus($code);
+$RES = $RES->write($body);
 
-exit(0);
+return $RES;
+
+
+/**
+	Authentication Validator
+*/
+function _do_auth($RES)
+{
+	$auth = $_SERVER['HTTP_AUTHORIZATION'];
+
+	if (empty($auth)) {
+		_exit_json(array(
+			'status' => 'failure',
+			'detail' => 'Invalid Auth [CSM#030]',
+		), 400);
+	}
+
+	if (!preg_match('/^Basic\s+(.+)$/', $auth, $m)) {
+		_exit_json(array(
+			'status' => 'failure',
+			'detail' => 'Invalid Auth [CSM#037]',
+		), 400);
+	}
+
+	return $RES;
+}

@@ -32,6 +32,11 @@ class Config
 
 		});
 
+		// Product Type
+		$a->get('/license-type', function($REQ, $RES, $ARG) {
+			return _from_rce_file('config/license-type.php', $RES, $ARG);
+		});
+
 		// License
 		$a->group('/license', function() {
 

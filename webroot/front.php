@@ -76,8 +76,7 @@ $app->group('/config', 'App\Module\Config')->add('App\Middleware\RCE')->add('App
 $app->group('/plant', function() {
 
 	$this->get('', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/plant/search.php', $_SESSION['rbe-base']), $ARG);
+		return _from_rce_file('plant/search.php', $RES, $ARG);
 	});
 
 	//$this->post('', function($REQ, $RES, $ARG) {
@@ -104,67 +103,14 @@ $app->group('/plant', function() {
 
 
 // Inventory Group
-$app->group('/lot', function() {
-
-	$this->get('', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/lot/search.php', $_SESSION['rbe-base']), $ARG);
-	});
-
-//	$this->post('/', function($REQ, $RES, $ARG) {
-//		die('Create Inventory');
-//	});
-//
-//	// Combine Inventory to a new Type
-//	$this->post('/combine', function($REQ, $RES, $ARG) {
-//		return $RES->withJson(array(
-//			'ulid' => ULID::generate(), // '1234567890123456',
-//			'weight' => 123.45,
-//			'weight_unit' => 'g',
-//			'quantity' => 1,
-//		));
-//	});
-//
-//	// Convert Inventory to a new Type
-//	$this->post('/convert', function($REQ, $RES, $ARG) {
-//		return $RES->withJson(array(
-//			'code' => '123456',
-//			'weight' => '',
-//			'weight_unit' => 123.45,
-//			'quantity' => 1,
-//		));
-//	})->add(function($req, $RES) {
-//		// Enfore Type => Type Rules
-//		//die(print_r($_POST));
-//	});
-//
-//	// View Item
-	$this->get('/{guid}', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/lot/single.php', $_SESSION['rbe-base']), $ARG);
-	});
-//
-//	// Update Item
-//	$this->post('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-//		die('Update Inventory Item');
-//	});
-//
-//	// Delete Item
-//	$this->delete('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-//		// First send a 202, Pending
-//		// Second send a 204, Deleted/No Content
-//		die('Update Inventory Item');
-//	});
-//
-})->add('App\Middleware\RCE')->add('App\Middleware\Session');
+$app->group('/lot', 'App\Module\Lot')->add('App\Middleware\RCE')->add('App\Middleware\Session');
 
 
 // QA Group
 $app->group('/qa', function() {
 
 	$this->get('', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/qa/search.php', $_SESSION['rbe-base']), $ARG);
+		return _from_rce_file('qa/search.php', $RES, $ARG);
 	});
 
 	$this->get('/{guid}', function($REQ, $RES, $ARG) {
@@ -198,8 +144,7 @@ $app->group('/qa', function() {
 $app->group('/transfer', function() {
 
 	$this->get('/outgoing', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/transfer/outgoing/search.php', $_SESSION['rbe-base']), $ARG);
+		return _from_rce_file('transfer/outgoing/search.php', $RES, $ARG);
 	});
 
 	//$this->get('/outgoing/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
@@ -218,8 +163,7 @@ $app->group('/transfer', function() {
 		Incoming Transfers
 	*/
 	$this->get('/incoming', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/transfer/incoming/search.php', $_SESSION['rbe-base']), $ARG);
+		return _from_rce_file('transfer/incoming/search.php', $RES, $ARG);
 	});
 
 
@@ -227,8 +171,7 @@ $app->group('/transfer', function() {
 		Rejected Transfers
 	*/
 	$this->get('/rejected', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/transfer/rejected/search.php', $_SESSION['rbe-base']), $ARG);
+		return _from_rce_file('transfer/rejected/search.php', $RES, $ARG);
 	});
 
 })->add('App\Middleware\RCE')->add('App\Middleware\Session');

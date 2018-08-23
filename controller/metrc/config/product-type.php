@@ -3,12 +3,22 @@
 	Return a List of Licenses
 */
 
-
-
 $rbe = \RCE::factory($_SESSION['rbe']);
 
 // /items/v1/categories
-$res = $rbe->itemCategoryList();
+try {
+	$res = $rbe->itemCategoryList();
+} catch (Exception $e) {
+	if (401 == $e->getCode()) {
+		//return $RES->withJSON(array(
+		_exit_json(array(
+			'status' => 'failure',
+			'detail' => 'Not Allowed',
+		), 401);
+	}
+
+	throw $e;
+}
 
 
 // /packages/v1/types
