@@ -18,7 +18,6 @@
 		"ext-curl": "*",
 		"ext-date": "*",
 		"ext-json": "*",
-		"ext-mcrypt": "*",
 		"ext-PDO": "*",
 		"ext-session": "*",
 		"ext-sockets": "*",

@@ -10,7 +10,7 @@ define('APP_SALT', md5(APP_NAME . APP_SITE));
 
 openlog('openthc-pipe', LOG_ODELAY|LOG_PID, LOG_LOCAL0);
 
-error_reporting((E_ALL|E_STRICT) ^ E_NOTICE);
+error_reporting(E_ALL & ~ E_NOTICE);
 
 // My (crappy) AutoLoader
 spl_autoload_register(function($c) {

@@ -99,5 +99,5 @@ SQL::query("INSERT OR REPLACE INTO _config (key, val) VALUES (?, ?)", $arg);
 
 return $RES->withJSON(array(
 	'status' => 'success',
-	'result' => $res['result']['data'],
+	'result' => $ret,
 ), $ret_code, JSON_PRETTY_PRINT);
