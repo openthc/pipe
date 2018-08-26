@@ -74,17 +74,17 @@ class RCE
 				$rce->setTestMode();
 				break;
 			case 'nv':
-				$rce = new RBE_Metrc_Nevada($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_NV($_SESSION['rbe-auth']);
 				break;
 			case 'nv-test':
-				$rce = new RBE_Metrc_Nevada($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_NV($_SESSION['rbe-auth']);
 				$rce->setTestMode();
 				break;
 			case 'or':
-				$rce = new RBE_Metrc_Oregon($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_OR($_SESSION['rbe-auth']);
 				break;
 			case 'or-test':
-				$rce = new RBE_Metrc_Oregon($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_OR($_SESSION['rbe-auth']);
 				$rce->setTestMode();
 				break;
 			}
