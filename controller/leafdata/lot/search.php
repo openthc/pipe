@@ -9,91 +9,69 @@ $ret_code = 304;
 
 $obj_name = 'lot';
 
-$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);
-SQL::init('sqlite:' . $sql_file);
+$age = RCE_Sync::age($obj_name);
 
-$dt0 = $_SERVER['REQUEST_TIME'];
-$dt1 = intval(SQL::fetch_one("SELECT val FROM _config WHERE key = 'sync-{$obj_name}-time'"));
-$age = $dt0 - $dt1;
 
+// Load Cache Data
+$sql = "SELECT guid, hash FROM {$obj_name}";
+$res_cached = SQL::fetch_mix($sql);
+
+
+// Load Fresh Data?
 if ($age >= 240) {
 
-	$res_cached = SQL::fetch_mix("SELECT guid, hash FROM {$obj_name}");
+	$rce = \RCE::factory($_SESSION['rbe']);
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$res_source = new RCE_Iterator_LeafData($rce->inventory());
 
-	$res_source = $rbe->inventory()->all();
-	if ('success' != $res_source['status']) {
-		return $RES->withJSON(array(
-			'status' => 'failure',
-			'detail' => $rbe->formatError($res_source),
-		), 500);
+	foreach ($res_source as $src) {
+
+		$hash = _hash_obj($src);
+
+		if ($hash != $res_cached[ $src['global_id'] ]) {
+
+			$idx_update++;
+
+			$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
+			$arg = array(
+				':guid' => $src['global_id'],
+				':hash' => $hash,
+				':meta' => json_encode($src),
+			);
+
+			SQL::query($sql, $arg);
+
+		}
 	}
 
-	$res_source = $res_source['result']['data'];
-
-} else {
-
-	$res_cached = array();
-	$res_source = array();
-
-	$res = SQL::fetch_all("SELECT hash, meta FROM {$obj_name}");
-
-	foreach ($res as $rec) {
-
-		$x = json_decode($rec['meta'], true);
-		$x['hash'] = $rec['hash'];
-
-		$res_cached[ $x['global_id'] ] = $x['hash'];
-		$res_source[] = $x;
-	}
+	$RES = $RES->withHeader('x-openthc-update', $idx_update);
 
 }
 
-$ret = array();
 
-foreach ($res_source as $src) {
+// Now Fetch all from DB and Send Back
+$res_output = array();
+$sql = "SELECT guid, hash, meta FROM {$obj_name} ORDER BY guid DESC";
+$res_source = SQL::fetch_all($sql);
+foreach ($res_source as $rec) {
 
-	if (empty($src['hash'])) {
-		$src['hash'] = _hash_obj($src);
-	}
-
-	$rec = array(
-		//'name' => trim($src['name']),
-		//'code' => trim($src['external_id']),
-		'guid' => $src['global_id'],
-		'hash' => $src['hash'],
-		//'_source' => $src,
-		// '_update' => 0,
+	$out = array(
+		'guid' => $rec['guid'],
+		'hash' => $rec['hash'],
 	);
 
-	if ($rec['hash'] != $res_cached[ $rec['guid'] ]) {
-
-		unset($src['hash']);
-
-		$ret_code = 200;
-
-		$rec['_source'] = $src;
-		$rec['_updated'] = 1;
-
-		$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
-		$arg = array(
-			':guid' => $src['global_id'],
-			':hash' => $rec['hash'],
-			':meta' => json_encode($src),
-		);
-		SQL::query($sql, $arg);
-
+	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
+		$out['_updated'] = 1;
+		$out['_source'] = json_decode($rec['meta'], true);
 	}
 
-	$ret[] = $rec;
+	$res_output[] = $out;
 
 }
 
-$arg = array("sync-{$obj_name}-time", time());
-SQL::query("INSERT OR REPLACE INTO _config (key, val) VALUES (?, ?)", $arg);
+RCE_Sync::age($obj_name, time());
 
 return $RES->withJSON(array(
 	'status' => 'success',
-	'result' => $ret,
+	'result' => $res_output,
 ), $ret_code, JSON_PRETTY_PRINT);

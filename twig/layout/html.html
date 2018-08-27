@@ -1,22 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="HandheldFriendly" content="True">
-<meta name="MobileOptimized" content="320">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="viewport" content="initial-scale=1, user-scalable=yes">
-<meta name="application-name" content="OpenTHC">
-<meta name="apple-mobile-web-app-title" content="OpenTHC">
-<meta name="msapplication-TileColor" content="#003100">
-<meta name="theme-color" content="#003100">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" integrity="sha256-rByPlHULObEjJ6XQxW/flG2r+22R5dKiAoef+aXWfik=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha256-zVUlvIh3NEZRYa9X/qpNY8P1aBy0d4FrI7bhfZSZVwc=" crossorigin="anonymous" />
-<title>Pipe - OpenTHC</title>
-</head>
-<body>
+{% extends "layout/html-base.html" %}
+
+{% block html_body %}
 
 <div class="container">
 
@@ -25,15 +9,12 @@
 
 </div>
 
-{# include "block/footer-zero.html" #}
+{% block foot_script %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha256-KM512VNnjElC30ehFwehXjx1YCHPiQkOPmqnrWtpccM=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/js/bootstrap.bundle.min.js" integrity="sha256-5iSSZuqS9gu7Z8M4AidY5PWt+8rGDE1X3Rapsl9Ik0M=" crossorigin="anonymous"></script>
+{{ parent() }}
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.8.1/riot+compiler.min.js" integrity="sha256-ITtxm3nGHAHRenI3AkyPmPaPY+8bkFX9+f/3jAtoNPw=" crossorigin="anonymous"></script>
 
-{% block foot_script %}
 {% endblock %}
 
-</body>
-</html>
+{% endblock %}

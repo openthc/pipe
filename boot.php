@@ -8,6 +8,8 @@ define('APP_SITE', 'https://pipe.openthc.org');
 define('APP_ROOT', dirname(__FILE__));
 define('APP_SALT', md5(APP_NAME . APP_SITE));
 
+define('APP_BUILD', '420.18.238');
+
 openlog('openthc-pipe', LOG_ODELAY|LOG_PID, LOG_LOCAL0);
 
 error_reporting(E_ALL & ~ E_NOTICE);
@@ -27,6 +29,7 @@ spl_autoload_register(function($c) {
 require_once(APP_ROOT . '/vendor/autoload.php');
 require_once(APP_ROOT . '/lib/RCE.php');
 require_once(APP_ROOT . '/lib/RCE_HTTP.php');
+require_once(APP_ROOT . '/lib/RCE_Sync.php');
 
 function _from_rce_file($f, $RES, $ARG)
 {
@@ -60,7 +63,6 @@ function _hash_obj($o)
 	$hash = sha1(json_encode($o));
 	return $hash;
 }
-
 
 
 class App
