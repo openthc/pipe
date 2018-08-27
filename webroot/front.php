@@ -179,8 +179,7 @@ $app->group('/transfer', function() {
 $app->group('/sale', function() {
 
 	$this->get('', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/retail/search.php', $_SESSION['rbe-base']), $ARG);
+		return _from_rce_file('retail/search.php', $RES, $ARG);
 	});
 
 	$this->post('', function($REQ, $RES, $ARG) {

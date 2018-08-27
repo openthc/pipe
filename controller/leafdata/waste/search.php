@@ -1,7 +1,6 @@
 <?php
 /**
-	Return a List of Waste objects
-	LeafData calls this a Disposal
+	Return a List of Waste (disposal)
 */
 
 use Edoceo\Radix\DB\SQL;
@@ -10,94 +9,74 @@ $ret_code = 304;
 
 $obj_name = 'waste';
 
-$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);
-SQL::init('sqlite:' . $sql_file);
+$age = RCE_Sync::age($obj_name);
 
-$dt0 = $_SERVER['REQUEST_TIME'];
-$sql = sprintf("SELECT val FROM _config WHERE key = 'sync-{$obj_name}-time'");
-$dt1 = intval(SQL::fetch_one($sql));
-$age = $dt0 - $dt1;
 
+// Load Cache Data
+$sql = "SELECT guid, hash FROM {$obj_name}";
+$res_cached = SQL::fetch_mix($sql);
+
+
+// Load Fresh Data?
 if ($age >= 240) {
 
-	$sql = "SELECT guid, hash FROM {$obj_name}";
-	$res_cached = SQL::fetch_mix($sql);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$res_source = new RCE_Iterator_LeafData($rce->disposal());
 
-	$res_source = $rbe->disposal()->all();
-	if ('success' != $res_source['status']) {
-		return $RES->withJSON(array(
-			'status' => 'failure',
-			'detail' => $rbe->formatError($res_source),
-		), 500);
+	foreach ($res_source as $src) {
+
+		$hash = _hash_obj($src);
+
+		if ($hash != $res_cached[ $src['global_id'] ]) {
+
+			$idx_update++;
+
+			$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
+			$arg = array(
+				':guid' => $src['global_id'],
+				':hash' => $hash,
+				':meta' => json_encode($src),
+			);
+
+			SQL::query($sql, $arg);
+
+		}
 	}
 
-	$res_source = $res_source['result']['data'];
-
-} else {
-
-	// From Cache
-	$res_cached = array();
-	$res_source = array();
-
-	$sql = "SELECT hash, meta FROM {$obj_name}";
-	$res = SQL::fetch_all($sql);
-
-	foreach ($res as $rec) {
-
-		$x = json_decode($rec['meta'], true);
-		$x['hash'] = $rec['hash'];
-
-		$res_cached[ $x['global_id'] ] = $x['hash'];
-		$res_source[] = $x;
-	}
+	$RES = $RES->withHeader('x-openthc-update', $idx_update);
 
 }
+//echo "Count Cache: " . count($res_cached) . "\n";
+//echo "Count Fresh: $idx_source\n";
 
-$ret = array();
+
+// Now Fetch all from DB and Send Back
+$res_output = array();
+$sql = "SELECT guid, hash, meta FROM {$obj_name} ORDER BY guid DESC";
+$res_source = SQL::fetch_all($sql);
 
 foreach ($res_source as $src) {
 
-	if (empty($src['hash'])) {
-		$src['hash'] = _hash_obj($src);
-	}
-
-	$rec = array(
-		'name' => trim($src['name']),
-		//'code' => trim($src['external_id']),
-		'guid' => $src['global_id'],
+	$out = array(
+		'guid' => $src['guid'],
 		'hash' => $src['hash'],
+		//'code' => trim($src['external_id']),
+		//'name' => sprintf('%s in %s', trim($src['strain_name']), trim($src['area_name'])),
 	);
 
-	if ($rec['hash'] != $res_cached[ $rec['guid'] ]) {
-
-		$ret_code = 200;
-
-		$rec['_source'] = $src;
-		$rec['_updated'] = 1;
-
-		unset($src['hash']);
-
-		$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
-		$arg = array(
-			':guid' => $src['global_id'],
-			':hash' => $rec['hash'],
-			':meta' => json_encode($src),
-		);
-
-		SQL::query($sql, $arg);
-
+	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
+		$out['_updated'] = 1;
+		$out['_source'] = json_decode($src['meta'], true);
 	}
 
-	$ret[] = $rec;
+	$res_output[] = $out;
 
 }
 
-$arg = array("sync-{$obj_name}-time", time());
-SQL::query("INSERT OR REPLACE INTO _config (key, val) VALUES (?, ?)", $arg);
+RCE_Sync::age($obj_name, time());
 
 return $RES->withJSON(array(
 	'status' => 'success',
-	'result' => $ret,
+	'result' => $res_output,
 ), $ret_code, JSON_PRETTY_PRINT);
