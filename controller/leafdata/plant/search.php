@@ -59,15 +59,15 @@ $res_source = SQL::fetch_all($sql);
 foreach ($res_source as $src) {
 
 	$out = array(
-		'guid' => $rec['guid'],
-		'hash' => $rec['hash'],
+		'guid' => $src['guid'],
+		'hash' => $src['hash'],
 		//'code' => trim($src['external_id']),
 		//'name' => sprintf('%s in %s', trim($src['strain_name']), trim($src['area_name'])),
 	);
 
 	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
 		$out['_updated'] = 1;
-		$out['_source'] = json_decode($rec['meta'], true);
+		$out['_source'] = json_decode($src['meta'], true);
 	}
 
 	$res_output[] = $out;
