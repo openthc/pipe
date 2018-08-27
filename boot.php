@@ -30,6 +30,8 @@ require_once(APP_ROOT . '/vendor/autoload.php');
 require_once(APP_ROOT . '/lib/RCE.php');
 require_once(APP_ROOT . '/lib/RCE_HTTP.php');
 require_once(APP_ROOT . '/lib/RCE_Sync.php');
+require_once(APP_ROOT . '/lib/RCE_Iterator.php');
+require_once(APP_ROOT . '/lib/RCE_Iterator_LeafData.php');
 
 function _from_rce_file($f, $RES, $ARG)
 {
