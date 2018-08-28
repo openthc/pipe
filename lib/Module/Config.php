@@ -60,8 +60,7 @@ class Config
 		});
 
 		//	$a->post('/{guid:[0-9a-f]+}/', function($REQ, $RES, $ARG) {
-		//		require_once(APP_ROOT . '/v2016/contacts/update.php');
-		//		return $RES;
+		//		return _from_rce_file('contacts/update.php', $RES, $ARG);
 		//	});
 
 		// Products
@@ -113,8 +112,7 @@ class Config
 		*/
 		// Search
 		$a->get('/vehicle', function($REQ, $RES, $ARG) {
-			//return _from_rce_file('vehicle/search.php', $RES, $ARG);
-			return _exit_501($RES);
+			return _from_rce_file('vehicle/search.php', $RES, $ARG);
 		});
 
 		// For Areas/Rooms/Zones

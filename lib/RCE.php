@@ -15,7 +15,7 @@ class RCE
 
 			$sid = $_SESSION['rbe-auth']['session'];
 
-			switch ($rbe['code']) {
+			switch ($cfg['code']) {
 			case 'hi':
 				$rce = new RBE_BioTrack_HI($sid);
 				break;
