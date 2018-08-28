@@ -1,13 +1,13 @@
 <?php
 /**
-	List of All Inventory & Inventory_Sample Objects
+	Return All Licenses (vendor, qa_lab, third_party_transporter)
 */
 
 use Edoceo\Radix\DB\SQL;
 
 $ret_code = 200;
 
-$obj_name = 'lot';
+$obj_name = 'license';
 
 $out_detail = array();
 $out_result = array();
@@ -25,17 +25,19 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rbe = \RCE::factory($_SESSION['rbe']);
 
-	// Load Inventory
-	$out_detail[] = 'Loading Inventory';
-	$res_source = $rbe->sync_inventory(array(
+	// Load Primary Licenses
+	$out_detail[] = 'Loading Licenses';
+	$res_source = $rbe->sync_vendor(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
 
 	if (1 == $res_source['success']) {
-		foreach ($res_source['inventory'] as $src) {
+		foreach ($res_source['vendor'] as $src) {
 
-			$guid = $src['id'];
+			//$src['_kind'] = RBE_Biotrack::$loc_type[$x['locationtype']]; // RBE_Biotrack'company';
+
+			$guid = sprintf('%s-%s', $src['ubi'], $src['location']);
 			$hash = _hash_obj($src);
 
 			if ($hash != $res_cached[ $guid ]) {
@@ -50,27 +52,57 @@ if ($age >= RCE_Sync::MAX_AGE) {
 		$out_detail[] = $res_source['error'];
 	}
 
-	// Load Inventory
-	$out_detail[] = 'Loading Inventory/Sample';
-	$res_source = $rbe->sync_inventory_sample(array(
+
+	// Load Labs
+	$out_detail[] = 'Loading Labs';
+	$res_source = $rbe->sync_qa_lab(array(
+		'min' => intval($_GET['min']),
+		'max' => intval($_GET['max']),
+	));
+	//_exit_json($res_source);
+
+	if (1 == $res_source['success']) {
+		foreach ($res_source['qa_lab'] as $src) {
+
+			$src['_kind'] = 'QA';
+
+			$guid = trim($src['location']);
+			$hash = _hash_obj($src);
+
+			if ($hash != $res_cached[ $guid ]) {
+
+				$idx_update++;
+
+				RCE_Sync::save($obj_name, $guid, $hash, $src);
+
+			}
+		}
+	} else {
+		$out_detail[] = $res_source['error'];
+	}
+
+
+	// Load Transporters
+	$out_detail[] = 'Loading Transporters';
+	$res_source = $rbe->sync_third_party_transporter(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
 
 	if (1 == $res_source['success']) {
-		if (!empty($res_source['inventory_sample'])) {
-			foreach ($res_source['inventory_sample'] as $src) {
+		foreach ($res_source['third_party_transporter'] as $src) {
 
-				$guid = $src['id'];
-				$hash = _hash_obj($src);
+			$src['_kind'] = 'Carrier';
 
-				if ($hash != $res_cached[ $guid ]) {
+			$guid = sprintf('%s-%s', $src['ubi'], $src['license_number']);
+			$hash = _hash_obj($src);
 
-					$idx_update++;
+			if ($hash != $res_cached[ $guid ]) {
 
-					RCE_Sync::save($obj_name, $guid, $hash, $src);
+				$idx_update++;
 
-				}
+				RCE_Sync::save($obj_name, $guid, $hash, $src);
+
 			}
 		}
 	} else {
@@ -78,6 +110,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	}
 
 	RCE_Sync::age($obj_name, time());
+
 }
 
 
@@ -122,44 +155,3 @@ return $RES->withJSON(array(
 	'detail' => $out_detail,
 	'result' => $out_result,
 ), $ret_code, JSON_PRETTY_PRINT);
-
-
-///////////////////////////////////////////////////////////////////////
-if (!empty($res['inventory'])) {
-	foreach ($res['inventory'] as $rec) {
-		$ret[] = array(
-			'guid' => $rec['id'],
-			'strain' => array('name' => $rec['strain']),
-			'product' => array(
-				'name' => $rec['productname'],
-				'type' => $rec['inventorytype'],
-				'unit' => array(
-					'type' => 'bulk',
-					'count' => $rec['remaining_quantity'],
-					'weight' => $rec['usable_weight'],
-				)
-			),
-			'_source' => $rec,
-		);
-	}
-}
-
-//$res = $rbe->sync_inventory_adjust(0);
-//switch ($res['success']) {
-//case 0:
-//	break;
-//case 1:
-//	if (!empty($res['inventory_adjust'])) {
-//		foreach ($res['inventory_adjust'] as $rec) {
-//			// $ret[] = $rec;
-//		}
-//	}
-//	break;
-//}
-
-// @todo Unify Ouput According to OpenTHC Specification
-
-return $RES->withJSON(array(
-	'status' => 'success',
-	'result' => $ret,
-), 200, JSON_PRETTY_PRINT);

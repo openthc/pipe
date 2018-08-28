@@ -1,18 +1,19 @@
 <?php
 /**
-	Return all QA Samples
+	Return All Companies
 */
 
 use Edoceo\Radix\DB\SQL;
 
 $ret_code = 200;
 
-$obj_name = 'qa';
+$obj_name = 'vehicle';
 
 $out_detail = array();
 $out_result = array();
 
 $age = RCE_Sync::age($obj_name);
+
 
 
 // Load Cache Data
@@ -25,17 +26,18 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rbe = \RCE::factory($_SESSION['rbe']);
 
-	// Load QA
-	$out_detail[] = 'Loading QA';
-	$res_source = $rbe->sync_inventory_qa_sample(array(
+
+	// Load Primary Licenses
+	$out_detail[] = 'Loading Vehicle';
+	$res_source = $rbe->sync_vehicle(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
 
-	if ((1 == $res_source['success']) && !empty($res_source['inventory_qa_sample'])) {
-		foreach ($res_source['inventory_qa_sample'] as $src) {
+	if (1 == $res_source['success']) {
+		foreach ($res_source['vehicle'] as $src) {
 
-			$guid = $src['id'];
+			$guid = $src['vehicle_id'];
 			$hash = _hash_obj($src);
 
 			if ($hash != $res_cached[ $guid ]) {
@@ -46,7 +48,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 			}
 		}
-	} elseif (!empty($res_source['error'])) {
+	} else {
 		$out_detail[] = $res_source['error'];
 	}
 
@@ -83,7 +85,7 @@ foreach ($res_source as $src) {
 	if ($add_source) {
 		$out['_source'] = json_decode($src['meta'], true);
 	}
-
+                                                                              
 	$out_result[] = $out;
 
 }

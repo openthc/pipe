@@ -3,9 +3,6 @@
 	Gets a QA Result
 */
 
-require_once(APP_ROOT . '/lib/RBE/BioTrack.php');
-require_once(APP_ROOT . '/lib/RBE/BioTrack/WA.php');
-
 $ret = array(
 	//'company' => 'Lab Company',
 	//'contact' => 'Lab Contact',
@@ -22,7 +19,7 @@ $ret = array(
 	),
 );
 
-$rbe = new RBE_Biotrack_WA($_SESSION['rbe-auth']);
+$rce = \RCE::factory($_SESSION['rbe']);
 
 //
 //$res = $rbe->sync_qa_lab(0);
@@ -39,7 +36,7 @@ $rbe = new RBE_Biotrack_WA($_SESSION['rbe-auth']);
 //}
 
 // First Results
-$res0 = $rbe->inventory_qa_check($_GET['code']);
+$res0 = $rce->inventory_qa_check($_GET['code']);
 switch ($res0['success']) {
 case 0:
 	return $RES->withJSON(array(
@@ -145,7 +142,7 @@ case 1:
 //}
 
 // Now the Check_All
-$res1 = $rbe->inventory_qa_check_all($_GET['code']);
+$res1 = $rce->inventory_qa_check_all($_GET['code']);
 switch ($res0['success']) {
 case 0:
 	break;

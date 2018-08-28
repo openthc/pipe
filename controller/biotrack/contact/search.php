@@ -1,13 +1,13 @@
 <?php
 /**
-	Return all QA Samples
+	Return All Contacts (Employee)
 */
 
 use Edoceo\Radix\DB\SQL;
 
 $ret_code = 200;
 
-$obj_name = 'qa';
+$obj_name = 'contact';
 
 $out_detail = array();
 $out_result = array();
@@ -25,17 +25,17 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rbe = \RCE::factory($_SESSION['rbe']);
 
-	// Load QA
-	$out_detail[] = 'Loading QA';
-	$res_source = $rbe->sync_inventory_qa_sample(array(
+	// Load Contacts
+	//$out_detail[] = 'Fetch Employee';
+	$res_source = $rbe->sync_employee(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
 
-	if ((1 == $res_source['success']) && !empty($res_source['inventory_qa_sample'])) {
-		foreach ($res_source['inventory_qa_sample'] as $src) {
+	if (1 == $res_source['success']) {
+		foreach ($res_source['employee'] as $src) {
 
-			$guid = $src['id'];
+			$guid = $src['employee_id'];
 			$hash = _hash_obj($src);
 
 			if ($hash != $res_cached[ $guid ]) {
@@ -46,7 +46,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 			}
 		}
-	} elseif (!empty($res_source['error'])) {
+	} else {
 		$out_detail[] = $res_source['error'];
 	}
 
