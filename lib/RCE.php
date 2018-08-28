@@ -8,29 +8,31 @@ class RCE
 	/**
 
 	*/
-	static function factory($rbe)
+	static function factory($cfg)
 	{
-		switch ($rbe['engine']) {
+		switch ($cfg['engine']) {
 		case 'biotrack':
 
-			switch ($rbe['agency']) {
+			$sid = $_SESSION['rbe-auth']['session'];
+
+			switch ($rbe['code']) {
 			case 'hi':
-				$rce = new RBE_BioTrack_HI($_SESSION['rbe-auth']);
+				$rce = new RBE_BioTrack_HI($sid);
 				break;
 			case 'il':
-				$rce = new RBE_BioTrack_IL($_SESSION['rbe-auth']);
+				$rce = new RBE_BioTrack_IL($sid);
 				break;
 			case 'nd':
-				$rce = new RBE_BioTrack_ND($_SESSION['rbe-auth']);
+				$rce = new RBE_BioTrack_ND($sid);
 				break;
 			case 'nm':
-				$rce = new RBE_BioTrack_NM($_SESSION['rbe-auth']);
+				$rce = new RBE_BioTrack_NM($sid);
 				break;
 			case 'pr':
-				$rce = new RBE_BioTrack_PR($_SESSION['rbe-auth']);
+				$rce = new RBE_BioTrack_PR($sid);
 				break;
 			case 'wa/ucs':
-				$rce = new RBE_BioTrack_WAUCS($_SESSION['rbe-auth']);
+				$rce = new RBE_BioTrack_WAUCS($sid);
 				break;
 			}
 
@@ -40,7 +42,7 @@ class RCE
 
 			$rce = new RBE_LeafData($_SESSION['rbe-auth']);
 
-			switch ($rbe['code']) {
+			switch ($cfg['code']) {
 			case 'leafdata-test':
 			case 'wa-test':
 				$rce->setTestMode('work');
@@ -51,7 +53,7 @@ class RCE
 
 		case 'metrc':
 
-			switch ($rbe['code']) {
+			switch ($cfg['code']) {
 			case 'ak':
 				$rce = new RBE_Metrc_AK($_SESSION['rbe-auth']);
 				break;
@@ -94,7 +96,7 @@ class RCE
 		}
 
 		if (empty($rce)) {
-			throw new \Exception('Invalid RCE');
+			throw new \Exception(sprintf('Invalid RCE "%s" [ALR#099]', $cfg['code']));
 		}
 
 		return $rce;
