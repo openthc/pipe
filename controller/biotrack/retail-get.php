@@ -4,9 +4,9 @@
 */
 
 
-$rbe = RCE::factory($_SESSION['rbe']);
+$rce = RCE::factory($_SESSION['rbe']);
 
-$res = $rbe->sync_sale(array(
+$res = $rce->sync_sale(array(
 	'min' => intval($_GET['min']),
 	'max' => intval($_GET['max']),
 ));

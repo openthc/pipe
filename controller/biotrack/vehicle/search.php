@@ -1,11 +1,11 @@
 <?php
 /**
-	Return All Companies
+	Return All Vehicles
 */
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 200;
+$ret_code = 203;
 
 $obj_name = 'vehicle';
 
@@ -13,7 +13,6 @@ $out_detail = array();
 $out_result = array();
 
 $age = RCE_Sync::age($obj_name);
-
 
 
 // Load Cache Data
@@ -24,12 +23,12 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
 
 	// Load Primary Licenses
 	$out_detail[] = 'Loading Vehicle';
-	$res_source = $rbe->sync_vehicle(array(
+	$res_source = $rce->sync_vehicle(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));

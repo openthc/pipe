@@ -5,7 +5,7 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 304;
+$ret_code = 203;
 
 $obj_name = 'strain';
 
@@ -18,7 +18,7 @@ $res_cached = SQL::fetch_mix($sql);
 
 
 // Load Fresh Data?
-if ($age >= 240) {
+if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rce = \RCE::factory($_SESSION['rbe']);
 
@@ -26,23 +26,19 @@ if ($age >= 240) {
 
 	foreach ($res_source as $src) {
 
+		$guid = $src['global_id'];
 		$hash = _hash_obj($src);
 
-		if ($hash != $res_cached[ $src['global_id'] ]) {
+		if ($hash != $res_cached[ $guid ]) {
 
 			$idx_update++;
 
-			$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
-			$arg = array(
-				':guid' => $src['global_id'],
-				':hash' => $hash,
-				':meta' => json_encode($src),
-			);
-
-			SQL::query($sql, $arg);
+			RCE_Sync::save($obj_name, $guid, $hash, $src);
 
 		}
 	}
+
+	RCE_Sync::age($obj_name, time());
 
 	$RES = $RES->withHeader('x-openthc-update', $idx_update);
 
@@ -57,49 +53,19 @@ $res_source = SQL::fetch_all($sql);
 foreach ($res_source as $src) {
 
 	$out = array(
-		'guid' => $rec['guid'],
-		'hash' => $rec['hash'],
-		//'code' => trim($src['external_id']),
-		//'name' => sprintf('%s in %s', trim($src['strain_name']), trim($src['area_name'])),
+		'guid' => $src['guid'],
+		'hash' => $src['hash'],
 	);
 
 	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
 		$out['_updated'] = 1;
-		$out['_source'] = json_decode($rec['meta'], true);
+		$out['_source'] = json_decode($src['meta'], true);
 	}
 
 	$res_output[] = $out;
 
-	//$rec = array(
-	//	'name' => trim($src['name']),
-	//	//'code' => trim($src['external_id']),
-	//	'guid' => $src['global_id'],
-	//	'hash' => $src['hash'],
-	//);
-    //
-	//if ($rec['hash'] != $res_cached[ $rec['guid'] ]) {
-    //
-	//	$rec['_source'] = $src;
-	//	$rec['_updated'] = 1;
-    //
-	//	unset($src['hash']);
-    //
-	//	$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
-	//	$arg = array(
-	//		':guid' => $src['global_id'],
-	//		':hash' => $rec['hash'],
-	//		':meta' => json_encode($src),
-	//	);
-    //
-	//	SQL::query($sql, $arg);
-    //
-	//}
-    //
-	//$ret[] = $rec;
-
 }
 
-RCE_Sync::age($obj_name, time());
 
 return $RES->withJSON(array(
 	'status' => 'success',

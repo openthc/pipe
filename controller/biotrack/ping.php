@@ -5,7 +5,7 @@
 
 use Edoceo\Radix;
 
-$rbe = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rbe']);
 
 $ret_ping = array();
 
@@ -13,7 +13,7 @@ $arg = array(
 	'data' => array(),
 );
 
-$obj_list = $rbe->listSyncObjects();
+$obj_list = $rce->listSyncObjects();
 $obj_list = array_keys($obj_list);
 foreach ($obj_list as $obj) {
 	$arg['data'][] = array(
@@ -22,7 +22,7 @@ foreach ($obj_list as $obj) {
 	);
 }
 
-$res = $rbe->sync_check($arg);
+$res = $rce->sync_check($arg);
 switch (intval($res['success'])) {
 case 0:
 	$RES = $RES->withJson(array(
@@ -41,7 +41,7 @@ foreach ($obj_list as $obj) {
 	$want++;
 
 	$sfn = sprintf('sync_%s', $obj);
-	$res = $rbe->$sfn(array(
+	$res = $rce->$sfn(array(
 		'min' => 999999999,
 		'max' => 999999999 + 1,
 	));
@@ -50,13 +50,13 @@ foreach ($obj_list as $obj) {
 }
 
 // Can See QA?
-// $ret_ping['inventory_qa_check_all'] = $rbe->inventory_qa_check_all(9999999999999999);
-// $ret_ping['inventory_qa_check'] = $rbe->inventory_qa_check(9999999999999999);
+// $ret_ping['inventory_qa_check_all'] = $rce->inventory_qa_check_all(9999999999999999);
+// $ret_ping['inventory_qa_check'] = $rce->inventory_qa_check(9999999999999999);
 
 // And the Other Four Magic Things
 // Need to Known Location First!
-// $ret_ping['inventory_manifest_lookup'] = $rbe->inventory_manifest_lookup('123456');
-// $ret_ping['inventory_transfer_outbound_return_lookup'] = $rbe->inventory_transfer_outbound_return_lookup('123456');
+// $ret_ping['inventory_manifest_lookup'] = $rce->inventory_manifest_lookup('123456');
+// $ret_ping['inventory_transfer_outbound_return_lookup'] = $rce->inventory_transfer_outbound_return_lookup('123456');
 
 return $RES->withJson(array(
 	'status' => 'success',
@@ -76,9 +76,9 @@ return $RES->withJson(array(
 //	require_once(APP_ROOT . '/lib/RBE/BioTrack.php');
 //	require_once(APP_ROOT . '/lib/RBE/BioTrack/WA.php');
 //
-//	$rbe = new RBE_Biotrack_WA();
-//	$rbe->setTraining(true);
-//	$chk = $rbe->login($ext, $uid, $pwd);
+//	$rce = new RBE_Biotrack_WA();
+//	$rce->setTraining(true);
+//	$chk = $rce->login($ext, $uid, $pwd);
 //
 //	switch (intval($chk['success'])) {
 //	case 0:

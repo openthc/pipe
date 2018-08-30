@@ -3,11 +3,11 @@
 	Return a List of Licenses
 */
 
-$rbe = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rbe']);
 
 // /items/v1/categories
 try {
-	$res = $rbe->itemCategoryList();
+	$res = $rce->itemCategoryList();
 } catch (Exception $e) {
 	if (401 == $e->getCode()) {
 		//return $RES->withJSON(array(
@@ -22,7 +22,7 @@ try {
 
 
 // /packages/v1/types
-// $res = $rbe->packageTypeList();
+// $res = $rce->packageTypeList();
 // $ret = array();
 
 foreach ($res['result'] as $x) {

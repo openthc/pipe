@@ -5,7 +5,7 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 200;
+$ret_code = 203;
 
 $obj_name = 'zone';
 
@@ -23,7 +23,7 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
 	// Load Inventory Rooms
 	$out_detail[] = 'Loading Zone/Inventory';
@@ -36,9 +36,9 @@ if ($age >= RCE_Sync::MAX_AGE) {
 		return sprintf('inventory-%s', $src['roomid']);
 	};
 	
-	$idx_update += RCE_Sync::biotrack_pull($rbe, 'sync_inventory_room', $rfn, $gfn,
+	$idx_update += RCE_Sync::biotrack_pull($rce, 'sync_inventory_room', $rfn, $gfn,
 	
-	$res_source = $rbe->sync_inventory_room(array(
+	$res_source = $rce->sync_inventory_room(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
@@ -65,7 +65,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	// Load Inventory Rooms
 	$out_detail[] = 'Loading Zone/Plant';
-	$res_source = $rbe->sync_plant_room(array(
+	$res_source = $rce->sync_plant_room(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));

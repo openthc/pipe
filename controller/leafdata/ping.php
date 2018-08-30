@@ -22,37 +22,37 @@ default:
 
 }
 
-$rbe = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rbe']);
 
 $good = 0;
 $want = 0;
 
 $want++;
-$res = $rbe->call('GET', '/inventory_types');
+$res = $rce->call('GET', '/inventory_types');
 if (empty($res['error'])) {
 	$good++;
 }
 
 $want++;
-$res = $rbe->call('GET', '/areas');
+$res = $rce->call('GET', '/areas');
 if (empty($res['error'])) {
 	$good++;
 }
 
 $want++;
-$res = $rbe->call('GET', '/mmes');
+$res = $rce->call('GET', '/mmes');
 if (empty($res['error'])) {
 	$good++;
 }
 
 $want++;
-$res = $rbe->call('GET', '/users');
+$res = $rce->call('GET', '/users');
 if (empty($res['error'])) {
 	$good++;
 }
 
 $want++;
-$res = $rbe->call('GET', '/strains');
+$res = $rce->call('GET', '/strains');
 if (empty($res['error'])) {
 	$good++;
 }

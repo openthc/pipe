@@ -22,7 +22,7 @@ $ret = array(
 $rce = \RCE::factory($_SESSION['rbe']);
 
 //
-//$res = $rbe->sync_qa_lab(0);
+//$res = $rce->sync_qa_lab(0);
 //switch ($res['success']) {
 //case 0:
 //	// Tag an Error

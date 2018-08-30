@@ -5,7 +5,7 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 200;
+$ret_code = 203;
 
 $obj_name = 'license';
 
@@ -23,11 +23,11 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
 	// Load Primary Licenses
 	$out_detail[] = 'Loading Licenses';
-	$res_source = $rbe->sync_vendor(array(
+	$res_source = $rce->sync_vendor(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
@@ -55,7 +55,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	// Load Labs
 	$out_detail[] = 'Loading Labs';
-	$res_source = $rbe->sync_qa_lab(array(
+	$res_source = $rce->sync_qa_lab(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
@@ -84,7 +84,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	// Load Transporters
 	$out_detail[] = 'Loading Transporters';
-	$res_source = $rbe->sync_third_party_transporter(array(
+	$res_source = $rce->sync_third_party_transporter(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));

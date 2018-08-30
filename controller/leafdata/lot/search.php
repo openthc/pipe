@@ -5,7 +5,7 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 304;
+$ret_code = 203;
 
 $obj_name = 'lot';
 
@@ -18,31 +18,27 @@ $res_cached = SQL::fetch_mix($sql);
 
 
 // Load Fresh Data?
-if ($age >= 240) {
+if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rce = \RCE::factory($_SESSION['rbe']);
 
-	$res_source = new RCE_Iterator_LeafData($rce->inventory());
+	$res_source = new RCE_Iterator_LeafData($rbe->inventory());
 
 	foreach ($res_source as $src) {
 
+		$guid = $src['global_id'];
 		$hash = _hash_obj($src);
 
-		if ($hash != $res_cached[ $src['global_id'] ]) {
+		if ($hash != $res_cached[ $guid ]) {
 
 			$idx_update++;
 
-			$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
-			$arg = array(
-				':guid' => $src['global_id'],
-				':hash' => $hash,
-				':meta' => json_encode($src),
-			);
-
-			SQL::query($sql, $arg);
+			RCE_Sync::save($obj_name, $guid, $hash, $src);
 
 		}
 	}
+
+	RCE_Sync::age($obj_name, time());
 
 	$RES = $RES->withHeader('x-openthc-update', $idx_update);
 
@@ -53,23 +49,23 @@ if ($age >= 240) {
 $res_output = array();
 $sql = "SELECT guid, hash, meta FROM {$obj_name} ORDER BY guid DESC";
 $res_source = SQL::fetch_all($sql);
-foreach ($res_source as $rec) {
+
+foreach ($res_source as $src) {
 
 	$out = array(
-		'guid' => $rec['guid'],
-		'hash' => $rec['hash'],
+		'guid' => $src['guid'],
+		'hash' => $src['hash'],
 	);
 
 	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
 		$out['_updated'] = 1;
-		$out['_source'] = json_decode($rec['meta'], true);
+		$out['_source'] = json_decode($src['meta'], true);
 	}
 
 	$res_output[] = $out;
 
 }
 
-RCE_Sync::age($obj_name, time());
 
 return $RES->withJSON(array(
 	'status' => 'success',

@@ -3,9 +3,9 @@
 
 */
 
-$rbe = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rbe']);
 
-$obj = $rbe->qa()->one($ARG['guid']);
+$obj = $rce->qa()->one($ARG['guid']);
 if (empty($obj)) {
 	return $RES->withJSON(array(
 		'status' => 'failure',

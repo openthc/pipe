@@ -5,7 +5,7 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 200;
+$ret_code = 203;
 
 $obj_name = 'lot';
 
@@ -23,11 +23,11 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
 	// Load Inventory
 	$out_detail[] = 'Loading Inventory';
-	$res_source = $rbe->sync_inventory(array(
+	$res_source = $rce->sync_inventory(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
@@ -52,7 +52,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	// Load Inventory
 	$out_detail[] = 'Loading Inventory/Sample';
-	$res_source = $rbe->sync_inventory_sample(array(
+	$res_source = $rce->sync_inventory_sample(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
@@ -144,7 +144,7 @@ if (!empty($res['inventory'])) {
 	}
 }
 
-//$res = $rbe->sync_inventory_adjust(0);
+//$res = $rce->sync_inventory_adjust(0);
 //switch ($res['success']) {
 //case 0:
 //	break;

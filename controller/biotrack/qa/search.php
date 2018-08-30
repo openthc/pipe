@@ -5,7 +5,7 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 200;
+$ret_code = 203;
 
 $obj_name = 'qa';
 
@@ -23,11 +23,11 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
 	// Load QA
 	$out_detail[] = 'Loading QA';
-	$res_source = $rbe->sync_inventory_qa_sample(array(
+	$res_source = $rce->sync_inventory_qa_sample(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));

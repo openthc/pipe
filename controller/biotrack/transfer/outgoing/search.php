@@ -23,11 +23,11 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
 	// Load Primary Licenses
 	$out_detail[] = 'Loading Plant';
-	$res_source = $rbe->sync_manifest(array(
+	$res_source = $rce->sync_manifest(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));

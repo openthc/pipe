@@ -6,29 +6,24 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 304;
+$ret_code = 203;
 
 $obj_name = 'product';
 
-$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);
-SQL::init('sqlite:' . $sql_file);
+$age = RCE_Sync::age($obj_name);
 
-$dt0 = $_SERVER['REQUEST_TIME'];
-$sql = sprintf("SELECT val FROM _config WHERE key = 'sync-{$obj_name}-time'");
-$dt1 = intval(SQL::fetch_one($sql));
-$age = $dt0 - $dt1;
-if ($age >= 240) {
+if ($age >= RCE_Sync::MAX_AGE) {
 
 	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
-	$res_source = $rbe->inventory_type()->all();
+	$res_source = $rce->inventory_type()->all();
 	if ('success' != $res_source['status']) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
-			'detail' => $rbe->formatError($res_source),
+			'detail' => $rce->formatError($res_source),
 		), 500);
 	}
 
@@ -77,14 +72,7 @@ foreach ($res_source as $src) {
 
 		unset($src['hash']);
 
-		$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
-		$arg = array(
-			':guid' => $src['global_id'],
-			':hash' => $rec['hash'],
-			':meta' => json_encode($src),
-		);
-
-		SQL::query($sql, $arg);
+		RCE_Sync::save($obj_name, $guid, $hash, $src);
 
 	}
 
@@ -92,8 +80,8 @@ foreach ($res_source as $src) {
 
 }
 
-$arg = array("sync-{$obj_name}-time", time());
-SQL::query("INSERT OR REPLACE INTO _config (key, val) VALUES (?, ?)", $arg);
+RCE_Sync::age($obj_name, time());
+
 
 return $RES->withJSON(array(
 	'status' => 'success',

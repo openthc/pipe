@@ -5,7 +5,7 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 200;
+$ret_code = 203;
 
 $obj_name = 'contact';
 
@@ -23,11 +23,11 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
 	// Load Contacts
 	//$out_detail[] = 'Fetch Employee';
-	$res_source = $rbe->sync_employee(array(
+	$res_source = $rce->sync_employee(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));

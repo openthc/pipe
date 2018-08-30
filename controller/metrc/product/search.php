@@ -5,11 +5,11 @@
 
 
 
-$rbe = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rbe']);
 
 // /items/v1/categories
-$res = $rbe->itemList('active');
-//$res = $rbe->packageList('active');
+$res = $rce->itemList('active');
+//$res = $rce->packageList('active');
 
 
 foreach ($res['result'] as $x) {

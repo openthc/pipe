@@ -22,13 +22,13 @@ if ($age >= 240) {
 	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
-	$res_source = $rbe->transfer()->all();
+	$res_source = $rce->transfer()->all();
 	if ('success' != $res_source['status']) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
-			'detail' => $rbe->formatError($res_source),
+			'detail' => $rce->formatError($res_source),
 		), 500);
 	}
 
@@ -80,14 +80,7 @@ foreach ($res_source as $src) {
 
 		unset($src['hash']);
 
-		$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
-		$arg = array(
-			':guid' => $src['global_id'],
-			':hash' => $obj['hash'],
-			':meta' => json_encode($src),
-		);
-
-		SQL::query($sql, $arg);
+		RCE_Sync::save($obj_name, $guid, $hash, $src);
 
 	}
 

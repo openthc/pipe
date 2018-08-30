@@ -6,7 +6,7 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 200;
+$ret_code = 203;
 
 $obj_name = 'strain';
 
@@ -18,19 +18,19 @@ $sql = sprintf("SELECT val FROM _config WHERE key = 'sync-{$obj_name}-time'");
 $dt1 = intval(SQL::fetch_one($sql));
 $age = $dt0 - $dt1;
 
-if ($age >= 240) {
+if ($age >= RCE_Sync::MAX_AGE) {
 
 	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
-	$res_source = $rbe->strainList();
+	$res_source = $rce->strainList();
 
 	if (200 != $res_source['status']) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
-			'detail' => $rbe->formatError($res_source),
+			'detail' => $rce->formatError($res_source),
 		), 500);
 	}
 
@@ -82,14 +82,7 @@ foreach ($res_source as $src) {
 
 		unset($src['hash']);
 
-		$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
-		$arg = array(
-			':guid' => $rec['guid'],
-			':hash' => $rec['hash'],
-			':meta' => json_encode($src),
-		);
-
-		SQL::query($sql, $arg);
+		RCE_Sync::save($obj_name, $guid, $hash, $src);
 
 	}
 
@@ -97,8 +90,8 @@ foreach ($res_source as $src) {
 
 }
 
-$arg = array("sync-{$obj_name}-time", time());
-SQL::query("INSERT OR REPLACE INTO _config (key, val) VALUES (?, ?)", $arg);
+RCE_Sync::age($obj_name, time());
+
 
 $RES = $RES->withHeader('openthc-age', $age);
 return $RES->withJSON(array(
