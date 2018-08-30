@@ -3,4 +3,7 @@
 	Not Implemented for METRC
 */
 
-return _exit_501($RES);
+return $RES->withJSON(array(
+	'status' => 'failure',
+	'detail' => 'Not Implemented in METRC',
+), 500);

@@ -5,8 +5,6 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 203;
-
 $obj_name = 'qa';
 
 $out_detail = array();
@@ -88,7 +86,9 @@ foreach ($res_source as $src) {
 
 }
 
-// $RES = $RES->withHeader('x-openthc-update', $idx_update);
+$ret_code = ($idx_update ? 200 : 203);
+
+$RES = $RES->withHeader('x-openthc-update', $idx_update);
 
 return $RES->withJSON(array(
 	'status' => 'success',

@@ -6,8 +6,6 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 203;
-
 $obj_name = 'product';
 
 $age = RCE_Sync::age($obj_name);
@@ -28,6 +26,8 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	}
 
 	$res_source = $res_source['result']['data'];
+
+	RCE_Sync::age($obj_name, time());
 
 } else {
 
@@ -80,8 +80,10 @@ foreach ($res_source as $src) {
 
 }
 
-RCE_Sync::age($obj_name, time());
 
+$ret_code = ($idx_update ? 200 : 203);
+
+// $RES = $RES->withHeader('x-openthc-update', $idx_update);
 
 return $RES->withJSON(array(
 	'status' => 'success',

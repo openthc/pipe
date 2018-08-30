@@ -39,8 +39,6 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	RCE_Sync::age($obj_name, time());
 
-	$RES = $RES->withHeader('x-openthc-update', $idx_update);
-
 }
 //echo "Count Cache: " . count($res_cached) . "\n";
 //echo "Count Fresh: $idx_source\n";
@@ -69,6 +67,10 @@ foreach ($res_source as $src) {
 
 }
 
+
+$ret_code = ($idx_update ? 200 : 203);
+
+$RES = $RES->withHeader('x-openthc-update', $idx_update);
 
 return $RES->withJSON(array(
 	'status' => 'success',

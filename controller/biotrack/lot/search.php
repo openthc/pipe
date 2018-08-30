@@ -5,8 +5,6 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 203;
-
 $obj_name = 'lot';
 
 $out_detail = array();
@@ -117,6 +115,8 @@ foreach ($res_source as $src) {
 
 // $RES = $RES->withHeader('x-openthc-update', $idx_update);
 
+$ret_code = ($idx_update ? 200 : 203);
+
 return $RES->withJSON(array(
 	'status' => 'success',
 	'detail' => $out_detail,
@@ -159,7 +159,9 @@ if (!empty($res['inventory'])) {
 
 // @todo Unify Ouput According to OpenTHC Specification
 
+$ret_code = ($idx_update ? 200 : 203);
+
 return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $ret,
-), 200, JSON_PRETTY_PRINT);
+), $ret_code, JSON_PRETTY_PRINT);

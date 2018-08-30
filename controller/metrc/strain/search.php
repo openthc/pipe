@@ -6,7 +6,6 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 203;
 
 $obj_name = 'strain';
 
@@ -91,6 +90,9 @@ foreach ($res_source as $src) {
 }
 
 RCE_Sync::age($obj_name, time());
+
+
+$ret_code = ($idx_update ? 200 : 203);
 
 
 $RES = $RES->withHeader('openthc-age', $age);

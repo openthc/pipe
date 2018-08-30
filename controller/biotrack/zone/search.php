@@ -5,8 +5,6 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 203;
-
 $obj_name = 'zone';
 
 $out_detail = array();
@@ -27,7 +25,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	// Load Inventory Rooms
 	$out_detail[] = 'Loading Zone/Inventory';
-	
+
 	$rfn = function($src) {
 		$src['_kind'] = 'Inventory';
 		return $src;
@@ -35,9 +33,9 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	$gfn = function($src) {
 		return sprintf('inventory-%s', $src['roomid']);
 	};
-	
+
 	$idx_update += RCE_Sync::biotrack_pull($rce, 'sync_inventory_room', $rfn, $gfn,
-	
+
 	$res_source = $rce->sync_inventory_room(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
@@ -123,10 +121,13 @@ foreach ($res_source as $src) {
 	if ($add_source) {
 		$out['_source'] = json_decode($src['meta'], true);
 	}
-                                                                              
+
 	$out_result[] = $out;
 
 }
+
+
+$ret_code = ($idx_update ? 200 : 203);
 
 // $RES = $RES->withHeader('x-openthc-update', $idx_update);
 
