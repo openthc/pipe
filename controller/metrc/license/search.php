@@ -6,103 +6,74 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 200;
-
 $obj_name = 'license';
 
-$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);
-SQL::init('sqlite:' . $sql_file);
+$age = RCE_Sync::age($obj_name);
 
-$dt0 = $_SERVER['REQUEST_TIME'];
-$sql = sprintf("SELECT val FROM _config WHERE key = 'sync-{$obj_name}-time'");
-$dt1 = intval(SQL::fetch_one($sql));
-$age = $dt0 - $dt1;
 
-if ($age >= 240) {
+// Load Cache Data
+$sql = "SELECT guid, hash FROM {$obj_name}";
+$res_cached = SQL::fetch_mix($sql);
 
-	$sql = "SELECT guid, hash FROM {$obj_name}";
-	$res_cached = SQL::fetch_mix($sql);
 
-	$rbe = \RCE::factory($_SESSION['rbe']);
+// Load Fresh Data?
+if ($age >= RCE_Sync::MAX_AGE) {
 
-	$res_source = $rbe->facilitiesList();
+	$rce = \RCE::factory($_SESSION['rbe']);
 
-	if (200 != $res_source['status']) {
-		return $RES->withJSON(array(
-			'status' => 'failure',
-			'detail' => $rbe->formatError($res_source),
-		), 500);
-	}
-
+	$res_source = $rce->facilitiesList();
 	$res_source = $res_source['result'];
 
-} else {
+	foreach ($res_source as $src) {
 
-	// From Cache
-	$res_cached = array();
-	$res_source = array();
+		$guid = $src['License']['Number'];
+		$hash = _hash_obj($src);
 
-	$sql = "SELECT guid, hash, meta FROM {$obj_name}";
-	$res = SQL::fetch_all($sql);
+		if ($hash != $res_cached[ $guid ]) {
 
-	foreach ($res as $rec) {
+			$idx_update++;
 
-		$res_cached[ $rec['guid'] ] = $rec['hash'];
-
-		$x = json_decode($rec['meta'], true);
-		$x['hash'] = $rec['hash'];
-
-		$res_source[] = $x;
+			RCE_Sync::save($obj_name, $guid, $hash, $src);
+		}
 	}
 
-	_exit_json($_SESSION['sql-hash']);
+	RCE_Sync::age($obj_name, time());
+
+	$RES = $RES->withHeader('x-openthc-update', $idx_update);
+
 }
 
-$ret = array();
+
+// Now Fetch all from DB and Send Back
+$res_output = array();
+$sql = "SELECT guid, hash, meta FROM {$obj_name} ORDER BY guid DESC";
+$res_source = SQL::fetch_all($sql);
 
 foreach ($res_source as $src) {
 
-	if (empty($src['hash'])) {
-		$src['hash'] = _hash_obj($src);
-	}
+	$m = json_decode($src['meta'], true);
 
-	$rec = array(
-		'name' => trim($src['Name']),
-		'code' => $src['License']['Number'],
-		'guid' => $src['License']['Number'],
+	$out = array(
+		'guid' => $src['guid'],
 		'hash' => $src['hash'],
-		'type' => trim($src['License']['LicenseType']),
+		'name' => trim($m['Name']),
+		'code' => $m['License']['Number'],
+		'type' => trim($m['License']['LicenseType']),
 	);
 
-	if ($rec['hash'] != $res_cached[ $rec['guid'] ]) {
-
-		$ret_code = 200;
-
-		$rec['_source'] = $src;
-		$rec['_updated'] = 1;
-
-		unset($src['hash']);
-
-		$sql = "INSERT OR REPLACE INTO {$obj_name} (guid, hash, meta) VALUES (:guid, :hash, :meta)";
-		$arg = array(
-			':guid' => $rec['guid'],
-			':hash' => $rec['hash'],
-			':meta' => json_encode($src),
-		);
-
-		SQL::query($sql, $arg);
-
+	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
+		$out['_updated'] = 1;
+		$out['_source'] = $m;
 	}
 
-	$ret[] = $rec;
+	$res_output[] = $out;
 
 }
 
-$arg = array("sync-{$obj_name}-time", time());
-SQL::query("INSERT OR REPLACE INTO _config (key, val) VALUES (?, ?)", $arg);
 
-$RES = $RES->withHeader('openthc-age', $age);
+$ret_code = ($idx_update ? 200 : 203);
+
 return $RES->withJSON(array(
 	'status' => 'success',
-	'result' => $ret,
+	'result' => $res_output,
 ), $ret_code, JSON_PRETTY_PRINT);

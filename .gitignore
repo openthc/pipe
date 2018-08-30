@@ -1,6 +1,8 @@
 
+composer.lock
+
+etc/rce.ini
+
+lib/RBE/
 var/
 vendor/
-
-composer.lock
-etc/rce.ini
