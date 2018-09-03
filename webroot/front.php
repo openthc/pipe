@@ -244,7 +244,60 @@ $app->group('/stem', function() {
 
 // Display System Info
 $app->get('/system', function($REQ, $RES, $ARG) {
-	// Nothing Yet
+
+	// Return a list of supported RCEs
+	$rce_file = sprintf('%s/etc/rce.ini', APP_ROOT);
+	$rce_data = parse_ini_file($rce_file, true, INI_SCANNER_RAW);
+
+	$cfg = array(
+		'headers' => array(
+			'user-agent' => 'OpenTHC/420.18.230 (Pipe-Stem-Ping)',
+		),
+		'http_errors' => false
+	);
+
+	$c = new \GuzzleHttp\Client($cfg);
+
+	$req_list = array();
+
+	foreach ($rce_data as $rce_info) {
+		//var_dump($rce_info);
+		$url = $rce_info['server'];
+		$req_list[$url] = $c->getAsync($url);
+
+	}
+
+	$res_list = \GuzzleHttp\Promise\settle($req_list)->wait();
+
+	foreach ($res_list as $key => $res) {
+
+		//var_dump($key);
+		//var_dump($res);
+
+		echo "Connect: $key<br>";
+
+		switch ($res['state']) {
+		case 'fulfilled':
+
+			$res = $res['value'];
+			$c = $res->getStatusCode();
+
+			//echo $res->() . "\n";
+
+			echo "$c<br>";
+			echo '<pre>';
+			// var_dump($res->getHeaders());
+			echo h($res->getBody());
+			echo '</pre>';
+			break;
+
+		case 'rejected':
+			// Problem
+			break;
+		}
+
+	}
+
 });
 
 $app->get('/system/rce', function($REQ, $RES, $ARG) {

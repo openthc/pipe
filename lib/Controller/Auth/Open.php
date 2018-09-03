@@ -1,6 +1,6 @@
 <?php
 /**
-	Connect and Authenticate to an RBE
+	Connect and Authenticate to an RCE
 */
 
 namespace App\Controller\Auth;
@@ -25,7 +25,7 @@ class Open
 		case 'POST':
 			switch ($_POST['a']) {
 			case 'set-license':
-				$_SESSION['rbe-auth']['license'] = $_POST['license'];
+				$_SESSION['rce-auth']['license'] = $_POST['license'];
 				return $RES->withRedirect('/browse');
 				break;
 			}
@@ -40,29 +40,32 @@ class Open
 	*/
 	function connect($REQ, $RES, $ARG)
 	{
-		$rbe = $this->validateRBE();
+		$rce = $this->validateRCE();
 
-		if (empty($rbe)) {
+		if (empty($rce)) {
 			return $RES->withJson(array(
 				'status' => 'failure',
-				'detail' => sprintf('CAC#017: Invalid RBE: "%s"', strtolower(trim($_POST['rbe']))),
+				'detail' => sprintf('CAC#017: Invalid RCE: "%s"', strtolower(trim($_POST['rce']))),
 			), 400);
 		}
 
-		$_SESSION['rbe'] = $rbe;
+		$_SESSION['rce'] = $rce;
+		$_SESSION['rce-auth'] = array();
+		$_SESSION['rce-base'] = null;
+		$_SESSION['sql-hash'] = null;
 
-		switch ($rbe['engine']) {
+		switch ($rce['engine']) {
 		case 'biotrack':
-			$_SESSION['rbe-base'] = 'biotrack';
-			$RES = $this->_biotrack($RES, $rbe);
+			$_SESSION['rce-base'] = 'biotrack';
+			$RES = $this->_biotrack($RES);
 			break;
 		case 'leafdata':
-			$_SESSION['rbe-base'] = 'leafdata';
-			$RES = $this->_leafdata($RES, $rbe);
+			$_SESSION['rce-base'] = 'leafdata';
+			$RES = $this->_leafdata($RES);
 			break;
 		case 'metrc':
-			$_SESSION['rbe-base'] = 'metrc';
-			$RES = $this->_metrc($RES, $rbe);
+			$_SESSION['rce-base'] = 'metrc';
+			$RES = $this->_metrc($RES);
 			break;
 		}
 
@@ -75,33 +78,40 @@ class Open
 		return $RES;
 	}
 
+	/**
+		Render the Connection Form
+	*/
 	function renderForm($REQ, $RES, $ARG)
 	{
-		$rbe_file = sprintf('%s/etc/rce.ini', APP_ROOT);
-		$rbe_data = parse_ini_file($rbe_file, true, INI_SCANNER_RAW);
-		 //var_dump($rbe_data);
-		 //exit;
+		$rce_file = sprintf('%s/etc/rce.ini', APP_ROOT);
+		$rce_data = parse_ini_file($rce_file, true, INI_SCANNER_RAW);
 
 		$data = array();
-		$data['rbe_list'] = $rbe_data;
-		$data['rbe_code'] = $_SESSION['rbe']['code'];
-		$data['rbe_meta_company'] = $_SESSION[''];
-		$data['rbe_meta_license'] = $_SESSION['rbe-auth']['license'];
-		$data['rbe_meta_vendor_api_key'] = $_SESSION['rbe-auth']['vendor-key'];
-		$data['rbe_meta_client_api_key'] = $_SESSION['rbe-auth']['client-key'];
-		if (empty($data['rbe_meta_client_api_key'])) {
-			$data['rbe_meta_client_api_key'] = $_SESSION['rbe-auth']['secret'];
+		$data['rce_list'] = $rce_data;
+		$data['rce_code'] = $_SESSION['rce']['code'];
+		$data['rce_company'] = $_SESSION['rce-auth']['company'];
+		$data['rce_license'] = $_SESSION['rce-auth']['license'];
+		$data['rce_vendor_psk'] = $_SESSION['rce-auth']['vendor-key'];
+		$data['rce_client_psk'] = $_SESSION['rce-auth']['client-key'];
+		$data['rce_username'] = $_SESSION['rce-auth']['username'];;
+		$data['rce_password'] = $_SESSION['rce-auth']['password'];;
+
+		if (empty($data['rce_client_api_key'])) {
+			$data['rce_client_api_key'] = $_SESSION['rce-auth']['secret'];
 		}
 
 		return $this->_c->view->render($RES, 'page/auth.html', $data);
 
 	}
 
-	function _biotrack($RES, $rbe)
+	/**
+		Connect to a BT system
+	*/
+	function _biotrack($RES)
 	{
 		if (!empty($_POST['sid'])) {
 
-			$_SESSION['rbe-auth'] = $_POST['sid'];
+			$_SESSION['rce-auth']['session'] = $_POST['sid'];
 
 			$RES = $RES->withJson(array(
 				'status' => 'success',
@@ -112,7 +122,7 @@ class Open
 			return $RES;
 		}
 
-		$uid = strtolower(trim($_POST['rbe-meta-username']));
+		$uid = strtolower(trim($_POST['rce-username']));
 
 		if (!preg_match('/\w+@\w+/', $uid)) {
 			return $RES->withJson(array(
@@ -123,7 +133,7 @@ class Open
 		}
 
 		// Password
-		$pwd = trim($_POST['rbe-meta-password']);
+		$pwd = trim($_POST['rce-password']);
 		if (!preg_match('/^.{10}/', $pwd)) {
 			return $RES->withJson(array(
 				'status' => 'failure',
@@ -131,18 +141,18 @@ class Open
 			), 400);
 		}
 
-		$ext = preg_replace('/[^\d]+/', null, $_POST['rbe-meta-company']);
+		$ext = preg_replace('/[^\d]+/', null, $_POST['rce-company']);
 		$ext = substr($ext, 0, 9);
 
 		if (!preg_match('/^\d{9}$/', $ext)) {
 			return $RES->withJson(array(
 				'status' => 'failure',
-				'detail' => 'OCA#060: Provide UBI in the rbe-meta-company field',
+				'detail' => 'OCA#060: Provide UBI in the rce-company field',
 			), 400);
 		}
 
-		$api = \RCE::factory($rbe);
-		$chk = $api->login($ext, $uid, $pwd);
+		$rce = \RCE::factory($_SESSION['rce']);
+		$chk = $rce->login($ext, $uid, $pwd);
 
 		// @todo Detect a 500 Layer Response from BioTrack
 
@@ -159,8 +169,10 @@ class Open
 
 		case 1:
 
-			$_SESSION['rbe'] = $rbe;
-			$_SESSION['rbe-auth'] = $chk['sessionid'];
+			$_SESSION['rce-auth']['company'] = $ext;
+			$_SESSION['rce-auth']['username'] = $uid;
+			$_SESSION['rce-auth']['password'] = $pwd;
+			$_SESSION['rce-auth']['session'] = $chk['sessionid'];
 
 			return $RES->withJson(array(
 				'status' => 'success',
@@ -176,12 +188,12 @@ class Open
 	/**
 		Connect to a LeafData System
 	*/
-	function _leafdata($RES, $rbe)
+	function _leafdata($RES)
 	{
-		$lic = trim($_POST['rbe-meta-license']);
+		$lic = trim($_POST['rce-license']);
 		$lic = strtoupper($lic);
 
-		$key = trim($_POST['rbe-meta-client-apikey']);
+		$key = trim($_POST['rce-client-psk']);
 
 		if (!preg_match('/^(G|J|L|M|R)\w+$/', $lic)) {
 			return $RES->withJSON(array(
@@ -194,24 +206,24 @@ class Open
 			return $RES->withJSON(array(
 				'status' => 'failure',
 				'detail' => 'CAC#131 Invalid API Key',
+				'_post' => $_POST,
 			));
 		}
 
-		$_SESSION['rbe'] = $rbe;
-		$_SESSION['rbe-auth'] = array(
+		$_SESSION['rce-auth'] = array(
 			'license' => $lic,
 			'secret' => $key,
 		);
 
-		$api = \RCE::factory($rbe);
-		$res = $api->ping();
+		$rce = \RCE::factory($_SESSION['rce']);
+		$res = $rce->ping();
 
 		if (empty($res)) {
 			return $RES->withJSON(array(
 				'status' => 'failure',
 				'detail' => 'CAC#192 Invalid License or API Key',
 				'_s' => $_SESSION,
-				'_api' => $api,
+				'_rce' => $rce,
 				'_res' => $res,
 			));
 		}
@@ -226,17 +238,15 @@ class Open
 	/**
 		Connect to a METRC system
 	*/
-	function _metrc($RES, $rbe)
+	function _metrc($RES)
 	{
-		//_var_dump($rbe);
-
-		$_SESSION['rbe-auth'] = array(
-			'vendor-key' => $_POST['rbe-meta-vendor-apikey'],
-			'client-key' => $_POST['rbe-meta-client-apikey'],
-			'license' => $_POST['rbe-meta-license'],
+		$_SESSION['rce-auth'] = array(
+			'vendor-key' => $_POST['rce-vendor-psk'],
+			'client-key' => $_POST['rce-client-psk'],
+			'license' => $_POST['rce-license'],
 		);
 
-		$rce = \RCE::factory($rbe);
+		$rce = \RCE::factory($_SESSION['rce']);
 		//_var_dump($rce);
 
 		$res = $rce->ping();
@@ -255,29 +265,28 @@ class Open
 	}
 
 	/**
-		Validate the RBE
+		Validate the RCE
 	*/
-	private function validateRBE()
+	private function validateRCE()
 	{
 
-		$rbe_file = sprintf('%s/etc/rce.ini', APP_ROOT);
-		$rbe_data = parse_ini_file($rbe_file, true, INI_SCANNER_RAW);
-		// var_dump($rbe_data);
+		$rce_file = sprintf('%s/etc/rce.ini', APP_ROOT);
+		$rce_data = parse_ini_file($rce_file, true, INI_SCANNER_RAW);
+		// var_dump($rce_data);
 
-		$rbe_want = strtolower(trim($_POST['rbe']));
+		$rce_want = strtolower(trim($_POST['rce']));
 
 		// Re-Map Legacy Name
-		//switch ($rbe_want) {
-		//if ('wa/leaf' == $rbe_want) {
-		//	$rbe_want = 'wa/mjf';
+		//switch ($rce_want) {
+		//if ('wa/leaf' == $rce_want) {
+		//	$rce_want = 'wa/mjf';
 		//}
 
-		$rbe_info = $rbe_data[ $rbe_want ];
+		$rce_info = $rce_data[ $rce_want ];
 
-		if (!empty($rbe_info)) {
-			$rbe_info['code'] = $rbe_want;
-			$rbe_info['agency'] = $rbe_want;
-			return $rbe_info;
+		if (!empty($rce_info)) {
+			$rce_info['code'] = $rce_want;
+			return $rce_info;
 		}
 	}
 
@@ -307,6 +316,7 @@ class Open
 			SQL::query('CREATE TABLE strain (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE transfer (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE waste (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
+			SQL::query('CREATE TABLE vehicle (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE zone (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 
 			SQL::query('INSERT INTO _config VALUES (?, ?)', array('Created', date(\DateTime::RFC3339)));
