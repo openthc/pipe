@@ -3,27 +3,35 @@
 	Handles a Proxy to /packages/v1/{id}
 */
 
+use Edoceo\Radix\DB\SQL;
 
+$obj_name = 'product';
 
-$rce = \RCE::factory($_SESSION['rbe']);
+$age = RCE_Sync::age($obj_name);
 
-// /items/v1/categories
-$res = $rce->itemList('active');
-//$res = $rce->packageList('active');
+if ($age >= RCE_Sync::MAX_AGE) {
 
+	$rce = \RCE::factory($_SESSION['rce']);
 
-foreach ($res['result'] as $x) {
+	// /items/v1/categories
+	$res = $rce->itemList('active');
+	//$res = $rce->packageList('active');
 
-	$rec = array(
-		'name' => trim($x['Name']),
-		'base' => trim($x['ProductCategoryType']),
-		'mode' => trim($x['QuantityType']),
-		'_source' => $x,
-	);
+	foreach ($res['result'] as $x) {
 
-	$ret[] = $rec;
+		$rec = array(
+			'name' => trim($x['Name']),
+			'base' => trim($x['ProductCategoryType']),
+			'mode' => trim($x['QuantityType']),
+			'_source' => $x,
+		);
+
+		$ret[] = $rec;
+
+	}
 
 }
+
 
 
 return $RES->withJSON(array(

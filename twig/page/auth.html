@@ -8,41 +8,41 @@
 
 <div class="form-group">
 	<label>RCE</label>
-	<select class="form-control" name="rbe">
-	{% for rbe_stub, rbe_data in rbe_list %}
-		<option {{ rbe_stub == rbe_code ? " selected " }} value="{{ rbe_stub }}">{{ rbe_data.name ? rbe_data.name : rbe_stub }}</option>
+	<select class="form-control" name="rce">
+	{% for rce_stub, rce_data in rce_list %}
+		<option {{ rce_stub == rce_code ? " selected " }} value="{{ rce_stub }}">{{ rce_data.name ? rce_data.name : rce_stub }}</option>
 	{% endfor %}
 	</select>
 </div>
 
 <div class="form-group">
 	<label>Company:</label>
-	<input autocomplete="x" class="form-control" name="rbe-meta-company" placeholder="Company ID, like a UBI or something - BioTrack, LeafData" value="{{ rbe_meta_company }}">
+	<input autocomplete="x" class="form-control" name="rce-meta-company" placeholder="Company ID, like a UBI or something - BioTrack, LeafData" value="{{ rce_meta_company }}">
 </div>
 
 <div class="form-group">
 	<label>License:</label>
-	<input autocomplete="x" class="form-control" name="rbe-meta-license" placeholder="LeafData, METRC*" value="{{ rbe_meta_license }}">
+	<input autocomplete="x" class="form-control" name="rce-meta-license" placeholder="LeafData, METRC*" value="{{ rce_meta_license }}">
 </div>
 
 <div class="form-group">
 	<label>Vendor API Key:</label>
-	<input autocomplete="x" class="form-control" name="rbe-meta-vendor-apikey" placeholder="METRC" value="{{ rbe_meta_vendor_api_key }}">
+	<input autocomplete="x" class="form-control" name="rce-meta-vendor-apikey" placeholder="METRC" value="{{ rce_meta_vendor_api_key }}">
 </div>
 
 <div class="form-group">
 	<label>Client API Key:</label>
-	<input autocomplete="x" class="form-control" name="rbe-meta-client-apikey" placeholder="LeafData, METRC" value="{{ rbe_meta_client_api_key }}">
+	<input autocomplete="x" class="form-control" name="rce-meta-client-apikey" placeholder="LeafData, METRC" value="{{ rce_meta_client_api_key }}">
 </div>
 
 <div class="form-group">
 	<label>Username:</label>
-	<input autocomplete="x" class="form-control" name="rbe-meta-username" placeholder="BioTrack" value="{{ rbe_meta_username }}">
+	<input autocomplete="x" class="form-control" name="rce-meta-username" placeholder="BioTrack" value="{{ rce_meta_username }}">
 </div>
 
 <div class="form-group">
 	<label>Password:</label>
-	<input autocomplete="x" class="form-control" name="rbe-meta-password" placeholder="BioTrack" value="{{ rbe_meta_password }}">
+	<input autocomplete="x" class="form-control" name="rce-meta-password" placeholder="BioTrack" value="{{ rce_meta_password }}">
 </div>
 
 <button class="btn btn-lg btn-outline-primary" type="submit">Connect</button>

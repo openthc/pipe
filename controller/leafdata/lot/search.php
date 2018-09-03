@@ -18,9 +18,9 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rce']);
 
-	$res_source = new RCE_Iterator_LeafData($rbe->inventory());
+	$res_source = new RCE_Iterator_LeafData($rce->inventory());
 
 	foreach ($res_source as $src) {
 

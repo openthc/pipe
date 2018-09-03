@@ -3,7 +3,7 @@
 	Return a Single License
 */
 
-$rce = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rce']);
 
 $res = $rce->license()->all();
 

@@ -21,7 +21,7 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rce']);
 
 	// Load Primary Licenses
 	$out_detail[] = 'Loading Licenses';

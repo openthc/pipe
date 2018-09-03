@@ -36,7 +36,7 @@ require_once(APP_ROOT . '/lib/RCE_Iterator_LeafData.php');
 function _from_rce_file($f, $RES, $ARG)
 {
 	$f = trim($f, '/');
-	$f = sprintf('%s/controller/%s/%s', APP_ROOT, $_SESSION['rbe-base'], $f);
+	$f = sprintf('%s/controller/%s/%s', APP_ROOT, $_SESSION['rce-base'], $f);
 	if (!is_file($f)) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
@@ -85,7 +85,7 @@ class App_Metric
 }
 
 /**
-	A Faker cause some of the RBE tools depend on this
+	A Faker cause some of the RCE tools depend on this
 */
 class License
 {

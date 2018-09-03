@@ -5,7 +5,7 @@
 
 use Edoceo\Radix;
 
-$rce = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rce']);
 
 $ret_ping = array();
 
@@ -27,7 +27,7 @@ switch (intval($res['success'])) {
 case 0:
 	$RES = $RES->withJson(array(
 		'status' => 'failure',
-		'detail' => 'CPB#039: RBE Error',
+		'detail' => 'CPB#039: RCE Error',
 		'result' => $res,
 	), 400);
 	return(0);
@@ -62,31 +62,3 @@ return $RES->withJson(array(
 	'status' => 'success',
 	'result' => $ret_ping,
 ), 200, JSON_PRETTY_PRINT);
-
-//case 'wa/test':
-//
-//	if (!preg_match('/^\d{9}$/', $ext)) {
-//		$res = $res->withJson(array(
-//			'status' => 'failure',
-//			'detail' => 'OCA#053: Provide UBI in the rbe-data field',
-//		), 400);
-//		return(0);
-//	}
-//
-//	require_once(APP_ROOT . '/lib/RBE/BioTrack.php');
-//	require_once(APP_ROOT . '/lib/RBE/BioTrack/WA.php');
-//
-//	$rce = new RBE_Biotrack_WA();
-//	$rce->setTraining(true);
-//	$chk = $rce->login($ext, $uid, $pwd);
-//
-//	switch (intval($chk['success'])) {
-//	case 0:
-//
-//		break;
-//	case 1:
-//		break;
-//	}
-//
-//}
-//

@@ -37,7 +37,7 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 
 ## Authentication
 
-Authentication must take place with the system to interface with and that information is passed to the OACI for authentication with the Regulatory Compliance Engine ("RBE")
+Authentication must take place with the system to interface with and that information is passed to the OACI for authentication with the Regulatory Compliance Engine ("RCE")
 
 ## Supported Compliance Engines
 

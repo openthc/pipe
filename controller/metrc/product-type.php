@@ -3,7 +3,7 @@
 	Return a List of Licenses
 */
 
-$rce = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rce']);
 
 // /items/v1/categories
 try {

@@ -12,10 +12,10 @@ require_once(dirname(dirname(__FILE__)) . '/boot.php');
 // Slim Configuration
 $app = new \OpenTHC\App(array('debug' => true));
 
-//// Tell Container to use a Magic Response object
-////$container['response'] = function($c0) {
-////
-////};
+// Tell Container to use a Magic Response object
+//$container['response'] = function($c0) {
+//
+//};
 
 
 // 404 Handler
@@ -36,12 +36,11 @@ $con['notFoundHandler'] = function($c) {
 */
 $app->group('/auth', function() {
 
-	$this->get('', 'App\Controller\Auth\Status');
-
 	$this->get('/open', 'App\Controller\Auth\Open');
 	$this->post('/open', 'App\Controller\Auth\Open');
 
-	//$this->get('', 'App\Controller\Ping');
+	$this->get('/info', 'App\Controller\Auth\Status');
+
 	$this->get('/ping', function($REQ, $RES, $ARG) {
 		return _from_rce_file('ping.php', $RES, $ARG);
 	})->add('App\Middleware\RCE');
@@ -57,8 +56,8 @@ $app->group('/auth', function() {
 $app->get('/browse', function($REQ, $RES, $ARG) {
 
 	$data = array();
-	$data['rbe_auth'] = $_SESSION['rbe-auth'];
-	$data['rbe_meta_license'] = $_SESSION['rbe-auth']['license'];
+	$data['rce_auth'] = $_SESSION['rce-auth'];
+	$data['rce_meta_license'] = $_SESSION['rce-auth']['license'];
 
 	return $this->view->render($RES, 'page/browse.html', $data);
 })->add('App\Middleware\RCE')->add('App\Middleware\Session');
@@ -83,16 +82,16 @@ $app->group('/plant', function() {
 
 	$this->get('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
 		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/plant/single.php', $_SESSION['rbe-base']), $ARG);
+		return $RES->execute(sprintf('%s/plant/single.php', $_SESSION['rce-base']), $ARG);
 	});
 
 	$this->post('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
 		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/plant/update.php', $_SESSION['rbe-base']), $ARG);
+		return $RES->execute(sprintf('%s/plant/update.php', $_SESSION['rce-base']), $ARG);
 	});
 
 	//$this->post('/{guid:[0-9a-f]+}/collect', function($REQ, $RES, $ARG) {
-	//	$f = sprintf('%s/controller/%s/plants-get.php', APP_ROOT, $_SESSION['rbe-base']);
+	//	$f = sprintf('%s/controller/%s/plants-get.php', APP_ROOT, $_SESSION['rce-base']);
 	//	require_once($f);
 	//	return $RES;
 	//});
@@ -113,7 +112,7 @@ $app->group('/qa', function() {
 
 	$this->get('/{guid}', function($REQ, $RES, $ARG) {
 		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/qa/single.php', $_SESSION['rbe-base']), $ARG);
+		return $RES->execute(sprintf('%s/qa/single.php', $_SESSION['rce-base']), $ARG);
 	});
 	//->add(function($REQ, $RES, $ncb) {
 	//
@@ -146,13 +145,13 @@ $app->group('/transfer', function() {
 	});
 
 	//$this->get('/outgoing/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
-	//	$f = sprintf('%s/controller/%s/transfer-single.php', APP_ROOT, $_SESSION['rbe-base']);
+	//	$f = sprintf('%s/controller/%s/transfer-single.php', APP_ROOT, $_SESSION['rce-base']);
 	//	$RES = require_once($f);
 	//	return $RES;
 	//});
 
 	//$this->post('/outgoing/{guid:[\w\.]+}/accept', function($REQ, $RES, $ARG) {
-	//	$f = sprintf('%s/controller/%s/transfer-accept.php', APP_ROOT, $_SESSION['rbe-base']);
+	//	$f = sprintf('%s/controller/%s/transfer-accept.php', APP_ROOT, $_SESSION['rce-base']);
 	//	$RES = require_once($f);
 	//	return $RES;
 	//});
@@ -241,6 +240,25 @@ $app->group('/stem', function() {
 })
 //->add('App\Middleware\Log\HTTP')
 ;
+
+
+// Display System Info
+$app->get('/system', function($REQ, $RES, $ARG) {
+	// Nothing Yet
+});
+
+$app->get('/system/rce', function($REQ, $RES, $ARG) {
+
+	// Return a list of supported RCEs
+	$rce_file = sprintf('%s/etc/rce.ini', APP_ROOT);
+	$rce_data = parse_ini_file($rce_file, true, INI_SCANNER_RAW);
+
+	return $RES->withJSON(array(
+		'status' => 'success',
+		'result' => $rce_data,
+	), 200, JSON_PRETTY_PRINT);
+
+});
 
 
 // Run the App

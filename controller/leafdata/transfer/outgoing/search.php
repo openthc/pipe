@@ -22,7 +22,7 @@ if ($age >= 240) {
 	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
-	$rce = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rce']);
 
 	$res_source = $rce->transfer()->all();
 	if ('success' != $res_source['status']) {

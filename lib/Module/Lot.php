@@ -27,6 +27,10 @@ class Lot
 			return _from_rce_file('lot/search.php', $RES, $ARG);
 		});
 
+		$a->get('/history', function($REQ, $RES, $ARG) {
+			return _from_rce_file('lot/history/search.php', $RES, $ARG);
+		});
+
 		//	$a->post('/', function($REQ, $RES, $ARG) {
 		//		die('Create Inventory');
 		//	});

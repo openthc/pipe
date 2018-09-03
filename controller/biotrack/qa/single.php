@@ -19,7 +19,7 @@ $ret = array(
 	),
 );
 
-$rce = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rce']);
 
 //
 //$res = $rce->sync_qa_lab(0);
@@ -41,7 +41,7 @@ switch ($res0['success']) {
 case 0:
 	return $RES->withJSON(array(
 		'status' => 'failure',
-		'detail' => 'QGO#019: Invalid Result from RBE',
+		'detail' => 'QGO#019: Invalid Result from RCE',
 		'result' => $res0,
 	));
 	break;
@@ -153,7 +153,7 @@ case 1:
 if (empty($res1['data']) || !is_array($res1['data']) || (1 != count($res1['data']))) {
 	return $RES->withJSON(array(
 		'status' => 'failure',
-		'detail' => 'QGO#025: Invalid Result from RBE',
+		'detail' => 'QGO#025: Invalid Result from RCE',
 	));
 }
 

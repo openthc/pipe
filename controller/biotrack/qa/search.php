@@ -21,7 +21,7 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rce']);
 
 	// Load QA
 	$out_detail[] = 'Loading QA';
@@ -33,7 +33,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	if ((1 == $res_source['success']) && !empty($res_source['inventory_qa_sample'])) {
 		foreach ($res_source['inventory_qa_sample'] as $src) {
 
-			$guid = $src['id'];
+			$guid = sprintf('%s-%s', $src['transactionid_original'], $src['inventoryid']);
 			$hash = _hash_obj($src);
 
 			if ($hash != $res_cached[ $guid ]) {

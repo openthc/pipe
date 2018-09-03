@@ -7,7 +7,7 @@
 
 // curl -X GET https://watest.leafdatazone.com/api/v1/strains -H  "x-mjf-key: "FDSFSD" -H  "x-mjf-mme-code: FDSFDSFDS" -H "Content-Type: application/json" -d ''
 
-switch ($_SESSION['rbe']) {
+switch ($_SESSION['rce']) {
 case 'nv':
 case 'nv/leafdata':
 case 'wa':
@@ -17,12 +17,12 @@ case 'wa/leafdata':
 default:
 	$RES = $RES->withJson(array(
 		'status' => 'failure',
-		'detail' => 'CLP#020: Invalid RBE',
+		'detail' => 'CLP#020: Invalid RCE',
 	), 400);
 
 }
 
-$rce = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rce']);
 
 $good = 0;
 $want = 0;

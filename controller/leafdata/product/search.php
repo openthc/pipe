@@ -15,7 +15,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
-	$rce = \RCE::factory($_SESSION['rbe']);
+	$rce = \RCE::factory($_SESSION['rce']);
 
 	$res_source = $rce->inventory_type()->all();
 	if ('success' != $res_source['status']) {

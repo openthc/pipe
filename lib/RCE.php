@@ -13,7 +13,7 @@ class RCE
 		switch ($cfg['engine']) {
 		case 'biotrack':
 
-			$sid = $_SESSION['rbe-auth']['session'];
+			$sid = $_SESSION['rce-auth']['session'];
 
 			switch ($cfg['code']) {
 			case 'hi':
@@ -40,7 +40,7 @@ class RCE
 
 		case 'leafdata':
 
-			$rce = new RBE_LeafData($_SESSION['rbe-auth']);
+			$rce = new RBE_LeafData($_SESSION['rce-auth']);
 
 			switch ($cfg['code']) {
 			case 'leafdata-test':
@@ -55,38 +55,38 @@ class RCE
 
 			switch ($cfg['code']) {
 			case 'ak':
-				$rce = new RBE_Metrc_AK($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_AK($_SESSION['rce-auth']);
 				break;
 			case 'ak-test':
-				$rce = new RBE_Metrc_AK($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_AK($_SESSION['rce-auth']);
 				$rce->setTestMode();
 				break;
 			case 'ca':
-				$rce = new RBE_Metrc_CA($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_CA($_SESSION['rce-auth']);
 				break;
 			case 'ca-test':
-				$rce = new RBE_Metrc_CA($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_CA($_SESSION['rce-auth']);
 				$rce->setTestMode();
 				break;
 			case 'co':
-				$rce = new RBE_Metrc_CO($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_CO($_SESSION['rce-auth']);
 				break;
 			case 'co-test':
-				$rce = new RBE_Metrc_CO($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_CO($_SESSION['rce-auth']);
 				$rce->setTestMode();
 				break;
 			case 'nv':
-				$rce = new RBE_Metrc_NV($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_NV($_SESSION['rce-auth']);
 				break;
 			case 'nv-test':
-				$rce = new RBE_Metrc_NV($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_NV($_SESSION['rce-auth']);
 				$rce->setTestMode();
 				break;
 			case 'or':
-				$rce = new RBE_Metrc_OR($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_OR($_SESSION['rce-auth']);
 				break;
 			case 'or-test':
-				$rce = new RBE_Metrc_OR($_SESSION['rbe-auth']);
+				$rce = new RBE_Metrc_OR($_SESSION['rce-auth']);
 				$rce->setTestMode();
 				break;
 			}

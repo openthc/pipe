@@ -4,7 +4,7 @@
 */
 
 
-$rce = RCE::factory($_SESSION['rbe']);
+$rce = RCE::factory($_SESSION['rce']);
 
 $res = $rce->sync_sale(array(
 	'min' => intval($_GET['min']),

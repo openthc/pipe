@@ -3,7 +3,7 @@
 
 */
 
-$rce = \RCE::factory($_SESSION['rbe']);
+$rce = \RCE::factory($_SESSION['rce']);
 
 $obj = $rce->qa()->one($ARG['guid']);
 if (empty($obj)) {
