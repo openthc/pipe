@@ -17,7 +17,7 @@ use Edoceo\Radix\DB\SQL;
 
 file_put_contents('/tmp/sesion', print_r($_SESSION, true));
 
-$sql_hash = 0; // intval($_SESSION['rbe-auth']['company']);
+$sql_hash = 0;
 $sql_file = sprintf('%s/var/stem-biotrack-%08x.sqlite', APP_ROOT, $sql_hash);
 $sql_good = is_file($sql_file);
 
