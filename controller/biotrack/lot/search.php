@@ -125,6 +125,7 @@ return $RES->withJSON(array(
 
 
 ///////////////////////////////////////////////////////////////////////
+// @todo Unify Ouput According to OpenTHC Specification
 if (!empty($res['inventory'])) {
 	foreach ($res['inventory'] as $rec) {
 		$ret[] = array(
@@ -143,25 +144,3 @@ if (!empty($res['inventory'])) {
 		);
 	}
 }
-
-//$res = $rce->sync_inventory_adjust(0);
-//switch ($res['success']) {
-//case 0:
-//	break;
-//case 1:
-//	if (!empty($res['inventory_adjust'])) {
-//		foreach ($res['inventory_adjust'] as $rec) {
-//			// $ret[] = $rec;
-//		}
-//	}
-//	break;
-//}
-
-// @todo Unify Ouput According to OpenTHC Specification
-
-$ret_code = ($idx_update ? 200 : 203);
-
-return $RES->withJSON(array(
-	'status' => 'success',
-	'result' => $ret,
-), $ret_code, JSON_PRETTY_PRINT);

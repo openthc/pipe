@@ -4,4 +4,4 @@
 	@todo we could filter on the License table for common UBIs
 */
 
-return $RES->withRedirect('/license');
+return $RES->withRedirect('/config/license');

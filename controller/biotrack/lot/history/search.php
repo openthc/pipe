@@ -1,11 +1,11 @@
 <?php
 /**
-	Return all Rooms - inventory_room and plant_room
+	List of All Inventory & Inventory_Sample Objects
 */
 
 use Edoceo\Radix\DB\SQL;
 
-$obj_name = 'zone';
+$obj_name = 'lot_history';
 
 $out_detail = array();
 $out_result = array();
@@ -21,59 +21,19 @@ $res_cached = SQL::fetch_mix($sql);
 // Load Fresh Data?
 if ($age >= RCE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$rce = \RCE::factory($_SESSION['rbe']);
 
-	// Load Inventory Rooms
-	$out_detail[] = 'Loading Zone/Inventory';
-
-	$rfn = function($src) {
-		$src['_kind'] = 'Inventory';
-		return $src;
-	};
-	$gfn = function($src) {
-		return sprintf('inventory-%s', $src['roomid']);
-	};
-
-	//$idx_update += RCE_Sync::biotrack_pull($rce, 'sync_inventory_room', $rfn, $gfn,
-
-	$res_source = $rce->sync_inventory_room(array(
+	// Load Inventory
+	$out_detail[] = 'Loading Inventory History';
+	$res_source = $rce->sync_inventory_adjust(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
 
 	if (1 == $res_source['success']) {
-		foreach ($res_source['inventory_room'] as $src) {
+		foreach ($res_source['inventory_adjust'] as $src) {
 
-			$src['_kind'] = 'Inventory';
-
-			$guid = sprintf('inventory-%s', $src['roomid']);
-			$hash = _hash_obj($src);
-
-			if ($hash != $res_cached[ $guid ]) {
-
-				$idx_update++;
-
-				RCE_Sync::save($obj_name, $guid, $hash, $src);
-
-			}
-		}
-	} else {
-		$out_detail[] = $res_source['error'];
-	}
-
-	// Load Inventory Rooms
-	$out_detail[] = 'Loading Zone/Plant';
-	$res_source = $rce->sync_plant_room(array(
-		'min' => intval($_GET['min']),
-		'max' => intval($_GET['max']),
-	));
-
-	if (1 == $res_source['success']) {
-		foreach ($res_source['plant_room'] as $src) {
-
-			$src['_kind'] = 'Plant';
-
-			$guid = sprintf('plant-%s', $src['roomid']);
+			$guid = sprintf('%s-%s', $src['transactionid_original'], $src['inventoryid']);
 			$hash = _hash_obj($src);
 
 			if ($hash != $res_cached[ $guid ]) {
@@ -126,10 +86,9 @@ foreach ($res_source as $src) {
 
 }
 
+// $RES = $RES->withHeader('x-openthc-update', $idx_update);
 
 $ret_code = ($idx_update ? 200 : 203);
-
-// $RES = $RES->withHeader('x-openthc-update', $idx_update);
 
 return $RES->withJSON(array(
 	'status' => 'success',
