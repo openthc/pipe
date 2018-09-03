@@ -13,15 +13,15 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 
 	curl \
 		--data 'rce=hi' \
-		--data 'username=user@example.com' \
-		--data 'password=DoNotTe11!' \
+		--data 'rce-username=user@example.com' \
+		--data 'rce-password=DoNotTe11!' \
 
 ### LeafData
 
 	curl \
 		--data 'rce=wa' \
-		--data 'license=A123456' \
-		--data 'api-key=SOMESEQUENCE' \
+		--data 'rce-license=A123456' \
+		--data 'rce-client-psk=SOMESEQUENCE' \
 
 	f_batch_id=WAL876986.BA2E2SN
 	f_updated_at1=11/1/2017&
@@ -31,8 +31,8 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 
 	curl \
 		--data 'rce=co' \
-		--data 'vendor-key=ABC123' \
-		--data 'client-key=ZYX987' \
+		--data 'rce-vendor-psk=ABC123' \
+		--data 'rce-client-psk=ZYX987' \
 
 
 ## Authentication
