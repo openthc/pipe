@@ -5,18 +5,8 @@
 
 namespace App\Module;
 
-class Config
+class Config extends \OpenTHC\Module\Base
 {
-	protected $_container;
-
-	/**
-
-	*/
-	function __construct($c)
-	{
-		$this->_container = $c;
-	}
-
 	/**
 		@param $a App
 	*/

@@ -10,7 +10,9 @@ require_once(dirname(dirname(__FILE__)) . '/boot.php');
 // header('Access-Control-Allow-Credentials: true');
 
 // Slim Configuration
-$app = new \OpenTHC\App(array('debug' => true));
+//$cfg = array();
+//$cfg = array('debug' => true);
+$app = new \OpenTHC\App($cfg);
 
 // Tell Container to use a Magic Response object
 //$container['response'] = function($c0) {
@@ -144,11 +146,9 @@ $app->group('/transfer', function() {
 		return _from_rce_file('transfer/outgoing/search.php', $RES, $ARG);
 	});
 
-	//$this->get('/outgoing/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
-	//	$f = sprintf('%s/controller/%s/transfer-single.php', APP_ROOT, $_SESSION['rce-base']);
-	//	$RES = require_once($f);
-	//	return $RES;
-	//});
+	$this->get('/outgoing/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
+		return _from_rce_file('transfer/outgoing/single.php', $RES, $ARG);
+	});
 
 	//$this->post('/outgoing/{guid:[\w\.]+}/accept', function($REQ, $RES, $ARG) {
 	//	$f = sprintf('%s/controller/%s/transfer-accept.php', APP_ROOT, $_SESSION['rce-base']);

@@ -7,20 +7,13 @@ namespace App\Controller\Auth;
 
 use Edoceo\Radix\DB\SQL;
 
-class Open
+class Open extends \OpenTHC\Controller\Base
 {
-	protected $_c;
-
-	function __construct($c)
-	{
-		$this->_c = $c;
-	}
-
 	function __invoke($REQ, $RES, $ARG)
 	{
 		switch ($REQ->getMethod()) {
 		case 'GET':
-			return $this->renderForm($REQ, $RES, $ARG);
+			$RES = $this->renderForm($REQ, $RES, $ARG);
 			break;
 		case 'POST':
 			switch ($_POST['a']) {
@@ -83,6 +76,7 @@ class Open
 	*/
 	function renderForm($REQ, $RES, $ARG)
 	{
+
 		$rce_file = sprintf('%s/etc/rce.ini', APP_ROOT);
 		$rce_data = parse_ini_file($rce_file, true, INI_SCANNER_RAW);
 
@@ -100,7 +94,7 @@ class Open
 			$data['rce_client_api_key'] = $_SESSION['rce-auth']['secret'];
 		}
 
-		return $this->_c->view->render($RES, 'page/auth.html', $data);
+		return $this->_container->view->render($RES, 'page/auth.html', $data);
 
 	}
 
