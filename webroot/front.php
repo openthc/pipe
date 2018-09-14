@@ -219,27 +219,7 @@ $app->group('/waste', function() {
 /**
 	Stem Handlers simply log all requests/responses
 */
-$app->group('/stem', function() {
-
-	$this->get('', function($REQ, $RES, $ARG) {
-		return $this->view->render($RES, 'page/stem.html', array());
-	});
-
-	$this->post('/biotrack', function($REQ, $RES, $ARG) {
-		return require_once(APP_ROOT . '/controller/stem/biotrack.php');
-	});
-
-	$this->map([ 'GET', 'POST' ], '/leafdata/{path:.*}', function($REQ, $RES, $ARG) {
-		return require_once(APP_ROOT . '/controller/stem/leafdata.php');
-	});
-
-	$this->map([ 'GET', 'POST' ], '/metrc/{path:.*}', function($REQ, $RES, $ARG) {
-		return require_once(APP_ROOT . '/controller/stem/metrc.php');
-	});
-
-})
-//->add('App\Middleware\Log\HTTP')
-;
+$app->group('/stem', 'App\Module\Stem');
 
 
 // Display System Info
