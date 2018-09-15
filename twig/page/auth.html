@@ -8,41 +8,42 @@
 
 <div class="form-group">
 	<label>RCE</label>
-	<select class="form-control" name="rce">
+	<select class="form-control" id="rce" name="rce">
+	<option value="">- Select RCE -</option>
 	{% for rce_stub, rce_data in rce_list %}
-		<option {{ rce_stub == rce_code ? " selected " }} value="{{ rce_stub }}">{{ rce_data.name ? rce_data.name : rce_stub }}</option>
+		<option data-engine="{{ rce_data.engine }}" {{ rce_stub == rce_code ? "selected " }} value="{{ rce_stub }}">{{ rce_data.name ? rce_data.name : rce_stub }}</option>
 	{% endfor %}
 	</select>
 </div>
 
-<div class="form-group">
+<div class="form-group" data-biotrack="true" data-leafdata="true">
 	<label>Company:</label>
-	<input autocomplete="x" class="form-control" name="rce-company" placeholder="Company ID, like a UBI or something - BioTrack, LeafData" value="{{ rce_company }}">
+	<input autocomplete="x" class="form-control" name="company" placeholder="Company ID, like a UBI or something - BioTrack, LeafData" value="{{ rce_company }}">
 </div>
 
-<div class="form-group">
+<div class="form-group" data-leafdata="true" data-metrc="true">
 	<label>License:</label>
-	<input autocomplete="x" class="form-control" name="rce-license" placeholder="LeafData, METRC*" value="{{ rce_license }}">
+	<input autocomplete="x" class="form-control" name="license" placeholder="LeafData, METRC*" value="{{ rce_license }}">
 </div>
 
-<div class="form-group">
+<div class="form-group" data-metrc="true">
 	<label>Vendor API Key:</label>
-	<input autocomplete="x" class="form-control" name="rce-vendor-psk" placeholder="METRC" value="{{ rce_vendor_psk }}">
+	<input autocomplete="x" class="form-control" name="vendor-psk" placeholder="METRC" value="{{ rce_vendor_psk }}">
 </div>
 
-<div class="form-group">
+<div class="form-group" data-leafdata="true" data-metrc="true">
 	<label>Client API Key:</label>
-	<input autocomplete="x" class="form-control" name="rce-client-psk" placeholder="LeafData, METRC" value="{{ rce_client_psk }}">
+	<input autocomplete="x" class="form-control" name="client-psk" placeholder="LeafData, METRC" value="{{ rce_client_psk }}">
 </div>
 
-<div class="form-group">
+<div class="form-group" data-biotrack="true">
 	<label>Username:</label>
-	<input autocomplete="x" class="form-control" name="rce-username" placeholder="BioTrack" value="{{ rce_username }}">
+	<input autocomplete="x" class="form-control" name="username" placeholder="BioTrack" value="{{ rce_username }}">
 </div>
 
-<div class="form-group">
+<div class="form-group" data-biotrack="true">
 	<label>Password:</label>
-	<input autocomplete="x" class="form-control" name="rce-password" placeholder="BioTrack" value="{{ rce_password }}">
+	<input autocomplete="x" class="form-control" name="password" placeholder="BioTrack" value="{{ rce_password }}">
 </div>
 
 <button class="btn btn-lg btn-outline-primary" type="submit">Connect</button>
@@ -53,9 +54,23 @@
 
 {% block foot_script %}
 
+{{ parent() }}
+
 <script>
 $(function() {
-	
+	$('#rce').on('change', function() {
+
+		var $opt = $(this).find(':selected');
+		var eng = $opt.data('engine');
+
+		$('div[data-biotrack="true"]').hide();
+		$('div[data-leafdata="true"]').hide();
+		$('div[data-metrc="true"]').hide();
+
+		var sel = 'div[data-' + eng + '="true"]';
+		$(sel).show();
+
+	});
 });
 </script>
 

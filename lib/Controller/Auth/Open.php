@@ -116,7 +116,7 @@ class Open extends \OpenTHC\Controller\Base
 			return $RES;
 		}
 
-		$uid = strtolower(trim($_POST['rce-username']));
+		$uid = strtolower(trim($_POST['username']));
 
 		if (!preg_match('/\w+@\w+/', $uid)) {
 			return $RES->withJson(array(
@@ -127,7 +127,7 @@ class Open extends \OpenTHC\Controller\Base
 		}
 
 		// Password
-		$pwd = trim($_POST['rce-password']);
+		$pwd = trim($_POST['password']);
 		if (!preg_match('/^.{10}/', $pwd)) {
 			return $RES->withJson(array(
 				'status' => 'failure',
@@ -135,7 +135,7 @@ class Open extends \OpenTHC\Controller\Base
 			), 400);
 		}
 
-		$ext = preg_replace('/[^\d]+/', null, $_POST['rce-company']);
+		$ext = preg_replace('/[^\d]+/', null, $_POST['company']);
 		$ext = substr($ext, 0, 9);
 
 		if (!preg_match('/^\d{9}$/', $ext)) {
@@ -146,7 +146,10 @@ class Open extends \OpenTHC\Controller\Base
 		}
 
 		$rce = \RCE::factory($_SESSION['rce']);
+		var_dump($rce);
 		$chk = $rce->login($ext, $uid, $pwd);
+		var_dump($chk);
+		exit;
 
 		// @todo Detect a 500 Layer Response from BioTrack
 
@@ -184,10 +187,10 @@ class Open extends \OpenTHC\Controller\Base
 	*/
 	function _leafdata($RES)
 	{
-		$lic = trim($_POST['rce-license']);
+		$lic = trim($_POST['license']);
 		$lic = strtoupper($lic);
 
-		$key = trim($_POST['rce-client-psk']);
+		$key = trim($_POST['client-psk']);
 
 		if (!preg_match('/^(G|J|L|M|R)\w+$/', $lic)) {
 			return $RES->withJSON(array(
@@ -235,9 +238,9 @@ class Open extends \OpenTHC\Controller\Base
 	function _metrc($RES)
 	{
 		$_SESSION['rce-auth'] = array(
-			'vendor-key' => $_POST['rce-vendor-psk'],
-			'client-key' => $_POST['rce-client-psk'],
-			'license' => $_POST['rce-license'],
+			'vendor-key' => $_POST['vendor-psk'],
+			'client-key' => $_POST['client-psk'],
+			'license' => $_POST['license'],
 		);
 
 		$rce = \RCE::factory($_SESSION['rce']);

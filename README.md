@@ -13,15 +13,16 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 
 	curl \
 		--data 'rce=hi' \
-		--data 'rce-username=user@example.com' \
-		--data 'rce-password=DoNotTe11!' \
+		--data 'username=user@example.com' \
+		--data 'password=DoNotTe11!'
+
 
 ### LeafData
 
 	curl \
 		--data 'rce=wa' \
-		--data 'rce-license=A123456' \
-		--data 'rce-client-psk=SOMESEQUENCE' \
+		--data 'license=A123456' \
+		--data 'client-psk=SOMESEQUENCE'
 
 	f_batch_id=WAL876986.BA2E2SN
 	f_updated_at1=11/1/2017&
@@ -31,19 +32,21 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 
 	curl \
 		--data 'rce=co' \
-		--data 'rce-vendor-psk=ABC123' \
-		--data 'rce-client-psk=ZYX987' \
+		--data 'vendor-psk=ABC123' \
+		--data 'client-psk=ZYX987'
 
 
 ## Authentication
 
 Authentication must take place with the system to interface with and that information is passed to the OACI for authentication with the Regulatory Compliance Engine ("RCE")
 
+
 ## Supported Compliance Engines
 
  * BioTrackTHC ("BT") - Delaware*, Hawaii, New Mexico, North Dakota, Illinois, Puerto Rico
  * LeafData ("LD") - Washington
  * METRC ("FM") - Alaska, California, Colorado, Nevada, Oregon
+
 
 ## Supported Objects
 
@@ -53,19 +56,30 @@ Authentication must take place with the system to interface with and that inform
  * Zones (aka: Areas, Rooms) - (BT, LD, FM)
  * Vehicles - BT
 
+
 ## Reading Plants
 
-	curl /plants
-	curl /plants?filter=(active|wet-collect|dry-collect|done|dead)
-	curl /plants?filter=and&f-[n0]=[v0]&f-[n1]=[v1]
-	curl /plants?filter=or&f-[n0]=[v0]&f-[n1]=[v1]
+	curl /plant
+	curl /plant?filter=(active|wet-collect|dry-collect|done|dead)
+	curl /plant?filter=and&f-[n0]=[v0]&f-[n1]=[v1]
+	curl /plant?filter=or&f-[n0]=[v0]&f-[n1]=[v1]
+
 
 ## Reading Inventory
 
-	curl .../inventory
-	curl .../inventory?filter=(active)
-	curl .../inventory?filter=and
-	curl .../inventory?filter=or
+	curl /lot
+	curl /lot?filter=(active)
+	curl /lot?filter=and
+	curl /lot?filter=or
+
+
+## Reading Transfer Data
+
+	curl /transfer
+	curl /transfer/outgoing?filter=(active)
+	curl /transfer/incoming?filter=(active)
+	curl /transfer?filter=and
+	curl /transfer?filter=or
 
 
 ### Supported Systems
