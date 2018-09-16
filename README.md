@@ -24,9 +24,6 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 		--data 'license=A123456' \
 		--data 'client-psk=SOMESEQUENCE'
 
-	f_batch_id=WAL876986.BA2E2SN
-	f_updated_at1=11/1/2017&
-	f_updated_at2=11/30/2017
 
 ### METRC
 
@@ -84,17 +81,9 @@ Authentication must take place with the system to interface with and that inform
 
 ### Supported Systems
 
- * BioTrackTHC/HI
- * BioTrackTHC/IL
- * BioTrackTHC/ND
- * BioTrackTHC/NM
- * LeafData/WA
- * METRC/AK
- * METRC/CA
- * METRC/CO
- * METRC/NV
- * METRC/OR
-
+ * BioTrackTHC - Hawaii, Illinois, North Dakota, New Mexico, Washington (UCS)
+ * LeafData - Washington
+ * METRC - Alaska, California, Colorado, Nevada, Oregon
 
 ## Behat
 

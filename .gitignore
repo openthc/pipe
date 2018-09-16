@@ -1,5 +1,6 @@
-composer.lock
-composer.phar
-etc/rce.ini
+
 var/
 vendor/
+
+composer.lock
+etc/rce.ini
