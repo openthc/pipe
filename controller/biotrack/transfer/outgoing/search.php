@@ -24,7 +24,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	$rce = \RCE::factory($_SESSION['rce']);
 
 	// Load Primary Licenses
-	$out_detail[] = 'Loading Plant';
+	//$out_detail[] = 'sync_manifest()';
 	$res_source = $rce->sync_manifest(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
@@ -92,6 +92,6 @@ $ret_code = ($idx_update ? 200 : 203);
 
 return $RES->withJSON(array(
 	'status' => 'success',
-	'detail' => $out_detail,
+	//'detail' => $out_detail,
 	'result' => $out_result,
 ), $ret_code, JSON_PRETTY_PRINT);

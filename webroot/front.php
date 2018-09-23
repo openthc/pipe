@@ -11,7 +11,7 @@ require_once(dirname(dirname(__FILE__)) . '/boot.php');
 
 // Slim Configuration
 //$cfg = array();
-//$cfg = array('debug' => true);
+$cfg = array('debug' => true);
 $app = new \OpenTHC\App($cfg);
 
 // Tell Container to use a Magic Response object
@@ -41,8 +41,6 @@ $app->group('/auth', function() {
 	$this->get('/open', 'App\Controller\Auth\Open');
 	$this->post('/open', 'App\Controller\Auth\Open');
 
-	$this->get('/info', 'App\Controller\Auth\Status');
-
 	$this->get('/ping', function($REQ, $RES, $ARG) {
 		return _from_rce_file('ping.php', $RES, $ARG);
 	})->add('App\Middleware\RCE');
@@ -68,7 +66,9 @@ $app->get('/browse', function($REQ, $RES, $ARG) {
 /**
 	Config Stuff
 */
-$app->group('/config', 'App\Module\Config')->add('App\Middleware\RCE')->add('App\Middleware\Session');
+$app->group('/config', 'App\Module\Config')
+->add('App\Middleware\RCE')
+->add('App\Middleware\Session');
 
 
 // Plants
@@ -83,13 +83,11 @@ $app->group('/plant', function() {
 	//});
 
 	$this->get('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/plant/single.php', $_SESSION['rce-base']), $ARG);
+		return _from_rce_file('plant/single.php', $RES, $ARG);
 	});
 
 	$this->post('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/plant/update.php', $_SESSION['rce-base']), $ARG);
+		return _from_rce_file('plant/update.php', $RES, $ARG);
 	});
 
 	//$this->post('/{guid:[0-9a-f]+}/collect', function($REQ, $RES, $ARG) {
@@ -98,7 +96,9 @@ $app->group('/plant', function() {
 	//	return $RES;
 	//});
 
-})->add('App\Middleware\RCE')->add('App\Middleware\Session');
+})
+->add('App\Middleware\RCE')
+->add('App\Middleware\Session');
 
 
 // Inventory Group
@@ -113,8 +113,7 @@ $app->group('/qa', function() {
 	});
 
 	$this->get('/{guid}', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/qa/single.php', $_SESSION['rce-base']), $ARG);
+		return _from_rce_file('qa/single.php', $RES, $ARG);
 	});
 	//->add(function($REQ, $RES, $ncb) {
 	//
@@ -163,6 +162,13 @@ $app->group('/transfer', function() {
 		return _from_rce_file('transfer/incoming/search.php', $RES, $ARG);
 	});
 
+	$this->get('/incoming/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
+		return _from_rce_file('transfer/outgoing/single.php', $RES, $ARG);
+	});
+
+	$this->post('/incoming/{guid:[\w\.]+}/accept', function($REQ, $RES, $ARG) {
+		return _from_rce_file('transfer/incoming/accept.php', $RES, $ARG);
+	});
 
 	/*
 		Rejected Transfers

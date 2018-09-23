@@ -64,8 +64,23 @@ class Open extends \OpenTHC\Controller\Base
 
 		$this->_createDatabase();
 
-		if (!empty($_GET['r'])) {
-			return $RES->withRedirect($_GET['r']);
+		if (!empty($_GET['client_id'])) {
+			// Need to Connect to OpenTHC Here
+			// Perhaps this is Middleware?
+			switch ($_GET['client_id']) {
+			case 'dump.openthc.com':
+				return $RES->withRedirect('https://dump.openthc.com/auth/open?pipe-token=' . session_id());
+				break;
+			case 'qa.openthc.org':
+				return $RES->withRedirect('https://qa.openthc.org/auth/open?pipe-token=' . session_id());
+				break;
+			}
+		}
+
+		if (!empty($_POST['a'])) {
+			if ('auth-web' == $_POST['a']) {
+				return $RES->withRedirect('/browse');
+			}
 		}
 
 		return $RES;
@@ -146,10 +161,7 @@ class Open extends \OpenTHC\Controller\Base
 		}
 
 		$rce = \RCE::factory($_SESSION['rce']);
-		var_dump($rce);
 		$chk = $rce->login($ext, $uid, $pwd);
-		var_dump($chk);
-		exit;
 
 		// @todo Detect a 500 Layer Response from BioTrack
 
@@ -307,6 +319,7 @@ class Open extends \OpenTHC\Controller\Base
 			SQL::query('CREATE TABLE contact (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE license (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE lot (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
+			SQL::query('CREATE TABLE lot_delta (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE plant (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE product (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE qa (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');

@@ -5,89 +5,86 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 304;
-
 $obj_name = 'transfer';
 
-$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);
-SQL::init('sqlite:' . $sql_file);
+$age = RCE_Sync::age($obj_name);
 
-$dt0 = $_SERVER['REQUEST_TIME'];
-$sql = sprintf("SELECT val FROM _config WHERE key = 'sync-{$obj_name}-time'");
-$dt1 = intval(SQL::fetch_one($sql));
-$age = $dt0 - $dt1;
 
-if ($age >= 240) {
+// Load Cache Data
+$sql = "SELECT guid, hash FROM {$obj_name}";
+$res_cached = SQL::fetch_mix($sql);
 
-	$sql = "SELECT guid, hash FROM {$obj_name}";
-	$res_cached = SQL::fetch_mix($sql);
+
+// Load Fresh Data?
+if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rce = \RCE::factory($_SESSION['rce']);
 
-	$res_source = $rce->transfer()->all();
-	if ('success' != $res_source['status']) {
-		return $RES->withJSON(array(
-			'status' => 'failure',
-			'detail' => $rce->formatError($res_source),
-		), 500);
+	$res_source = new RCE_Iterator_LeafData($rce->transfer());
+
+	foreach ($res_source as $src) {
+
+		$guid = $src['global_id'];
+
+		$hash = _hash_obj($src);
+
+		if ($hash != $res_cached[ $guid ]) {
+
+			$idx_update++;
+
+			// Fully Inflate Transfer Object
+			$src = $rce->transfer()->one($guid);// inventory_transfer_items
+
+			RCE_Sync::save($obj_name, $guid, $hash, $src);
+
+		}
 	}
 
-	$res_source = $res_source['result']['data'];
-
-} else {
-
-	// From Cache
-	$res_cached = array();
-	$res_source = array();
-
-	$sql = "SELECT hash, meta FROM {$obj_name}";
-	$res = SQL::fetch_all($sql);
-
-	foreach ($res as $rec) {
-
-		$x = json_decode($rec['meta'], true);
-		$x['hash'] = $rec['hash'];
-
-		$res_cached[ $x['global_id'] ] = $x['hash'];
-		$res_source[] = $x;
-	}
+	RCE_Sync::age($obj_name, time());
 
 }
 
+
+// Now Fetch all from DB and Send Back
+$res_output = array();
+$sql = "SELECT guid, hash, meta FROM {$obj_name} ORDER BY guid DESC";
+$res_source = SQL::fetch_all($sql);
 
 foreach ($res_source as $src) {
 
-	if (empty($src['hash'])) {
-		$src['hash'] = _hash_obj($src);
+	$out = array(
+		'guid' => $src['guid'],
+		'hash' => $src['hash'],
+	);
+
+	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
+		$out['_updated'] = 1;
+		$out['_source'] = json_decode($src['meta'], true);
+	} elseif ('true' == $_GET['source']) {
+		$out['_source'] = json_decode($src['meta'], true);
 	}
 
-	$obj = array();
-	$obj['guid'] = $src['global_id'];
-	$obj['hash'] = $src['hash'];
-	$obj['source_license_guid'] = $src['global_from_mme_id'];
-	$obj['target_license_guid'] = $src['global_to_mme_id'];
-	$obj['type'] = $src['manifest_type'];
-	$obj['status'] = $src['status'];
-	$obj['status_void'] = $src['void'];
+	$res_output[] = $out;
+
+//	$obj = array();
+//	$obj['guid'] = $src['global_id'];
+//	$obj['hash'] = $src['hash'];
+//	$obj['source_license_guid'] = $src['global_from_mme_id'];
+//	$obj['target_license_guid'] = $src['global_to_mme_id'];
+//	$obj['type'] = $src['manifest_type'];
+//	$obj['status'] = $src['status'];
+//	$obj['status_void'] = $src['void'];
 	//$obj['carrier_license_guid'] = $src['global_transporting_mme_id'];
 
-	if ($obj['hash'] != $res_cached[ $obj['guid'] ]) {
-
-		$ret_code = 200;
-
-		$obj['_source'] = $src;
-		$obj['_updated'] = 1;
-
-		unset($src['hash']);
-
-		RCE_Sync::save($obj_name, $guid, $hash, $src);
-
-	}
-
-	$obj_output[] = $obj;
 }
+
+
+$ret_code = ($idx_update ? 200 : 203);
+
+$RES = $RES->withHeader('x-openthc-age', $age);
+$RES = $RES->withHeader('x-openthc-update', $idx_update);
 
 return $RES->withJSON(array(
 	'status' => 'success',
-	'result' => $obj_output,
+	'result' => $res_output,
 ), $ret_code, JSON_PRETTY_PRINT);

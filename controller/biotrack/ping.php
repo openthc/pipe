@@ -60,5 +60,13 @@ foreach ($obj_list as $obj) {
 
 return $RES->withJson(array(
 	'status' => 'success',
-	'result' => $ret_ping,
+	'result' => array(
+		'host' => 'pipe.openthc.com',
+		'ipv4' => '',
+		'ipv6' => '',
+		'ssl-cert' => '',
+		'_session_id' => session_id(),
+		'_session' => $_SESSION,
+		'_source' => $ret_ping,
+	),
 ), 200, JSON_PRETTY_PRINT);
