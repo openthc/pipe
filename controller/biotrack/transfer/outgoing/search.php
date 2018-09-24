@@ -7,7 +7,6 @@ use Edoceo\Radix\DB\SQL;
 
 $obj_name = 'transfer';
 
-$out_detail = array();
 $out_result = array();
 
 $age = RCE_Sync::age($obj_name);
@@ -24,7 +23,6 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	$rce = \RCE::factory($_SESSION['rce']);
 
 	// Load Primary Licenses
-	$out_detail[] = 'Loading Plant';
 	$res_source = $rce->sync_manifest(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
@@ -45,7 +43,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 			}
 		}
 	} else {
-		$out_detail[] = $res_source['error'];
+		// throw new \Exception($res_source['error']);
 	}
 
 	RCE_Sync::age($obj_name, time());
@@ -92,6 +90,5 @@ $ret_code = ($idx_update ? 200 : 203);
 
 return $RES->withJSON(array(
 	'status' => 'success',
-	'detail' => $out_detail,
 	'result' => $out_result,
 ), $ret_code, JSON_PRETTY_PRINT);

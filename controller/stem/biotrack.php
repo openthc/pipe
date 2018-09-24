@@ -5,7 +5,7 @@
 
 	To use the Passthru Configure this as the URL Base
 
-	https://pipe.openthc.com/stem/biotrack
+	$BASE/stem/biotrack
 
 	Forward to:
 		https://wa.biotrack.com/serverjson.asp
@@ -15,9 +15,7 @@
 
 use Edoceo\Radix\DB\SQL;
 
-file_put_contents('/tmp/sesion', print_r($_SESSION, true));
-
-$sql_hash = 0;
+$sql_hash = $_SESSION['sql-hash'];
 $sql_file = sprintf('%s/var/stem-biotrack-%08x.sqlite', APP_ROOT, $sql_hash);
 $sql_good = is_file($sql_file);
 
@@ -37,8 +35,17 @@ $rce_host = parse_url($rce_base, PHP_URL_HOST);
 
 // Deny
 if (count($_GET) != 0) {
-	header('HTTP/1.1 400 Bad Request', true, 400);
-	die('No Query String Parameters are Accepted');
+	return $RES->withJSON(array(
+		'success' => 0,
+		'_detail' => 'No Query String parameters are accepted [CSB#040]',
+	), 400);
+}
+
+if ('POST' != $_SERVER['REQUEST_METHOD']) {
+	return $RES->withJSON(array(
+		'success' => 0,
+		'_detail' => 'Only a POST is allowed here [CSB#045]',
+	), 405);
 }
 
 
@@ -55,61 +62,65 @@ case 'application/json': // The RFC one
 	$ret['warn'][] = 'Set Content-Type to "text/JSON", application/json is only for application that work properly';
 	break;
 default:
-	header('HTTP/1.0 400 Bad Request', true, 400);
-	die('Specify "Content-Type: text/JSON"');
+	return $RES->withJSON(array(
+		'success' => 0,
+		'_detail' => 'Specify "Content-Type: text/JSON" [CSB#067]',
+	), 400);
 }
 
 
-$src_json = file_get_contents('php://input');
-
 // Good JSON?
+$src_json = file_get_contents('php://input');
 $src_json = json_decode($src_json, true);
 if (empty($src_json)) {
 	return $RES->withJSON(array(
 		'success' => 0,
-		'_detail' => 'MFB#034: Error Decoding Input',
+		'_detail' => 'Error Decoding Input [CSB#034]',
 		'_errors' => json_last_error_msg(),
 	));
 }
 
-// Action
-if (empty($src_json['action'])) {
-	return $RES->withJSON(array(
-		'_detail' => 'The "action" parameter must be provided',
-		//'_request' => $json,
-		'success' => 0,
-		'error' => 'Invalid Action',
-		'errorcode' => 62,
-	), 400);
-}
-if (!preg_match('/^\w+$/', $src_json['action'])) {
-	return $RES->withJSON(array(
-		'_detail' => 'Invalid "action" parameter',
-		//'_request' => $json,
-		'success' => 0,
-	), 400);
-}
 
-// Now Just Forward to BioTrack
+// API Version Check
 $src_json['API'] = '4.0';
-//if (!empty($this->_sid)) {
-//	$arg['sessionid'] = $this->_sid;
-//}
 
-//if (!empty($this->_training)) {
-//	$arg['training'] = 1;
-//}
 
+// Assign NONCE
 if (empty($src_json['nonce'])) {
 	$src_json['nonce'] = $_SERVER['UNIQUE_ID'];
 }
 
-// Auth
-//$RES = _req_auth($RES);
-//if (200 != $RES->getStatusCode()) {
-//	return $RES;
-//}
 
+// Action
+if (empty($src_json['action'])) {
+	return $RES->withJSON(array(
+		'success' => 0,
+		'error' => 'Invalid Action',
+		'errorcode' => 62,
+		'_detail' => 'The "action" parameter must be provided',
+		//'_request' => $json,
+	), 400);
+}
+if (!preg_match('/^\w+$/', $src_json['action'])) {
+	return $RES->withJSON(array(
+		'success' => 0,
+		'_detail' => 'Invalid "action" parameter [CSB#098]',
+	), 400);
+}
+
+
+// API Session Check
+if (empty($src_json['sessionid'])) {
+	if ('login' != $src_json['action']) {
+		return $RES->withJSON(array(
+			'success' => 0,
+			'_detail' => 'A "sessionid" must be provided [CSB#109]',
+		), 400);
+	}
+}
+
+
+// Now Just Forward to BioTrack
 
 // Resolve Path
 $rce_http = new RCE_HTTP(array(
@@ -123,7 +134,6 @@ case 'POST':
 
 	$req = new GuzzleHttp\Psr7\Request('POST', '');
 	$req = $req->withHeader('host', $rce_host);
-	//$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
 	$req = $req->withHeader('content-type', 'text/JSON');
 
 	$res = $rce_http->send($req, array('json' => $src_json));
@@ -145,38 +155,3 @@ $RES = $RES->withHeader('content-type', $res->getHeader('content-type'));
 $RES = $RES->write($body);
 
 return $RES;
-
-
-/**
-	Authentication Validator
-*/
-function _req_auth($RES)
-{
-	$auth = $_SERVER['HTTP_AUTHORIZATION'];
-
-	if (empty($auth)) {
-		return $RES->withJSON(array(
-			'status' => 'failure',
-			'detail' => 'Invalid Auth [CSM#030]',
-		), 400);
-	}
-
-	if (!preg_match('/^Basic\s+(.+)$/', $auth, $m)) {
-		return $RES->withJSON(array(
-			'status' => 'failure',
-			'detail' => 'Invalid Auth [CSM#037]',
-		), 400);
-	}
-
-	// Database
-	$sql_hash = crc32($_SERVER['HTTP_AUTHORIZATION']);
-	$sql_file = sprintf('%s/var/stem-metric-%08x.sqlite', APP_ROOT, $sql_hash);
-	$sql_good = is_file($sql_file);
-
-	SQL::init('sqlite:' . $sql_file);
-	if (!$sql_good) {
-		SQL::query("CREATE TABLE log_audit (cts not null default (strftime('%s','now')), code, path, req, res, err)");
-	}
-
-	return $RES;
-}

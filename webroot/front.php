@@ -5,12 +5,9 @@
 
 require_once(dirname(dirname(__FILE__)) . '/boot.php');
 
-// Want to use these?
-// header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN'], true);
-// header('Access-Control-Allow-Credentials: true');
 
 // Slim Configuration
-//$cfg = array();
+$cfg = array();
 //$cfg = array('debug' => true);
 $app = new \OpenTHC\App($cfg);
 
@@ -27,7 +24,6 @@ $con['notFoundHandler'] = function($c) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
 			'detail' => 'Not Found',
-			'_url' => $REQ->getUri()->__toString(),
 		), 404);
 	};
 };
@@ -40,8 +36,6 @@ $app->group('/auth', function() {
 
 	$this->get('/open', 'App\Controller\Auth\Open');
 	$this->post('/open', 'App\Controller\Auth\Open');
-
-	$this->get('/info', 'App\Controller\Auth\Status');
 
 	$this->get('/ping', function($REQ, $RES, $ARG) {
 		return _from_rce_file('ping.php', $RES, $ARG);
@@ -62,13 +56,18 @@ $app->get('/browse', function($REQ, $RES, $ARG) {
 	$data['rce_meta_license'] = $_SESSION['rce-auth']['license'];
 
 	return $this->view->render($RES, 'page/browse.html', $data);
-})->add('App\Middleware\RCE')->add('App\Middleware\Session');
+
+})
+->add('App\Middleware\RCE')
+->add('App\Middleware\Session');
 
 
 /**
 	Config Stuff
 */
-$app->group('/config', 'App\Module\Config')->add('App\Middleware\RCE')->add('App\Middleware\Session');
+$app->group('/config', 'App\Module\Config')
+->add('App\Middleware\RCE')
+->add('App\Middleware\Session');
 
 
 // Plants
@@ -83,13 +82,11 @@ $app->group('/plant', function() {
 	//});
 
 	$this->get('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/plant/single.php', $_SESSION['rce-base']), $ARG);
+		return _from_rce_file('plant/single.php', $RES, $ARG);
 	});
 
 	$this->post('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/plant/update.php', $_SESSION['rce-base']), $ARG);
+		return _from_rce_file('plant/update.php', $RES, $ARG);
 	});
 
 	//$this->post('/{guid:[0-9a-f]+}/collect', function($REQ, $RES, $ARG) {
@@ -98,11 +95,15 @@ $app->group('/plant', function() {
 	//	return $RES;
 	//});
 
-})->add('App\Middleware\RCE')->add('App\Middleware\Session');
+})
+->add('App\Middleware\RCE')
+->add('App\Middleware\Session');
 
 
 // Inventory Group
-$app->group('/lot', 'App\Module\Lot')->add('App\Middleware\RCE')->add('App\Middleware\Session');
+$app->group('/lot', 'App\Module\Lot')
+->add('App\Middleware\RCE')
+->add('App\Middleware\Session');
 
 
 // QA Group
@@ -113,8 +114,7 @@ $app->group('/qa', function() {
 	});
 
 	$this->get('/{guid}', function($REQ, $RES, $ARG) {
-		$RES = new Response_From_File();
-		return $RES->execute(sprintf('%s/qa/single.php', $_SESSION['rce-base']), $ARG);
+		return _from_rce_file('qa/single.php', $RES, $ARG);
 	});
 	//->add(function($REQ, $RES, $ncb) {
 	//
@@ -136,7 +136,9 @@ $app->group('/qa', function() {
 	//	return $RES;
 	//});
 
-})->add('App\Middleware\RCE')->add('App\Middleware\Session');
+})
+->add('App\Middleware\RCE')
+->add('App\Middleware\Session');
 
 
 // Transfer Group
@@ -163,6 +165,13 @@ $app->group('/transfer', function() {
 		return _from_rce_file('transfer/incoming/search.php', $RES, $ARG);
 	});
 
+	$this->get('/incoming/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
+		return _from_rce_file('transfer/outgoing/single.php', $RES, $ARG);
+	});
+
+	$this->post('/incoming/{guid:[\w\.]+}/accept', function($REQ, $RES, $ARG) {
+		return _from_rce_file('transfer/incoming/accept.php', $RES, $ARG);
+	});
 
 	/*
 		Rejected Transfers
@@ -171,7 +180,9 @@ $app->group('/transfer', function() {
 		return _from_rce_file('transfer/rejected/search.php', $RES, $ARG);
 	});
 
-})->add('App\Middleware\RCE')->add('App\Middleware\Session');
+})
+->add('App\Middleware\RCE')
+->add('App\Middleware\Session');
 
 
 // Retail Sales
