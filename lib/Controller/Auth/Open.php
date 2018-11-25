@@ -5,7 +5,6 @@
 
 namespace App\Controller\Auth;
 
-use Edoceo\Radix\DB\SQL;
 
 class Open extends \OpenTHC\Controller\Base
 {
@@ -62,10 +61,18 @@ class Open extends \OpenTHC\Controller\Base
 			break;
 		}
 
+		if (200 != $RES->getStatusCode()) {
+			return $RES;
+		}
+
 		$this->_createDatabase();
 
 		if (!empty($_GET['r'])) {
 			return $RES->withRedirect($_GET['r']);
+		}
+
+		if ('auth-web' == $_POST['a']) {
+			return $RES->withRedirect('/browse');
 		}
 
 		return $RES;
@@ -87,8 +94,12 @@ class Open extends \OpenTHC\Controller\Base
 		$data['rce_license'] = $_SESSION['rce-auth']['license'];
 		$data['rce_vendor_psk'] = $_SESSION['rce-auth']['vendor-key'];
 		$data['rce_client_psk'] = $_SESSION['rce-auth']['client-key'];
-		$data['rce_username'] = $_SESSION['rce-auth']['username'];;
-		$data['rce_password'] = $_SESSION['rce-auth']['password'];;
+		$data['rce_username'] = $_SESSION['rce-auth']['username'];
+		$data['rce_password'] = $_SESSION['rce-auth']['password'];
+
+		if (!empty($_GET['rce'])) {
+			$data['rce_code'] = $_GET['rce'];
+		}
 
 		if (empty($data['rce_client_api_key'])) {
 			$data['rce_client_api_key'] = $_SESSION['rce-auth']['secret'];
@@ -209,7 +220,7 @@ class Open extends \OpenTHC\Controller\Base
 
 		$_SESSION['rce-auth'] = array(
 			'license' => $lic,
-			'secret' => $key,
+			'client-key' => $key,
 		);
 
 		$rce = \RCE::factory($_SESSION['rce']);
@@ -218,11 +229,11 @@ class Open extends \OpenTHC\Controller\Base
 		if (empty($res)) {
 			return $RES->withJSON(array(
 				'status' => 'failure',
-				'detail' => 'CAC#192 Invalid License or API Key',
-				'_s' => $_SESSION,
-				'_rce' => $rce,
-				'_res' => $res,
-			));
+				'detail' => 'Invalid License or API Key [CAO#239]',
+				//'_s' => $_SESSION,
+				//'_rce' => $rce,
+				//'_res' => $res,
+			), 403);
 		}
 
 		return $RES->withJSON(array(
@@ -294,32 +305,7 @@ class Open extends \OpenTHC\Controller\Base
 	{
 
 		$_SESSION['sql-hash'] = md5(json_encode($_POST));
-
-		$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);
-		if (!is_file($sql_file)) {
-
-			// Create Database
-			SQL::init('sqlite:' . $sql_file);
-			SQL::query('CREATE TABLE _config (key TEXT PRIMARY KEY, val TEXT)');
-			SQL::query("CREATE TABLE _log_audit (cts not null default (strftime('%s','now')), code, meta TEXT)");
-			SQL::query("CREATE TABLE _log_alert (cts not null default (strftime('%s','now')), code, meta TEXT)");
-			SQL::query("CREATE TABLE _log_delta (cts not null default (strftime('%s','now')), code, meta TEXT)");
-			SQL::query('CREATE TABLE contact (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE license (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE lot (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE plant (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE product (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE qa (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE strain (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE transfer (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE waste (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE vehicle (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE zone (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-
-			SQL::query('INSERT INTO _config VALUES (?, ?)', array('Created', date(\DateTime::RFC3339)));
-			SQL::query('INSERT INTO _log_audit (code, meta) VALUES (?, ?)', array('App Created', date(\DateTime::RFC3339)));
-
-		}
+		\RCE_Sync::open();
 
 	}
 

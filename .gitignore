@@ -4,6 +4,7 @@ composer.lock
 etc/app.ini
 etc/rce.ini
 
+custom/
 lib/RBE/
 var/
 vendor/

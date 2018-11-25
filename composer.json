@@ -10,7 +10,8 @@
 	],
 	"autoload": {
 		"psr-4": {
-			"App\\": "./lib"
+			"App\\": "./lib",
+			"Custom\\": "./custom"
 		}
 	},
 	"require": {
