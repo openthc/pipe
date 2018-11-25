@@ -77,6 +77,8 @@ foreach ($res_source as $src) {
 	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
 		$out['_updated'] = 1;
 		$out['_source'] = json_decode($src['meta'], true);
+	} elseif ('true' == $_GET['source']) {
+		$out['_source'] = json_decode($src['meta'], true);
 	}
 
 	$res_output[] = $out;

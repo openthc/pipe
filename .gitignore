@@ -1,6 +1,7 @@
 
 composer.lock
 
+etc/app.ini
 etc/rce.ini
 
 lib/RBE/

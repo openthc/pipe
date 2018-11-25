@@ -8,8 +8,6 @@
 // curl -X GET https://watest.leafdatazone.com/api/v1/strains -H  "x-mjf-key: "FDSFSD" -H  "x-mjf-mme-code: FDSFDSFDS" -H "Content-Type: application/json" -d ''
 
 switch ($_SESSION['rce']) {
-case 'nv':
-case 'nv/leafdata':
 case 'wa':
 case 'wa/leafdata':
 	// OK
@@ -61,4 +59,5 @@ if (empty($res['error'])) {
 return $RES->withJson(array(
 	'status' => 'success',
 	'result' => intval($good / $want * 100),
+	'pipe-token' => session_id(),
 ));
