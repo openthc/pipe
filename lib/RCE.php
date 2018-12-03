@@ -40,12 +40,20 @@ class RCE
 
 		case 'leafdata':
 
-			$rce = new RBE_LeafData($_SESSION['rce-auth']);
+			$rce_auth = $_SESSION['rce-auth'];
+
+			$l = new License();
+			$l['id'] = null;
+			$l['code'] = $rce_auth['license'];
+			$rce_auth['license'] = $l;
+			$rce_auth['secret'] = $rce_auth['client-key'];
+
+			$rce = new RBE_LeafData($rce_auth);
 
 			switch ($cfg['code']) {
 			case 'leafdata-test':
 			case 'wa-test':
-				$rce->setTestMode('work');
+				$rce->setTestMode();
 				break;
 			}
 
