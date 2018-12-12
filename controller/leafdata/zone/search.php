@@ -20,7 +20,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rce = \RCE::factory($_SESSION['rce']);
 
-	$res_source = new RCE_Iterator_LeafData($rce->area());
+	$res_source = new RCE_Iterator_LeafData($rce->zone());
 
 	foreach ($res_source as $src) {
 

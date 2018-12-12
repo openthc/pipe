@@ -15,7 +15,7 @@ $sql = "SELECT guid, hash FROM {$obj_name}";
 $res_cached = SQL::fetch_mix($sql);
 
 
-// Load Fresh Data?
+// Load Fresh Data
 if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rce = \RCE::factory($_SESSION['rce']);
@@ -66,6 +66,7 @@ foreach ($res_source as $src) {
 
 
 $ret_code = ($idx_update ? 200 : 203);
+
 
 $RES = $RES->withHeader('x-openthc-age', $age);
 $RES = $RES->withHeader('x-openthc-update', $idx_update);

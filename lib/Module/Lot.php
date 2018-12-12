@@ -58,13 +58,11 @@ class Lot extends \OpenTHC\Module\Base
 		//	$a->post('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
 		//		die('Update Inventory Item');
 		//	});
-		//
-		//	// Delete Item
-		//	$a->delete('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		//		// First send a 202, Pending
-		//		// Second send a 204, Deleted/No Content
-		//		die('Update Inventory Item');
-		//	});
+
+		// Delete Item
+		$a->delete('/{guid}', function($REQ, $RES, $ARG) {
+			return _from_rce_file('lot/delete.php', $RES, $ARG);
+		});
 
 	}
 }
