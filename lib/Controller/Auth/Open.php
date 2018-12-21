@@ -8,6 +8,7 @@ namespace App\Controller\Auth;
 
 class Open extends \OpenTHC\Controller\Base
 {
+
 	function __invoke($REQ, $RES, $ARG)
 	{
 		switch ($REQ->getMethod()) {
@@ -67,10 +68,12 @@ class Open extends \OpenTHC\Controller\Base
 
 		$this->_createDatabase();
 
+		// Someone asked for redirect
 		if (!empty($_GET['r'])) {
 			return $RES->withRedirect($_GET['r']);
 		}
 
+		// From our webform
 		if ('auth-web' == $_POST['a']) {
 			return $RES->withRedirect('/browse');
 		}
@@ -92,8 +95,8 @@ class Open extends \OpenTHC\Controller\Base
 		$data['rce_code'] = $_SESSION['rce']['code'];
 		$data['rce_company'] = $_SESSION['rce-auth']['company'];
 		$data['rce_license'] = $_SESSION['rce-auth']['license'];
-		$data['rce_vendor_psk'] = $_SESSION['rce-auth']['vendor-key'];
-		$data['rce_client_psk'] = $_SESSION['rce-auth']['client-key'];
+		$data['rce_vendor_key'] = $_SESSION['rce-auth']['vendor-key'];
+		$data['rce_client_key'] = $_SESSION['rce-auth']['client-key'];
 		$data['rce_username'] = $_SESSION['rce-auth']['username'];
 		$data['rce_password'] = $_SESSION['rce-auth']['password'];
 
@@ -157,10 +160,7 @@ class Open extends \OpenTHC\Controller\Base
 		}
 
 		$rce = \RCE::factory($_SESSION['rce']);
-		var_dump($rce);
 		$chk = $rce->login($ext, $uid, $pwd);
-		var_dump($chk);
-		exit;
 
 		// @todo Detect a 500 Layer Response from BioTrack
 
@@ -201,19 +201,19 @@ class Open extends \OpenTHC\Controller\Base
 		$lic = trim($_POST['license']);
 		$lic = strtoupper($lic);
 
-		$key = trim($_POST['client-psk']);
+		$key = trim($_POST['client-key']);
 
 		if (!preg_match('/^(G|J|L|M|R)\w+$/', $lic)) {
 			return $RES->withJSON(array(
 				'status' => 'failure',
-				'detail' => 'CAC#124 Invalid License',
+				'detail' => 'Invalid License [CAO#209]',
 			));
 		}
 
 		if (empty($key)) {
 			return $RES->withJSON(array(
 				'status' => 'failure',
-				'detail' => 'CAC#131 Invalid API Key',
+				'detail' => 'Invalid API Key [CAO#216]',
 				'_post' => $_POST,
 			));
 		}
@@ -230,9 +230,6 @@ class Open extends \OpenTHC\Controller\Base
 			return $RES->withJSON(array(
 				'status' => 'failure',
 				'detail' => 'Invalid License or API Key [CAO#239]',
-				//'_s' => $_SESSION,
-				//'_rce' => $rce,
-				//'_res' => $res,
 			), 403);
 		}
 
@@ -249,8 +246,8 @@ class Open extends \OpenTHC\Controller\Base
 	function _metrc($RES)
 	{
 		$_SESSION['rce-auth'] = array(
-			'vendor-key' => $_POST['vendor-psk'],
-			'client-key' => $_POST['client-psk'],
+			'vendor-key' => $_POST['vendor-key'],
+			'client-key' => $_POST['client-key'],
 			'license' => $_POST['license'],
 		);
 
@@ -283,12 +280,6 @@ class Open extends \OpenTHC\Controller\Base
 		// var_dump($rce_data);
 
 		$rce_want = strtolower(trim($_POST['rce']));
-
-		// Re-Map Legacy Name
-		//switch ($rce_want) {
-		//if ('wa/leaf' == $rce_want) {
-		//	$rce_want = 'wa/mjf';
-		//}
 
 		$rce_info = $rce_data[ $rce_want ];
 
