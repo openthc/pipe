@@ -1,19 +1,22 @@
 <?php
 /**
 	Return a Single License
+	We have to filter ourselves because the API does not offer this option
 */
 
 $rce = \RCE::factory($_SESSION['rce']);
 
 $res = $rce->license()->all();
 
-$ret = array();
+$ret = null;
 
 foreach ($res['result'] as $x) {
 
 	if ($ARG['guid'] == $x['global_id']) {
 		// OK
 	} elseif ($ARG['guid'] == $x['code']) {
+		// OK
+	} elseif ($ARG['guid'] == substr($x['code'], 1)) {
 		// OK
 	} else {
 		// Skip
@@ -48,6 +51,7 @@ foreach ($res['result'] as $x) {
 			'line2' => $x['address2'],
 			'city' => $x['city'],
 		),
+		'_source' => $x,
 	);
 
 	break; // Stop for
@@ -55,6 +59,16 @@ foreach ($res['result'] as $x) {
 }
 
 
+// Nothing?
+if (empty($ret)) {
+	return $RES->withJSON(array(
+		'status' => 'failure',
+		'detail' => 'Not Found',
+	), 404);
+}
+
+
+// Something?
 return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $ret,
