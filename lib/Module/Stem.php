@@ -41,4 +41,18 @@ class Stem extends \OpenTHC\Module\Base
 
 	}
 
+	/**
+		@todo Attach this middleware somehow
+	*/
+	function _find_rce_from_header($REQ, $RES, $NMW)
+	{
+		// From Headers?
+		//if (!empty($_SERVER['HTTP_OPENTHC_RCE_BASE'])) {
+		//	$rce_base = $_SERVER['HTTP_OPENTHC_RCE_BASE'];
+		//}
+		//if (!empty($_SERVER['HTTP_OPENTHC_RCE_HOST'])) {
+		//	$rce_host = $_SERVER['HTTP_OPENTHC_RCE_HOST'];
+		//}
+	}
+
 }

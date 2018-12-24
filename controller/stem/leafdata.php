@@ -15,23 +15,46 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$rce_base = 'https://traceability.lcb.wa.gov/api/v1';
-//$rce_base = 'https://watest.leafdatazone.com/api/v1';
+// Default
+$rce_base = 'https://bunk.openthc.org/leafdata/v2017';
+$rce_host = null;
+
+// Using a SOCAT? Set Boths of These
 //$rce_base = 'http://localhost:8080/api/v1';
-//if (!empty($_SERVER['HTTP_OPENTHC_RCE_BASE'])) {
-//	$rce_base = $_SERVER['HTTP_OPENTHC_RCE_BASE'];
-//}
-$rce_host = parse_url($rce_base, PHP_URL_HOST);
+//$rce_host = null;
+
+// Requested System
+switch ($ARG['system']) {
+case 'wa':
+case 'wa-live':
+	$rce_base = 'https://traceability.lcb.wa.gov/api/v1';
+	break;
+case 'test':
+case 'wa-test':
+	$rce_base = 'https://watest.leafdatazone.com/api/v1';
+	break;
+default:
+	return $RES->withJSON(array(
+		'status' => 'failure',
+		'detail' => 'Invalid System [CSL#033]'
+	), 400);
+}
+
+
+// From URL if not already set
+if (empty($rce_host)) {
+	$rce_host = parse_url($rce_base, PHP_URL_HOST);
+}
 
 
 // Auth
-$RES = _do_auth($RES);
+$RES = _check_auth($RES);
 if (200 != $RES->getStatusCode()) {
 	return $RES;
 }
 
 
-// Database
+// Audit Log Database
 $sql_hash = crc32($_SERVER['HTTP_X_MJF_MME_CODE'] . $_SERVER['HTTP_X_MJF_KEY']);
 $sql_file = sprintf('%s/var/stem-leafdata-%08x.sqlite', APP_ROOT, $sql_hash);
 $sql_good = is_file($sql_file);
@@ -43,17 +66,18 @@ if (!$sql_good) {
 
 
 // Resolve Path
-$src_path = $_SERVER['REQUEST_URI']; // Contains Query String
-$src_path = str_replace('/stem/leafdata/', null, $src_path);
+$src_trim = sprintf('/stem/leafdata/%s', $ARG['system']); // Stuff to remove
 
-$src_json = file_get_contents('php://input');
+$src_path = $_SERVER['REQUEST_URI']; // Contains Query String
+$src_path = str_replace($src_trim, null, $src_path);
+$src_path = ltrim($src_path, '/');
 
 $req_path = $rce_base . '/' . $src_path;
 
-$rce_http = new RCE_HTTP();
-
 
 // Forward
+$rce_http = new RCE_HTTP();
+
 switch ($_SERVER['REQUEST_METHOD']) {
 case 'GET':
 
@@ -68,6 +92,9 @@ case 'GET':
 
 case 'POST':
 
+	$src_json = file_get_contents('php://input');
+	$src_json = json_decode($src_json, true);
+
 	$req = new GuzzleHttp\Psr7\Request('POST', $req_path);
 	$req = $req->withHeader('host', $rce_host);
 	$req = $req->withHeader('x-mjf-mme-code', $_SERVER['HTTP_X_MJF_MME_CODE']);
@@ -76,7 +103,9 @@ case 'POST':
 	$res = $rce_http->send($req, array('json' => $src_json));
 
 	break;
+
 }
+
 
 // var_dump($res);
 $code = ($res ? $res->getStatusCode() : 500);
@@ -91,7 +120,7 @@ return $RES;
 /**
 	Authentication Validator
 */
-function _do_auth($RES)
+function _check_auth($RES)
 {
 	$_SERVER['HTTP_X_MJF_MME_CODE'] = trim($_SERVER['HTTP_X_MJF_MME_CODE']);
 	$_SERVER['HTTP_X_MJF_KEY'] = trim($_SERVER['HTTP_X_MJF_KEY']);
@@ -102,7 +131,7 @@ function _do_auth($RES)
 	if (empty($lic) || empty($key)) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
-			'detail' => 'License or Key not missing [CSL#025]',
+			'detail' => 'License or Key missing [CSL#025]',
 		), 400);
 	}
 
