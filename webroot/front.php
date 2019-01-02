@@ -4,11 +4,12 @@
 */
 
 require_once(dirname(dirname(__FILE__)) . '/boot.php');
+require_once('/opt/common/lib/Controller/Auth/Connect.php');
 
 
-// Slim Configuration
-$cfg = array();
-//$cfg = array('debug' => true);
+// Slim Application
+//$cfg = array();
+$cfg = array('debug' => true);
 $app = new \OpenTHC\App($cfg);
 
 // Tell Container to use a Magic Response object
@@ -29,19 +30,24 @@ $con['notFoundHandler'] = function($c) {
 };
 
 
-/**
-	Authentication
-*/
+// Authentication
 $app->group('/auth', function() {
 
 	$this->get('/open', 'App\Controller\Auth\Open');
 	$this->post('/open', 'App\Controller\Auth\Open');
 
-	$this->get('/ping', function($REQ, $RES, $ARG) {
-		return _from_rce_file('ping.php', $RES, $ARG);
-	})->add('App\Middleware\RCE');
+	$this->get('/connect', 'OpenTHC\Controller\Auth\Connect');
 
-	$this->any('/shut', 'App\Controller\Auth\Shut');
+	$this->get('/back', function($REQ, $RES, $ARG) {
+		return $RES->withRedirect('/browse');
+	});
+
+	//$this->get('/ping', 'OpenTHC\Controller\Auth\Ping');
+	$this->any('/ping', function($REQ, $RES, $ARG) {
+		return _from_rce_file('ping.php', $RES, $ARG);
+	});
+
+	$this->get('/shut', 'OpenTHC\Controller\Auth\Shut');
 
 })->add('App\Middleware\Session');
 
@@ -56,7 +62,6 @@ $app->get('/browse', function($REQ, $RES, $ARG) {
 	$data['rce_meta_license'] = $_SESSION['rce-auth']['license'];
 
 	return $this->view->render($RES, 'page/browse.html', $data);
-
 })
 ->add('App\Middleware\RCE')
 ->add('App\Middleware\Session');
@@ -66,44 +71,26 @@ $app->get('/browse', function($REQ, $RES, $ARG) {
 	Config Stuff
 */
 $app->group('/config', 'App\Module\Config')
-->add('App\Middleware\RCE')
-->add('App\Middleware\Session');
+	->add('App\Middleware\RCE')
+	->add('App\Middleware\Session');
+
+
+// Batch
+$app->group('/batch', 'App\Module\Batch')
+	->add('App\Middleware\RCE')
+	->add('App\Middleware\Session');
 
 
 // Plants
-$app->group('/plant', function() {
-
-	$this->get('', function($REQ, $RES, $ARG) {
-		return _from_rce_file('plant/search.php', $RES, $ARG);
-	});
-
-	//$this->post('', function($REQ, $RES, $ARG) {
-	//	die('Create Plants');
-	//});
-
-	$this->get('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		return _from_rce_file('plant/single.php', $RES, $ARG);
-	});
-
-	$this->post('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		return _from_rce_file('plant/update.php', $RES, $ARG);
-	});
-
-	//$this->post('/{guid:[0-9a-f]+}/collect', function($REQ, $RES, $ARG) {
-	//	$f = sprintf('%s/controller/%s/plants-get.php', APP_ROOT, $_SESSION['rce-base']);
-	//	require_once($f);
-	//	return $RES;
-	//});
-
-})
-->add('App\Middleware\RCE')
-->add('App\Middleware\Session');
+$app->group('/plant', 'App\Module\Plant')
+	->add('App\Middleware\RCE')
+	->add('App\Middleware\Session');
 
 
 // Inventory Group
 $app->group('/lot', 'App\Module\Lot')
-->add('App\Middleware\RCE')
-->add('App\Middleware\Session');
+	->add('App\Middleware\RCE')
+	->add('App\Middleware\Session');
 
 
 // QA Group
@@ -186,31 +173,9 @@ $app->group('/transfer', function() {
 
 
 // Retail Sales
-$app->group('/sale', function() {
-
-	$this->get('', function($REQ, $RES, $ARG) {
-		return _from_rce_file('retail/search.php', $RES, $ARG);
-	});
-
-	$this->post('', function($REQ, $RES, $ARG) {
-		return _from_rce_file('retail/create.php', $RES, $ARG);
-	});
-
-	$this->get('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		print_r($_POST);
-		return $RES->withJSON(array('status' => 'failure', 'detail' => 'Not Implemented'), 500);
-	});
-
-	$this->post('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		print_r($_POST);
-		return $RES->withJSON(array('status' => 'failure', 'detail' => 'Not Implemented'), 500);
-	});
-
-	$this->delete('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {
-		return $RES->withJSON(array('status' => 'failure', 'detail' => 'Not Implemented'), 500);
-	});
-
-})->add('App\Middleware\RCE')->add('App\Middleware\Session');
+$app->group('/retail', 'App\Module\Retail')
+	->add('App\Middleware\RCE')
+	->add('App\Middleware\Session');
 
 
 // Waste Group
