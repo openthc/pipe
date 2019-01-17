@@ -96,6 +96,10 @@ class Config extends \OpenTHC\Module\Base
 		$a->get('/strain', function($REQ, $RES, $ARG) {
 			return _from_rce_file('strain/search.php', $RES, $ARG);
 		});
+		// Single
+		$a->get('/strain/{guid}', function($REQ, $RES, $ARG) {
+			return _from_rce_file('strain/single.php', $RES, $ARG);
+		});
 
 		/*
 			Vehicle
