@@ -15,7 +15,7 @@
 		}
 	},
 	"require": {
-		"php": ">=7.0.0",
+		"php": ">=7.2.0",
 		"ext-curl": "*",
 		"ext-date": "*",
 		"ext-json": "*",
@@ -23,12 +23,12 @@
 		"ext-session": "*",
 		"ext-sockets": "*",
 		"edoceo/radix": "dev-master",
-		"giggsey/libphonenumber-for-php": "8.9.10",
+		"giggsey/libphonenumber-for-php": "8.9.16",
 		"guzzlehttp/guzzle": "6.3.3",
 		"openthc/common": "dev-master",
-		"slim/slim": "3.10.0",
+		"slim/slim": "3.12.0",
 		"slim/twig-view": "2.4.0",
-		"twig/twig": "2.5.0"
+		"twig/twig": "2.6.2"
 	},
 	"require-dev": {
 		"behat/behat": "3.4.3"

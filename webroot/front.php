@@ -39,7 +39,16 @@ $app->group('/auth', function() {
 	$this->get('/connect', 'OpenTHC\Controller\Auth\Connect');
 
 	$this->get('/back', function($REQ, $RES, $ARG) {
-		return $RES->withRedirect('/browse');
+
+		$_POST['a'] = 'auth-web';
+		$_POST['rce'] = $_SESSION['rce']['engine'];
+		$_POST['license'] = $_SESSION['rce-auth']['license'];
+		$_POST['client-key'] = $_SESSION['rce-auth']['client-key'];
+
+		$C = new App\Controller\Auth\Open($this);
+		$RES = $C->connect($REQ, $RES, $ARG);
+		return $RES;
+
 	});
 
 	//$this->get('/ping', 'OpenTHC\Controller\Auth\Ping');
@@ -56,6 +65,8 @@ $app->group('/auth', function() {
 	A Very Simple Object Browser
 */
 $app->get('/browse', function($REQ, $RES, $ARG) {
+
+	session_write_close();
 
 	$data = array();
 	$data['rce_auth'] = $_SESSION['rce-auth'];
