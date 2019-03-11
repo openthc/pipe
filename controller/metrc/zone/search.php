@@ -28,7 +28,7 @@ if ($age >= 240) {
 	$rce = \RCE::factory($_SESSION['rce']);
 
 	try {
-		$res_source = $rce->roomList();
+		$res_source = $rce->zone()->search();
 	} catch (Exception $e) {
 		if (401 == $e->getCode()) {
 			return $RES->withJSON(array(

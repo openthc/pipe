@@ -14,7 +14,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	$rce = \RCE::factory($_SESSION['rce']);
 
 	// /items/v1/categories
-	$res = $rce->itemList('active');
+	$res = $rce->product()->search('active');
 	//$res = $rce->packageList('active');
 
 	foreach ($res['result'] as $x) {

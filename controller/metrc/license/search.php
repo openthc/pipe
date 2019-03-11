@@ -9,7 +9,7 @@ use Edoceo\Radix\DB\SQL;
 $obj_name = 'license';
 
 $age = RCE_Sync::age($obj_name);
-
+$age = RCE_Sync::MAX_AGE + 1;
 
 // Load Cache Data
 $sql = "SELECT guid, hash FROM {$obj_name}";
@@ -21,7 +21,9 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rce = \RCE::factory($_SESSION['rce']);
 
-	$res_source = $rce->facilitiesList();
+	$res_source = $rce->license()->search();
+	print_r($res_source);
+	exit;
 	$res_source = $res_source['result'];
 
 	foreach ($res_source as $src) {

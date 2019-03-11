@@ -24,7 +24,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rce = \RCE::factory($_SESSION['rce']);
 
-	$res_source = $rce->strainList();
+	$res_source = $rce->strain()->search();
 
 	if (200 != $res_source['status']) {
 		return $RES->withJSON(array(
