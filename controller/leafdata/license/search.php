@@ -1,16 +1,19 @@
 <?php
 /**
-	Return a List of Licenses
-	@todo Make Licenses a Special / Global Data-Store
-
-	@see https://www.telerik.com/blogs/understanding-http-304-responses
-*/
+ * Return a List of Licenses
+ */
 
 use Edoceo\Radix\DB\SQL;
 
 $obj_name = 'license';
 
 $age = RCE_Sync::age($obj_name);
+// If client requested no-cache
+if (!empty($_SERVER['HTTP_CACHE_CONTROL'])) {
+	if ('no-cache' == $_SERVER['HTTP_CACHE_CONTROL']) {
+		$age = RCE_Sync::MAX_AGE + 1;
+	}
+}
 
 
 // Load Cache Data
@@ -71,7 +74,6 @@ foreach ($res_source as $src) {
 			'line2' => $m['address2'],
 			'city' => $m['city'],
 		),
-		//'name' => sprintf('%s in %s', trim($src['strain_name']), trim($src['area_name'])),
 	);
 
 	if ($out['hash'] != $res_cached[ $out['guid'] ]) {

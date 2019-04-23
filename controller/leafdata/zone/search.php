@@ -1,13 +1,19 @@
 <?php
 /**
-	Return a List of Zones
-*/
+ * Return a List of Zones
+ */
 
 use Edoceo\Radix\DB\SQL;
 
 $obj_name = 'zone';
 
 $age = RCE_Sync::age($obj_name);
+// If client requested no-cache
+if (!empty($_SERVER['HTTP_CACHE_CONTROL'])) {
+	if ('no-cache' == $_SERVER['HTTP_CACHE_CONTROL']) {
+		$age = RCE_Sync::MAX_AGE + 1;
+	}
+}
 
 
 // Load Cache Data
@@ -15,7 +21,7 @@ $sql = "SELECT guid, hash FROM {$obj_name}";
 $res_cached = SQL::fetch_mix($sql);
 
 
-// Load Fresh Data?
+// Load Fresh Data
 if ($age >= RCE_Sync::MAX_AGE) {
 
 	$rce = \RCE::factory($_SESSION['rce']);

@@ -23,8 +23,6 @@
 		"ext-session": "*",
 		"ext-sockets": "*",
 		"edoceo/radix": "dev-master",
-		"giggsey/libphonenumber-for-php": "8.9.16",
-		"guzzlehttp/guzzle": "6.3.3",
 		"openthc/common": "dev-master",
 		"slim/slim": "3.12.0",
 		"slim/twig-view": "2.4.0",
