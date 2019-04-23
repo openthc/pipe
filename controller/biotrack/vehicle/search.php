@@ -1,7 +1,7 @@
 <?php
 /**
-	Return All Vehicles
-*/
+ * Return All Vehicles
+ */
 
 use Edoceo\Radix\DB\SQL;
 

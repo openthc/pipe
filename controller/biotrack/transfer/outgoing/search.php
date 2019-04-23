@@ -1,7 +1,7 @@
 <?php
 /**
-	Transfers
-*/
+ * Transfers
+ */
 
 use Edoceo\Radix\DB\SQL;
 

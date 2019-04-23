@@ -1,11 +1,11 @@
 <?php
 /**
-	List of All Inventory & Inventory_Sample Objects
+ * List of All Inventory Adjustments
 */
 
 use Edoceo\Radix\DB\SQL;
 
-$obj_name = 'lot_history';
+$obj_name = 'lot_delta';
 
 $out_detail = array();
 $out_result = array();

@@ -1,17 +1,13 @@
 <?php
 /**
-	Stem pass-thru handler for BioTrack systems
-	Accept the Request, Sanatize It, Process Response and Sanatize Objects
-
-	To use the Passthru Configure this as the URL Base
-
-	$BASE/stem/biotrack
-
-	Forward to:
-		https://wa.biotrack.com/serverjson.asp
-
-	Return Sanatized Response
-*/
+ * Stem pass-thru handler for BioTrack systems
+ * Accept the Request, Sanatize It, Process Response and Sanatize Objects
+ * To use the Passthru Configure this as the URL Base
+ * $BASE/stem/biotrack
+ * Forward to:
+ * https://wa.biotrack.com/serverjson.asp
+ * Return Sanatized Response
+ */
 
 use Edoceo\Radix\DB\SQL;
 
@@ -144,7 +140,6 @@ case 'POST':
 // this is a workaround for a biotrack bug where headers leak into the response body /djb 20170723
 //$_raw = str_replace('Content-Type: text/plain', null, $_raw);
 //$_raw = trim($_raw);
-
 
 // var_dump($res);
 $code = ($res ? $res->getStatusCode() : 500);

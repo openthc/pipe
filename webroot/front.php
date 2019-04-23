@@ -1,21 +1,14 @@
 <?php
 /**
-	Front Controller - via Slim
-*/
+ * OpenTHC Pipe Front Controller
+ */
 
 require_once(dirname(dirname(__FILE__)) . '/boot.php');
-require_once('/opt/common/lib/Controller/Auth/Connect.php');
-
 
 // Slim Application
 //$cfg = array();
 $cfg = array('debug' => true);
 $app = new \OpenTHC\App($cfg);
-
-// Tell Container to use a Magic Response object
-//$container['response'] = function($c0) {
-//
-//};
 
 
 // 404 Handler
@@ -62,8 +55,8 @@ $app->group('/auth', function() {
 
 
 /**
-	A Very Simple Object Browser
-*/
+ * A Very Simple Object Browser
+ */
 $app->get('/browse', function($REQ, $RES, $ARG) {
 
 	session_write_close();
@@ -78,9 +71,7 @@ $app->get('/browse', function($REQ, $RES, $ARG) {
 ->add('App\Middleware\Session');
 
 
-/**
-	Config Stuff
-*/
+// Config/Core Data Stuff
 $app->group('/config', 'App\Module\Config')
 	->add('App\Middleware\RCE')
 	->add('App\Middleware\Session');
@@ -92,13 +83,13 @@ $app->group('/batch', 'App\Module\Batch')
 	->add('App\Middleware\Session');
 
 
-// Plants
+// Plant
 $app->group('/plant', 'App\Module\Plant')
 	->add('App\Middleware\RCE')
 	->add('App\Middleware\Session');
 
 
-// Inventory Group
+// Inventory Lot
 $app->group('/lot', 'App\Module\Lot')
 	->add('App\Middleware\RCE')
 	->add('App\Middleware\Session');
@@ -200,12 +191,14 @@ $app->group('/waste', function() {
 		return _from_rce_file('waste/single.php', $RES, $ARG);
 	});
 
-})->add('App\Middleware\RCE')->add('App\Middleware\Session');
+})
+->add('App\Middleware\RCE')
+->add('App\Middleware\Session');
 
 
 /**
-	Stem Handlers simply log all requests/responses
-*/
+ * Stem Handlers simply log all requests/responses
+ */
 $app->group('/stem', 'App\Module\Stem');
 
 

@@ -1,6 +1,6 @@
 # OpenTHC Pipe
 
-The pipe is a common interface to multiple cannabis compliance engines.
+The pipe is a common interface to multiple cannabis regulatory compliance engines.
 
 Simply authenticate to the pipe system, which establishes a connection to the engine.
 Then pull and push data.
@@ -12,7 +12,7 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 ### BioTrack
 
 	curl \
-		--data 'rce=hi' \
+		--data 'rce=usa/hi' \
 		--data 'username=user@example.com' \
 		--data 'password=DoNotTe11!'
 
@@ -20,17 +20,17 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 ### LeafData
 
 	curl \
-		--data 'rce=wa' \
+		--data 'rce=usa/wa' \
 		--data 'license=A123456' \
-		--data 'client-psk=SOMESEQUENCE'
+		--data 'license-key=SOMESEQUENCE'
 
 
 ### METRC
 
 	curl \
-		--data 'rce=co' \
-		--data 'vendor-psk=ABC123' \
-		--data 'client-psk=ZYX987'
+		--data 'rce=usa/co' \
+		--data 'program-key=ABC123' \
+		--data 'license-key=ZYX987'
 
 
 ## Authentication

@@ -1,7 +1,7 @@
 <?php
 /**
-	Return All Contacts (Employee)
-*/
+ * Return All Contacts (Employee)
+ */
 
 use Edoceo\Radix\DB\SQL;
 
