@@ -74,24 +74,28 @@ $app->get('/browse', function($REQ, $RES, $ARG) {
 // Config/Core Data Stuff
 $app->group('/config', 'App\Module\Config')
 	->add('App\Middleware\RCE')
+	->add('App\Middleware\Database')
 	->add('App\Middleware\Session');
 
 
 // Batch
 $app->group('/batch', 'App\Module\Batch')
 	->add('App\Middleware\RCE')
+	->add('App\Middleware\Database')
 	->add('App\Middleware\Session');
 
 
 // Plant
 $app->group('/plant', 'App\Module\Plant')
 	->add('App\Middleware\RCE')
+	->add('App\Middleware\Database')
 	->add('App\Middleware\Session');
 
 
 // Inventory Lot
 $app->group('/lot', 'App\Module\Lot')
 	->add('App\Middleware\RCE')
+	->add('App\Middleware\Database')
 	->add('App\Middleware\Session');
 
 
@@ -127,6 +131,7 @@ $app->group('/qa', function() {
 
 })
 ->add('App\Middleware\RCE')
+->add('App\Middleware\Database')
 ->add('App\Middleware\Session');
 
 
@@ -171,12 +176,14 @@ $app->group('/transfer', function() {
 
 })
 ->add('App\Middleware\RCE')
+->add('App\Middleware\Database')
 ->add('App\Middleware\Session');
 
 
 // Retail Sales
 $app->group('/retail', 'App\Module\Retail')
 	->add('App\Middleware\RCE')
+	->add('App\Middleware\Database')
 	->add('App\Middleware\Session');
 
 
@@ -193,6 +200,7 @@ $app->group('/waste', function() {
 
 })
 ->add('App\Middleware\RCE')
+->add('App\Middleware\Database')
 ->add('App\Middleware\Session');
 
 
