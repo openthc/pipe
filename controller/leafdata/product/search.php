@@ -1,33 +1,33 @@
 <?php
 /**
-	Return a List of Products
-	In LeafData it's called an Inventory Type
-*/
+ * Return a List of Products -- In LeafData it's called an Inventory Type
+ */
 
 use Edoceo\Radix\DB\SQL;
 
 $obj_name = 'product';
 
-$age = RCE_Sync::age($obj_name);
+$age = CRE_Sync::age($obj_name);
 
-if ($age >= RCE_Sync::MAX_AGE) {
+// Load Fresh Data
+if ($age >= CRE_Sync::MAX_AGE) {
 
 	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
-	$res_source = $rce->inventory_type()->all();
+	$res_source = $cre->inventory_type()->all();
 	if ('success' != $res_source['status']) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
-			'detail' => $rce->formatError($res_source),
+			'detail' => $cre->formatError($res_source),
 		), 500);
 	}
 
 	$res_source = $res_source['result']['data'];
 
-	RCE_Sync::age($obj_name, time());
+	CRE_Sync::age($obj_name, time());
 
 } else {
 
@@ -72,7 +72,7 @@ foreach ($res_source as $src) {
 
 		unset($src['hash']);
 
-		RCE_Sync::save($obj_name, $guid, $hash, $src);
+		CRE_Sync::save($obj_name, $guid, $hash, $src);
 
 	}
 

@@ -16,8 +16,8 @@ $req_data = json_decode($src_json, true);
 //);
 
 
-$rce = \RCE::factory($_SESSION['rce']);
-$res = $rce->transfer()->receive($req_data);
+$cre = \CRE::factory($_SESSION['cre']);
+$res = $cre->transfer()->receive($req_data);
 
 
 // Call it good

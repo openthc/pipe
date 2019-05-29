@@ -1,7 +1,7 @@
 <?php
 /**
-	Ping the Leaf Data Connection
-*/
+ * Ping the Leaf Data Connection
+ */
 
 // curl -X GET https://watest.leafdatazone.com/api/v1/strains
 
@@ -15,12 +15,12 @@ case 'wa/leafdata':
 default:
 	$RES = $RES->withJson(array(
 		'status' => 'failure',
-		'detail' => 'CLP#020: Invalid RCE',
+		'detail' => 'CLP#020: Invalid CRE',
 	), 400);
 
 }
 
-$cre = \RCE::factory($_SESSION['cre']);
+$cre = \CRE::factory($_SESSION['cre']);
 
 $good = 0;
 $want = 0;

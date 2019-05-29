@@ -1,7 +1,7 @@
 <?php
 /**
-	Return a List of Waste (disposal)
-*/
+ * Return a List of Waste -- Called Disposal in LeafData
+ */
 
 use Edoceo\Radix\DB\SQL;
 
@@ -9,7 +9,7 @@ $ret_code = 203;
 
 $obj_name = 'waste';
 
-$age = RCE_Sync::age($obj_name);
+$age = CRE_Sync::age($obj_name);
 
 
 // Load Cache Data
@@ -18,11 +18,11 @@ $res_cached = SQL::fetch_mix($sql);
 
 
 // Load Fresh Data?
-if ($age >= RCE_Sync::MAX_AGE) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
-	$res_source = new RCE_Iterator_LeafData($rce->disposal());
+	$res_source = new CRE_Iterator_LeafData($cre->disposal());
 
 	foreach ($res_source as $src) {
 
@@ -32,12 +32,12 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 			$idx_update++;
 
-			RCE_Sync::save($obj_name, $guid, $hash, $src);
+			CRE_Sync::save($obj_name, $guid, $hash, $src);
 
 		}
 	}
 
-	RCE_Sync::age($obj_name, time());
+	CRE_Sync::age($obj_name, time());
 
 }
 //echo "Count Cache: " . count($res_cached) . "\n";

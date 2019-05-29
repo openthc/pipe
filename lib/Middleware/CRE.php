@@ -1,11 +1,11 @@
 <?php
 /**
- * Load the RCE
+ * Load the CRE
  */
 
 namespace App\Middleware;
 
-class RCE
+class CRE
 {
 
 	public function __invoke($REQ, $RES, $NMW)

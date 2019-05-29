@@ -4,9 +4,9 @@
 	We have to filter ourselves because the API does not offer this option
 */
 
-$rce = \RCE::factory($_SESSION['rce']);
+$cre = \CRE::factory($_SESSION['cre']);
 
-$res = $rce->license()->all();
+$res = $cre->license()->all();
 
 $ret = null;
 

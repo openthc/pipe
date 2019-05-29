@@ -1,16 +1,16 @@
 <?php
 /**
-	Fetch a Single Strain
-*/
+ * Return a Single Strain Object as JSON
+ */
 
+$cre = \CRE::factory($_SESSION['cre']);
 
-$rce = \RCE::factory($_SESSION['rce']);
+$res = $cre->strain()->one($ARG['guid']);
 
-$res = $rce->strain()->one($ARG['guid']);
 if (empty($res)) {
 	return $RES->withJSON(array(
 		'status' => 'failure',
-		'detail' => 'Strain not found',
+		'detail' => 'Not Found',
 	), 404);
 }
 
