@@ -7,7 +7,13 @@ use Edoceo\Radix\DB\SQL;
 
 $obj_name = 'strain';
 
-$age = RCE_Sync::age($obj_name);
+$age = CRE_Sync::age($obj_name);
+// If client requested no-cache
+if (!empty($_SERVER['HTTP_CACHE_CONTROL'])) {
+	if ('no-cache' == $_SERVER['HTTP_CACHE_CONTROL']) {
+		$age = CRE_Sync::MAX_AGE + 1;
+	}
+}
 
 
 // Load Cache Data
@@ -16,11 +22,11 @@ $res_cached = SQL::fetch_mix($sql);
 
 
 // Load Fresh Data?
-if ($age >= RCE_Sync::MAX_AGE) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
-	$res_source = new RCE_Iterator_LeafData($rce->strain());
+	$res_source = new CRE_Iterator_LeafData($cre->strain());
 
 	foreach ($res_source as $src) {
 
@@ -31,12 +37,12 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 			$idx_update++;
 
-			RCE_Sync::save($obj_name, $guid, $hash, $src);
+			CRE_Sync::save($obj_name, $guid, $hash, $src);
 
 		}
 	}
 
-	RCE_Sync::age($obj_name, time());
+	CRE_Sync::age($obj_name, time());
 
 }
 
@@ -48,14 +54,17 @@ $res_source = SQL::fetch_all($sql);
 
 foreach ($res_source as $src) {
 
+	$src['meta'] = json_decode($src['meta'], true);
+
 	$out = array(
 		'guid' => $src['guid'],
 		'hash' => $src['hash'],
+		'name' => $src['meta']['name'],
 	);
 
 	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
 		$out['_updated'] = 1;
-		$out['_source'] = json_decode($src['meta'], true);
+		$out['_source'] = $out['meta'];
 	}
 
 	$res_output[] = $out;

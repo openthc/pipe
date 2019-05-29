@@ -16,22 +16,22 @@
 use Edoceo\Radix\DB\SQL;
 
 // Default
-$rce_base = 'https://bunk.openthc.org/leafdata/v2017';
-$rce_host = null;
+$cre_base = 'https://bunk.openthc.org/leafdata/v2017';
+$cre_host = null;
 
 // Using a SOCAT? Set Boths of These
-//$rce_base = 'http://localhost:8080/api/v1';
-//$rce_host = null;
+//$cre_base = 'http://localhost:8080/api/v1';
+//$cre_host = null;
 
 // Requested System
 switch ($ARG['system']) {
 case 'wa':
 case 'wa-live':
-	$rce_base = 'https://traceability.lcb.wa.gov/api/v1';
+	$cre_base = 'https://traceability.lcb.wa.gov/api/v1';
 	break;
 case 'test':
 case 'wa-test':
-	$rce_base = 'https://watest.leafdatazone.com/api/v1';
+	$cre_base = 'https://watest.leafdatazone.com/api/v1';
 	break;
 default:
 	return $RES->withJSON(array(
@@ -42,8 +42,8 @@ default:
 
 
 // From URL if not already set
-if (empty($rce_host)) {
-	$rce_host = parse_url($rce_base, PHP_URL_HOST);
+if (empty($cre_host)) {
+	$cre_host = parse_url($cre_base, PHP_URL_HOST);
 }
 
 
@@ -72,21 +72,32 @@ $src_path = $_SERVER['REQUEST_URI']; // Contains Query String
 $src_path = str_replace($src_trim, null, $src_path);
 $src_path = ltrim($src_path, '/');
 
-$req_path = $rce_base . '/' . $src_path;
+$req_path = $cre_base . '/' . $src_path;
 
 
 // Forward
-$rce_http = new RCE_HTTP();
+$cre_http = new CRE_HTTP();
 
 switch ($_SERVER['REQUEST_METHOD']) {
-case 'GET':
+case 'DELETE':
 
-	$req = new GuzzleHttp\Psr7\Request('GET', $req_path);
-	$req = $req->withHeader('host', $rce_host);
+	$req = new GuzzleHttp\Psr7\Request('DELETE', $req_path);
+	$req = $req->withHeader('host', $cre_host);
 	$req = $req->withHeader('x-mjf-mme-code', $_SERVER['HTTP_X_MJF_MME_CODE']);
 	$req = $req->withHeader('x-mjf-key', $_SERVER['HTTP_X_MJF_KEY']);
 
-	$res = $rce_http->send($req);
+	$res = $cre_http->send($req);
+
+	break;
+
+case 'GET':
+
+	$req = new GuzzleHttp\Psr7\Request('GET', $req_path);
+	$req = $req->withHeader('host', $cre_host);
+	$req = $req->withHeader('x-mjf-mme-code', $_SERVER['HTTP_X_MJF_MME_CODE']);
+	$req = $req->withHeader('x-mjf-key', $_SERVER['HTTP_X_MJF_KEY']);
+
+	$res = $cre_http->send($req);
 
 	break;
 
@@ -96,11 +107,11 @@ case 'POST':
 	$src_json = json_decode($src_json, true);
 
 	$req = new GuzzleHttp\Psr7\Request('POST', $req_path);
-	$req = $req->withHeader('host', $rce_host);
+	$req = $req->withHeader('host', $cre_host);
 	$req = $req->withHeader('x-mjf-mme-code', $_SERVER['HTTP_X_MJF_MME_CODE']);
 	$req = $req->withHeader('x-mjf-key', $_SERVER['HTTP_X_MJF_KEY']);
 
-	$res = $rce_http->send($req, array('json' => $src_json));
+	$res = $cre_http->send($req, array('json' => $src_json));
 
 	break;
 

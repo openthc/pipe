@@ -1,11 +1,13 @@
 <?php
 /**
+ * Fetch a Single QA Result
+ */
 
-*/
+session_write_close();
 
-$rce = \RCE::factory($_SESSION['rce']);
+$cre = \CRE::factory($_SESSION['cre']);
 
-$obj = $rce->qa()->one($ARG['guid']);
+$obj = $cre->qa()->one($ARG['guid']);
 if (empty($obj)) {
 	return $RES->withJSON(array(
 		'status' => 'failure',

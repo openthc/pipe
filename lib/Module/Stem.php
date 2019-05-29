@@ -16,9 +16,11 @@ class Stem extends \OpenTHC\Module\Base
 
 		$a->map([ 'GET', 'POST' ], '/biotrack/{system}', function($REQ, $RES, $ARG) {
 			return require_once(APP_ROOT . '/controller/stem/biotrack.php');
-		})->add(array($this, '_load_rce'))->add('App\Middleware\Session');
+		})
+			//->add(array($this, '_load_cre'))
+			->add('App\Middleware\Session');
 
-		$a->map([ 'GET', 'POST' ], '/leafdata/{system}/{path:.*}', function($REQ, $RES, $ARG) {
+		$a->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{system}/{path:.*}', function($REQ, $RES, $ARG) {
 			return require_once(APP_ROOT . '/controller/stem/leafdata.php');
 		});
 
@@ -28,14 +30,11 @@ class Stem extends \OpenTHC\Module\Base
 
 	}
 
-	function _load_rce($REQ, $RES, $NMW)
+	function _load_cre($REQ, $RES, $NMW)
 	{
-		if (empty($_SESSION['rbe-auth'])) {
-			die("NO");
+		if (empty($_SESSION['cre-auth'])) {
+			return $RES->withStatus(500);
 		}
-
-		var_dump($_SESSION);
-		exit;
 
 		return $NMW($REQ, $RES);
 
@@ -44,14 +43,14 @@ class Stem extends \OpenTHC\Module\Base
 	/**
 		@todo Attach this middleware somehow
 	*/
-	function _find_rce_from_header($REQ, $RES, $NMW)
+	function _find_cre_from_header($REQ, $RES, $NMW)
 	{
 		// From Headers?
 		//if (!empty($_SERVER['HTTP_OPENTHC_RCE_BASE'])) {
-		//	$rce_base = $_SERVER['HTTP_OPENTHC_RCE_BASE'];
+		//	$cre_base = $_SERVER['HTTP_OPENTHC_RCE_BASE'];
 		//}
 		//if (!empty($_SERVER['HTTP_OPENTHC_RCE_HOST'])) {
-		//	$rce_host = $_SERVER['HTTP_OPENTHC_RCE_HOST'];
+		//	$cre_host = $_SERVER['HTTP_OPENTHC_RCE_HOST'];
 		//}
 	}
 

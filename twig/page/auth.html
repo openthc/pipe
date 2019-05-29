@@ -7,43 +7,43 @@
 <form autocomplete="x" method="post">
 
 <div class="form-group">
-	<label>RCE:</label>
-	<select class="form-control" id="rce" name="rce">
-	<option value="">- Select RCE -</option>
-	{% for rce_stub, rce_data in rce_list %}
-		<option data-engine="{{ rce_data.engine }}" {{ rce_stub == rce_code ? "selected " }} value="{{ rce_stub }}">{{ rce_data.name ? rce_data.name : rce_stub }}</option>
+	<label>CRE:</label>
+	<select class="form-control" id="cre" name="cre">
+	<option value="">- Select CRE -</option>
+	{% for cre_stub, cre_data in cre_list %}
+		<option data-engine="{{ cre_data.engine }}" {{ cre_stub == cre_code ? "selected " }} value="{{ cre_stub }}">{{ cre_data.name ? cre_data.name : cre_stub }}</option>
 	{% endfor %}
 	</select>
 </div>
 
 <div class="form-group" data-biotrack="true" data-leafdata="true">
 	<label>Company:</label>
-	<input autocomplete="x" class="form-control company-autocomplete" name="company" placeholder="Company ID, like a UBI or something - BioTrack, LeafData" value="{{ rce_company }}">
+	<input autocomplete="x" class="form-control company-autocomplete" name="company" placeholder="Company ID, like a UBI or something - BioTrack, LeafData" value="{{ cre_company }}">
 </div>
 
 <div class="form-group" data-leafdata="true" data-metrc="true">
 	<label>License:</label>
-	<input autocomplete="x" class="form-control license-autocomplete" name="license" placeholder="LeafData, METRC*" value="{{ rce_license }}">
+	<input autocomplete="x" class="form-control license-autocomplete" name="license" placeholder="LeafData, METRC*" value="{{ cre_license }}">
 </div>
 
 <div class="form-group" data-metrc="true">
 	<label>Vendor API Key:</label>
-	<input autocomplete="x" class="form-control" name="vendor-key" placeholder="METRC" value="{{ rce_vendor_key }}">
+	<input autocomplete="x" class="form-control" name="vendor-key" placeholder="METRC" value="{{ cre_vendor_key }}">
 </div>
 
 <div class="form-group" data-leafdata="true" data-metrc="true">
 	<label>Client API Key:</label>
-	<input autocomplete="x" class="form-control" name="client-key" placeholder="LeafData, METRC" value="{{ rce_client_key }}">
+	<input autocomplete="x" class="form-control" name="client-key" placeholder="LeafData, METRC" value="{{ cre_client_key }}">
 </div>
 
 <div class="form-group" data-biotrack="true">
 	<label>Username:</label>
-	<input autocomplete="x" class="form-control" name="username" placeholder="BioTrack" value="{{ rce_username }}">
+	<input autocomplete="x" class="form-control" name="username" placeholder="BioTrack" value="{{ cre_username }}">
 </div>
 
 <div class="form-group" data-biotrack="true">
 	<label>Password:</label>
-	<input autocomplete="x" class="form-control" name="password" placeholder="BioTrack" value="{{ rce_password }}">
+	<input autocomplete="x" class="form-control" name="password" placeholder="BioTrack" value="{{ cre_password }}">
 </div>
 
 <button class="btn btn-lg btn-outline-primary" name="a" type="submit" value="auth-web">Connect</button>
@@ -59,7 +59,7 @@
 <script>
 $(function() {
 
-	$('#rce').on('change', function() {
+	$('#cre').on('change', function() {
 
 		var $opt = $(this).find(':selected');
 		var eng = $opt.data('engine');
@@ -72,7 +72,7 @@ $(function() {
 		$(sel).show();
 
 	});
-	$('#rce').change();
+	$('#cre').change();
 
 	$('.company-autocomplete').autocomplete({
 		source: 'https://directory.openthc.com/api/autocomplete/company',

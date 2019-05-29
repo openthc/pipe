@@ -19,10 +19,10 @@ $ret = array(
 	),
 );
 
-$rce = \RCE::factory($_SESSION['rce']);
+$cre = \RCE::factory($_SESSION['cre']);
 
 //
-//$res = $rce->sync_qa_lab(0);
+//$res = $cre->sync_qa_lab(0);
 //switch ($res['success']) {
 //case 0:
 //	// Tag an Error
@@ -36,12 +36,12 @@ $rce = \RCE::factory($_SESSION['rce']);
 //}
 
 // First Results
-$res0 = $rce->inventory_qa_check($_GET['code']);
+$res0 = $cre->inventory_qa_check($_GET['code']);
 switch ($res0['success']) {
 case 0:
 	return $RES->withJSON(array(
 		'status' => 'failure',
-		'detail' => 'QGO#019: Invalid Result from RCE',
+		'detail' => 'QGO#019: Invalid Result from CRE',
 		'result' => $res0,
 	));
 	break;
@@ -142,7 +142,7 @@ case 1:
 //}
 
 // Now the Check_All
-$res1 = $rce->inventory_qa_check_all($_GET['code']);
+$res1 = $cre->inventory_qa_check_all($_GET['code']);
 switch ($res0['success']) {
 case 0:
 	break;
@@ -153,7 +153,7 @@ case 1:
 if (empty($res1['data']) || !is_array($res1['data']) || (1 != count($res1['data']))) {
 	return $RES->withJSON(array(
 		'status' => 'failure',
-		'detail' => 'QGO#025: Invalid Result from RCE',
+		'detail' => 'QGO#025: Invalid Result from CRE',
 	));
 }
 

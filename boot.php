@@ -14,11 +14,11 @@ error_reporting(E_ALL & ~ E_NOTICE);
 openlog('openthc-pipe', LOG_ODELAY|LOG_PID, LOG_LOCAL0);
 
 require_once(APP_ROOT . '/vendor/autoload.php');
-require_once(APP_ROOT . '/lib/RCE.php');
-require_once(APP_ROOT . '/lib/RCE_HTTP.php');
-require_once(APP_ROOT . '/lib/RCE_Sync.php');
-require_once(APP_ROOT . '/lib/RCE_Iterator.php');
-require_once(APP_ROOT . '/lib/RCE_Iterator_LeafData.php');
+require_once(APP_ROOT . '/lib/CRE.php');
+require_once(APP_ROOT . '/lib/CRE_HTTP.php');
+require_once(APP_ROOT . '/lib/CRE_Sync.php');
+require_once(APP_ROOT . '/lib/CRE_Iterator.php');
+require_once(APP_ROOT . '/lib/CRE_Iterator_LeafData.php');
 
 // My (crappy) AutoLoader
 spl_autoload_register(function($c) {
@@ -35,10 +35,10 @@ spl_autoload_register(function($c) {
 
 /*
 */
-function _from_rce_file($f, $RES, $ARG)
+function _from_cre_file($f, $RES, $ARG)
 {
 	$f = trim($f, '/');
-	$f = sprintf('%s/controller/%s/%s', APP_ROOT, $_SESSION['rce-base'], $f);
+	$f = sprintf('%s/controller/%s/%s', APP_ROOT, $_SESSION['cre-base'], $f);
 	if (!is_file($f)) {
 
 		return $RES->withJSON(array(
@@ -88,7 +88,7 @@ class App_Metric
 }
 
 /**
-	A Faker cause some of the RCE tools depend on this
+	A Faker cause some of the CRE tools depend on this
 */
 class License extends \OpenTHC\License
 {

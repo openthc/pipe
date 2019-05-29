@@ -15,19 +15,42 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$rce_base = 'https://sandbox-api-ca.metrc.com';
-//$rce_base = 'http://localhost:8080';
-//if (!empty($_SERVER['HTTP_OPENTHC_RCE_BASE'])) {
-//	$rce_base = $_SERVER['HTTP_OPENTHC_RCE_BASE'];
+$cre_base = 'https://sandbox-api-ca.metrc.com';
+//$cre_base = 'http://localhost:8080';
+//if (!empty($_SERVER['HTTP_OPENTHC_CRE_BASE'])) {
+//	$cre_base = $_SERVER['HTTP_OPENTHC_CRE_BASE'];
 //}
-$rce_host = parse_url($rce_base, PHP_URL_HOST);
+$cre_host = null;
 
+// Requested System
+switch ($ARG['system']) {
+case 'api-ca.metrc.com':
+//case 'sandbox-api-ca.metrc.com':
+case 'api-co.metrc.com':
+case 'sandbox-api-co.metrc.com':
+case 'api-nv.metrc.com':
+//case 'sandbox-api-nv.metrc.com':
+case 'api-or.metrc.com':
+case 'sandbox-api-or.metrc.com':
+	$cre_base = sprintf('https://%s', $ARG['system']);
+	break;
+default:
+	_exit_json(array(
+		'status' => 'failure',
+		'detail' => 'CRE Not Found',
+	), 404);
+}
+
+// From URL if not already set
+if (empty($cre_host)) {
+	$cre_host = parse_url($cre_base, PHP_URL_HOST);
+}
 
 // Auth
-$RES = _req_auth($RES);
-if (200 != $RES->getStatusCode()) {
-	return $RES;
-}
+// $RES = _req_auth($RES);
+// if (200 != $RES->getStatusCode()) {
+// 	return $RES;
+// }
 
 
 // Database
@@ -42,8 +65,13 @@ if (!$sql_good) {
 
 
 // Resolve Path
-$req_path = $_SERVER['REQUEST_URI']; // Contains Query String
-$req_path = str_replace('/stem/metrc', null, $req_path);
+$src_trim = sprintf('/stem/metrc/%s', $ARG['system']); // Stuff to remove
+
+$src_path = $_SERVER['REQUEST_URI']; // Contains Query String
+$src_path = str_replace($src_trim, null, $src_path);
+$src_path = ltrim($src_path, '/');
+
+$req_path = $cre_base . '/' . $src_path;
 
 // A cheap-ass, incomplete filter
 switch ($req_path) {
@@ -69,8 +97,8 @@ case '/sales/v1/receipts':
 	break;
 }
 
-$rce_http = new RCE_HTTP(array(
-	'base_uri' => $rce_base
+$cre_http = new CRE_HTTP(array(
+	'base_uri' => $cre_base
 ));
 
 
@@ -79,22 +107,22 @@ switch ($_SERVER['REQUEST_METHOD']) {
 case 'GET':
 
 	$req = new GuzzleHttp\Psr7\Request('GET', $req_path);
-	$req = $req->withHeader('host', $rce_host);
+	$req = $req->withHeader('host', $cre_host);
 	$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
 
-	$res = $rce_http->send($req);
+	$res = $cre_http->send($req);
 
 	break;
 
 case 'POST':
 
 	$req = new GuzzleHttp\Psr7\Request('POST', $req_path);
-	$req = $req->withHeader('host', $rce_host);
+	$req = $req->withHeader('host', $cre_host);
 	$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
 
 	$src_json = file_get_contents('php://input');
 
-	$res = $rce_http->send($req, array('json' => $src_json));
+	$res = $cre_http->send($req, array('json' => $src_json));
 
 	break;
 }

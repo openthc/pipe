@@ -7,14 +7,14 @@ use Edoceo\Radix\DB\SQL;
 
 $obj_name = 'license';
 
-$age = RCE_Sync::age($obj_name);
+$age = CRE_Sync::age($obj_name);
 // If client requested no-cache
 if (!empty($_SERVER['HTTP_CACHE_CONTROL'])) {
 	if ('no-cache' == $_SERVER['HTTP_CACHE_CONTROL']) {
-		$age = RCE_Sync::MAX_AGE + 1;
+		$age = CRE_Sync::MAX_AGE + 1;
 	}
 }
-
+$age = CRE_Sync::MAX_AGE + 1;
 
 // Load Cache Data
 $sql = "SELECT guid, hash FROM {$obj_name}";
@@ -22,33 +22,49 @@ $res_cached = SQL::fetch_mix($sql);
 
 
 // Load Fresh Data?
-if ($age >= RCE_Sync::MAX_AGE) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
-	$res_source = new RCE_Iterator_LeafData($rce->license());
+	$res_source = new CRE_Iterator_LeafData($cre->license());
 
 	foreach ($res_source as $src) {
+
+		// Trim all keys, cause these items have trailing bullshit
+		$key_list = array_keys($src);
+		foreach ($key_list as $key) {
+			$val = $src[$key];
+			if (is_string($val) || is_numeric($val)) {
+				$src[$key] = trim($val);
+			}
+		}
+
+		if ('0000000000' == $src['phone']) {
+			$src['phone'] = null;
+		}
+
+		// Unset Junk
+		unset($src['bio_license_number']);
+		unset($src['bio_location_id']);
+		unset($src['bio_org_id']);
+		unset($src['external_id']);
+		unset($src['fein']);
+		unset($src['id']);
+		unset($src['issuer']);
+		unset($src['mmeAssociations']);
+		unset($src['sender_receiver']);
 
 		$guid = $src['global_id'];
 		$hash = _hash_obj($src);
 
 		if ($hash != $res_cached[ $guid ]) {
-
 			$idx_update++;
-
-			// Trim all keys, cause these items have trailing bullshit
-			$key_list = array_keys($src);
-			foreach ($key_list as $key) {
-				$src[$key] = trim($src[$key]);
-			}
-
-			RCE_Sync::save($obj_name, $guid, $hash, $src);
+			CRE_Sync::save($obj_name, $guid, $hash, $src);
 
 		}
 	}
 
-	RCE_Sync::age($obj_name, time());
+	CRE_Sync::age($obj_name, time());
 
 }
 

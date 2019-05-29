@@ -1,90 +1,90 @@
 <?php
 /**
-	Return a List of QA Results
-*/
+ * Return a List of QA Results
+ */
 
 use Edoceo\Radix\DB\SQL;
 
-$ret_code = 203;
+session_write_close();
 
 $obj_name = 'qa';
 
-$age = RCE_Sync::age($obj_name);
+$age = CRE_Sync::age($obj_name);
 
-if ($age >= RCE_Sync::MAX_AGE) {
+// Load Cache Data
+$sql = "SELECT guid, hash FROM {$obj_name}";
+$res_cached = SQL::fetch_mix($sql);
 
-	$sql = "SELECT guid, hash FROM {$obj_name}";
-	$res_cached = SQL::fetch_mix($sql);
+// Load Fresh Data
+if ($age >= CRE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
-	$res_source = $rce->qa()->all();
+	$res_source = $cre->qa()->all();
 	if ('success' != $res_source['status']) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
-			'detail' => $rce->formatError($res_source),
+			'detail' => $cre->formatError($res_source),
 		), 500);
 	}
 
 	$res_source = $res_source['result']['data'];
 
-} else {
+	foreach ($res_source as $src) {
 
-	// From Cache
-	$res_cached = array();
-	$res_source = array();
+		// Filter: Some objects from LeafData are missing the Global ID!! Skip Them
+		if (empty($src['global_id'])) {
+			continue;
+		}
 
-	$sql = "SELECT hash, meta FROM {$obj_name}";
-	$res = SQL::fetch_all($sql);
+		$guid = $src['global_id'];
+		$hash = _hash_obj($src);
 
-	foreach ($res as $rec) {
+		if ($hash != $res_cached[ $guid ]) {
 
-		$x = json_decode($rec['meta'], true);
-		$x['hash'] = $rec['hash'];
+			$idx_update++;
 
-		$res_cached[ $x['global_id'] ] = $x['hash'];
-		$res_source[] = $x;
+			CRE_Sync::save($obj_name, $guid, $hash, $src);
+
+		}
 	}
+
+	CRE_Sync::age($obj_name, time());
 
 }
 
-$ret = array();
+
+// Now Fetch all from DB and Send Back
+$res_output = array();
+$sql = "SELECT guid, hash, meta FROM {$obj_name} ORDER BY guid DESC";
+$res_source = SQL::fetch_all($sql);
 
 foreach ($res_source as $src) {
 
-	if (empty($src['hash'])) {
-		$src['hash'] = _hash_obj($src);
-	}
-
-	$rec = array(
-		'guid' => $src['global_id'],
+	$out = array(
+		'guid' => $src['guid'],
 		'hash' => $src['hash'],
-		'name' => trim($src['name']),
 	);
 
-	if ($rec['hash'] != $res_cached[ $rec['guid'] ]) {
-
-		$ret_code = 200;
-
-		$rec['_source'] = $src;
-		$rec['_updated'] = 1;
-
-		unset($src['hash']);
-
-		RCE_Sync::save($obj_name, $guid, $hash, $src);
-
-		SQL::query($sql, $arg);
-
+	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
+		$out['_updated'] = 1;
+		$out['_source'] = json_decode($src['meta'], true);
+	} elseif ('true' == $_GET['source']) {
+		$out['_source'] = json_decode($src['meta'], true);
 	}
 
-	$ret[] = $rec;
+	$res_output[] = $out;
 
 }
 
 
-RCE_Sync::age($obj_name, time());
+$ret_code = ($idx_update ? 200 : 203);
+
+
+$RES = $RES->withHeader('x-openthc-age', $age);
+$RES = $RES->withHeader('x-openthc-update', $idx_update);
 
 return $RES->withJSON(array(
 	'status' => 'success',
-	'result' => $ret,
+	'result' => $res_output,
 ), $ret_code, JSON_PRETTY_PRINT);

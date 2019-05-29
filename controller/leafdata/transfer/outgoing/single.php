@@ -1,12 +1,10 @@
 <?php
 /**
  * Return a Single Outgoing Transfer Object
-*/
+ */
 
-RCE_Sync::open();
-
-$rce = \RCE::factory($_SESSION['rce']);
-$obj = $rce->transfer()->one($ARG['guid']);
+$cre = \CRE::factory($_SESSION['cre']);
+$obj = $cre->transfer()->one($ARG['guid']);
 if (empty($obj)) {
 	return $RES->withJSON(array(
 		'status' => 'failure',
@@ -63,4 +61,4 @@ foreach ($key_list as $key) {
 return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $obj,
-), 200);
+), 200, JSON_PRETTY_PRINT);

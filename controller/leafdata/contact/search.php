@@ -23,13 +23,13 @@ if ($age >= 240) {
 	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
-	$res_source = $rce->contact()->all();
+	$res_source = $cre->contact()->all();
 	if ('success' != $res_source['status']) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
-			'detail' => $rce->formatError($res_source),
+			'detail' => $cre->formatError($res_source),
 		), 500);
 	}
 

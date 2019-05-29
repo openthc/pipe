@@ -1,7 +1,7 @@
 <?php
 /**
-	Connect and Authenticate to an RCE
-*/
+ * Connect and Authenticate to a CRE
+ */
 
 namespace App\Controller\Auth;
 
@@ -18,7 +18,7 @@ class Open extends \OpenTHC\Controller\Base
 		case 'POST':
 			switch ($_POST['a']) {
 			case 'set-license':
-				$_SESSION['rce-auth']['license'] = $_POST['license'];
+				$_SESSION['cre-auth']['license'] = $_POST['license'];
 				return $RES->withRedirect('/browse');
 				break;
 			}
@@ -33,31 +33,31 @@ class Open extends \OpenTHC\Controller\Base
 	*/
 	function connect($REQ, $RES, $ARG)
 	{
-		$rce = $this->validateRCE();
+		$cre = $this->validateCRE();
 
-		if (empty($rce)) {
+		if (empty($cre)) {
 			return $RES->withJson(array(
 				'status' => 'failure',
-				'detail' => sprintf('CAC#017: Invalid RCE: "%s"', strtolower(trim($_POST['rce']))),
+				'detail' => sprintf('Invalid CRE: "%s" [CAC#017]', strtolower(trim($_POST['cre']))),
 			), 400);
 		}
 
-		$_SESSION['rce'] = $rce;
-		$_SESSION['rce-auth'] = array();
-		$_SESSION['rce-base'] = null;
+		$_SESSION['cre'] = $cre;
+		$_SESSION['cre-auth'] = array();
+		$_SESSION['cre-base'] = null;
 		$_SESSION['sql-hash'] = null;
 
-		switch ($rce['engine']) {
+		switch ($cre['engine']) {
 		case 'biotrack':
-			$_SESSION['rce-base'] = 'biotrack';
+			$_SESSION['cre-base'] = 'biotrack';
 			$RES = $this->_biotrack($RES);
 			break;
 		case 'leafdata':
-			$_SESSION['rce-base'] = 'leafdata';
+			$_SESSION['cre-base'] = 'leafdata';
 			$RES = $this->_leafdata($RES);
 			break;
 		case 'metrc':
-			$_SESSION['rce-base'] = 'metrc';
+			$_SESSION['cre-base'] = 'metrc';
 			$RES = $this->_metrc($RES);
 			break;
 		}
@@ -66,11 +66,24 @@ class Open extends \OpenTHC\Controller\Base
 			return $RES;
 		}
 
-		$this->_createDatabase();
+		$_SESSION['sql-hash'] = md5(json_encode($_POST));
 
 		// Someone asked for redirect
 		if (!empty($_GET['r'])) {
 			return $RES->withRedirect($_GET['r']);
+		}
+
+		if (!empty($_GET['client_id'])) {
+			// Need to Connect to OpenTHC Here
+			// Perhaps this is Middleware?
+			switch ($_GET['client_id']) {
+			case 'dump.openthc.com':
+				return $RES->withRedirect('https://dump.openthc.com/auth/open?pipe-token=' . session_id());
+				break;
+			case 'qa.openthc.org':
+				return $RES->withRedirect('https://qa.openthc.org/auth/open?pipe-token=' . session_id());
+				break;
+			}
 		}
 
 		// From our webform
@@ -87,25 +100,25 @@ class Open extends \OpenTHC\Controller\Base
 	function renderForm($REQ, $RES, $ARG)
 	{
 
-		$rce_file = sprintf('%s/etc/rce.ini', APP_ROOT);
-		$rce_data = parse_ini_file($rce_file, true, INI_SCANNER_RAW);
+		$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
+		$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
 
 		$data = array();
-		$data['rce_list'] = $rce_data;
-		$data['rce_code'] = $_SESSION['rce']['code'];
-		$data['rce_company'] = $_SESSION['rce-auth']['company'];
-		$data['rce_license'] = $_SESSION['rce-auth']['license'];
-		$data['rce_vendor_key'] = $_SESSION['rce-auth']['vendor-key'];
-		$data['rce_client_key'] = $_SESSION['rce-auth']['client-key'];
-		$data['rce_username'] = $_SESSION['rce-auth']['username'];
-		$data['rce_password'] = $_SESSION['rce-auth']['password'];
+		$data['cre_list'] = $cre_data;
+		$data['cre_code'] = $_SESSION['cre']['code'];
+		$data['cre_company'] = $_SESSION['cre-auth']['company'];
+		$data['cre_license'] = $_SESSION['cre-auth']['license'];
+		$data['cre_vendor_key'] = $_SESSION['cre-auth']['vendor-key'];
+		$data['cre_client_key'] = $_SESSION['cre-auth']['client-key'];
+		$data['cre_username'] = $_SESSION['cre-auth']['username'];
+		$data['cre_password'] = $_SESSION['cre-auth']['password'];
 
-		if (!empty($_GET['rce'])) {
-			$data['rce_code'] = $_GET['rce'];
+		if (!empty($_GET['cre'])) {
+			$data['cre_code'] = $_GET['cre'];
 		}
 
-		if (empty($data['rce_client_api_key'])) {
-			$data['rce_client_api_key'] = $_SESSION['rce-auth']['secret'];
+		if (empty($data['cre_client_api_key'])) {
+			$data['cre_client_api_key'] = $_SESSION['cre-auth']['secret'];
 		}
 
 		return $this->_container->view->render($RES, 'page/auth.html', $data);
@@ -119,7 +132,7 @@ class Open extends \OpenTHC\Controller\Base
 	{
 		if (!empty($_POST['sid'])) {
 
-			$_SESSION['rce-auth']['session'] = $_POST['sid'];
+			$_SESSION['cre-auth']['session'] = $_POST['sid'];
 
 			$RES = $RES->withJson(array(
 				'status' => 'success',
@@ -155,21 +168,20 @@ class Open extends \OpenTHC\Controller\Base
 		if (!preg_match('/^\d{9}$/', $ext)) {
 			return $RES->withJson(array(
 				'status' => 'failure',
-				'detail' => 'OCA#060: Provide UBI in the rce-company field',
+				'detail' => 'OCA#060: Provide UBI in the cre-company field',
 			), 400);
 		}
 
-		$rce = \RCE::factory($_SESSION['rce']);
-		$chk = $rce->login($ext, $uid, $pwd);
+		$cre = \RCE::factory($_SESSION['cre']);
+		$chk = $cre->login($ext, $uid, $pwd);
 
 		// @todo Detect a 500 Layer Response from BioTrack
 
 		switch (intval($chk['success'])) {
 		case 0:
-
 			return $RES->withJson(array(
 				'status' => 'failure',
-				'detail' => 'OCA#075: Invalid Username or Password',
+				'detail' => 'Invalid Username or Password [CAO#184]',
 				'result' => $chk,
 			), 400);
 
@@ -177,10 +189,10 @@ class Open extends \OpenTHC\Controller\Base
 
 		case 1:
 
-			$_SESSION['rce-auth']['company'] = $ext;
-			$_SESSION['rce-auth']['username'] = $uid;
-			$_SESSION['rce-auth']['password'] = $pwd;
-			$_SESSION['rce-auth']['session'] = $chk['sessionid'];
+			$_SESSION['cre-auth']['company'] = $ext;
+			$_SESSION['cre-auth']['username'] = $uid;
+			$_SESSION['cre-auth']['password'] = $pwd;
+			$_SESSION['cre-auth']['session'] = $chk['sessionid'];
 
 			return $RES->withJson(array(
 				'status' => 'success',
@@ -218,18 +230,19 @@ class Open extends \OpenTHC\Controller\Base
 			));
 		}
 
-		$_SESSION['rce-auth'] = array(
+		$_SESSION['cre-auth'] = array(
 			'license' => $lic,
 			'client-key' => $key,
 		);
 
-		$rce = \RCE::factory($_SESSION['rce']);
-		$res = $rce->ping();
+		$cre = \RCE::factory($_SESSION['cre']);
+		$res = $cre->ping();
 
 		if (empty($res)) {
 			return $RES->withJSON(array(
 				'status' => 'failure',
 				'detail' => 'Invalid License or API Key [CAO#239]',
+				'_post' => $_POST,
 			), 403);
 		}
 
@@ -245,16 +258,16 @@ class Open extends \OpenTHC\Controller\Base
 	*/
 	function _metrc($RES)
 	{
-		$_SESSION['rce-auth'] = array(
+		$_SESSION['cre-auth'] = array(
 			'vendor-key' => $_POST['vendor-key'],
 			'client-key' => $_POST['client-key'],
 			'license' => $_POST['license'],
 		);
 
-		$rce = \RCE::factory($_SESSION['rce']);
-		//_var_dump($rce);
+		$cre = \RCE::factory($_SESSION['cre']);
+		//_var_dump($cre);
 
-		$res = $rce->ping();
+		$res = $cre->ping();
 		if ($res) {
 			return $RES->withJSON(array(
 				'status' => 'success',
@@ -270,34 +283,28 @@ class Open extends \OpenTHC\Controller\Base
 	}
 
 	/**
-		Validate the RCE
+		Validate the CRE
 	*/
-	private function validateRCE()
+	private function validateCRE()
 	{
+		$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
+		$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
+		// var_dump($cre_data);
 
-		$rce_file = sprintf('%s/etc/rce.ini', APP_ROOT);
-		$rce_data = parse_ini_file($rce_file, true, INI_SCANNER_RAW);
-		// var_dump($rce_data);
+		$cre_want = strtolower(trim($_POST['cre']));
+		switch ($cre_want) {
+		case 'leafdata':
+		case 'wa/leaf':
+		case 'wa':
+			$cre_want = 'usa/wa';
+			break;
+		}
 
-		$rce_want = strtolower(trim($_POST['rce']));
+		$cre_info = $cre_data[ $cre_want ];
 
-		$rce_info = $rce_data[ $rce_want ];
-
-		if (!empty($rce_info)) {
-			$rce_info['code'] = $rce_want;
-			return $rce_info;
+		if (!empty($cre_info)) {
+			$cre_info['code'] = $cre_want;
+			return $cre_info;
 		}
 	}
-
-	/**
-		Create a Database for Caching Records
-	*/
-	private function _createDatabase()
-	{
-
-		$_SESSION['sql-hash'] = md5(json_encode($_POST));
-		\RCE_Sync::open();
-
-	}
-
 }

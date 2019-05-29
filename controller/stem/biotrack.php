@@ -21,12 +21,12 @@ if (!$sql_good) {
 }
 
 
-$rce_base = 'https://wa.biotrackthc.net/serverjson.asp';
-//$rce_base = 'http://localhost:8080';
-//if (!empty($_SERVER['HTTP_OPENTHC_RCE_BASE'])) {
-//	$rce_base = $_SERVER['HTTP_OPENTHC_RCE_BASE'];
+$cre_base = 'https://wa.biotrackthc.net/serverjson.asp';
+//$cre_base = 'http://localhost:8080';
+//if (!empty($_SERVER['HTTP_OPENTHC_CRE_BASE'])) {
+//	$cre_base = $_SERVER['HTTP_OPENTHC_CRE_BASE'];
 //}
-$rce_host = parse_url($rce_base, PHP_URL_HOST);
+$cre_host = parse_url($cre_base, PHP_URL_HOST);
 
 
 // Deny
@@ -119,8 +119,8 @@ if (empty($src_json['sessionid'])) {
 // Now Just Forward to BioTrack
 
 // Resolve Path
-$rce_http = new RCE_HTTP(array(
-	'base_uri' => $rce_base
+$cre_http = new CRE_HTTP(array(
+	'base_uri' => $cre_base
 ));
 
 
@@ -129,10 +129,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
 case 'POST':
 
 	$req = new GuzzleHttp\Psr7\Request('POST', '');
-	$req = $req->withHeader('host', $rce_host);
+	$req = $req->withHeader('host', $cre_host);
 	$req = $req->withHeader('content-type', 'text/JSON');
 
-	$res = $rce_http->send($req, array('json' => $src_json));
+	$res = $cre_http->send($req, array('json' => $src_json));
 
 	break;
 }

@@ -10,10 +10,10 @@
 
 use Edoceo\Radix\DB\SQL;
 
-class RCE_HTTP extends \GuzzleHttp\Client
+class CRE_HTTP extends \GuzzleHttp\Client
 {
 	/**
-		Simulate the old _curl_* functions from old RCE code
+		Simulate the old _curl_* functions from old CRE code
 	*/
 	static function _curl_init()
 	{
@@ -22,7 +22,7 @@ class RCE_HTTP extends \GuzzleHttp\Client
 	}
 
 	/**
-		Simulate the old _curl_* functions from old RCE code
+		Simulate the old _curl_* functions from old CRE code
 	*/
 	static function _curl_exec()
 	{

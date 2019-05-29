@@ -1,13 +1,13 @@
 <?php
 /**
-	Return a List of Outgoing Transfer Objects
-*/
+ * Return a List of Outgoing Transfer Objects
+ */
 
 use Edoceo\Radix\DB\SQL;
 
-$obj_name = 'transfer';
+$obj_name = 'transfer_outgoing';
 
-$age = RCE_Sync::age($obj_name);
+$age = CRE_Sync::age($obj_name);
 
 
 // Load Cache Data
@@ -16,11 +16,11 @@ $res_cached = SQL::fetch_mix($sql);
 
 
 // Load Fresh Data?
-if ($age >= RCE_Sync::MAX_AGE) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
-	$res_source = new RCE_Iterator_LeafData($rce->transfer());
+	$res_source = new CRE_Iterator_LeafData($cre->transfer());
 
 	foreach ($res_source as $src) {
 
@@ -33,14 +33,14 @@ if ($age >= RCE_Sync::MAX_AGE) {
 			$idx_update++;
 
 			// Fully Inflate Transfer Object
-			$src = $rce->transfer()->one($guid);// inventory_transfer_items
+			// $src = $cre->transfer()->one($guid);// inventory_transfer_items
 
-			RCE_Sync::save($obj_name, $guid, $hash, $src);
+			CRE_Sync::save($obj_name, $guid, $hash, $src);
 
 		}
 	}
 
-	RCE_Sync::age($obj_name, time());
+	CRE_Sync::age($obj_name, time());
 
 }
 
@@ -55,6 +55,12 @@ foreach ($res_source as $src) {
 	$out = array(
 		'guid' => $src['guid'],
 		'hash' => $src['hash'],
+		//'status' => VOID|LIVE/$src['status'],
+		//	$obj['status'] = $src['status'];
+		//	$obj['status_void'] = $src['void'];
+		'source_license_guid' => $src['global_from_mme_id'],
+		'target_license_guid' => $src['global_to_mme_id'],
+		//'carrier_license_guid' => $src['global_transporting_mme_id'];
 	);
 
 	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
@@ -65,16 +71,6 @@ foreach ($res_source as $src) {
 	}
 
 	$res_output[] = $out;
-
-//	$obj = array();
-//	$obj['guid'] = $src['global_id'];
-//	$obj['hash'] = $src['hash'];
-//	$obj['source_license_guid'] = $src['global_from_mme_id'];
-//	$obj['target_license_guid'] = $src['global_to_mme_id'];
-//	$obj['type'] = $src['manifest_type'];
-//	$obj['status'] = $src['status'];
-//	$obj['status_void'] = $src['void'];
-	//$obj['carrier_license_guid'] = $src['global_transporting_mme_id'];
 
 }
 
@@ -87,4 +83,4 @@ $RES = $RES->withHeader('x-openthc-update', $idx_update);
 return $RES->withJSON(array(
 	'status' => 'success',
 	'result' => $res_output,
-), $ret_code, JSON_PRETTY_PRINT);
+), $ret_code);
