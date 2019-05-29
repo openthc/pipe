@@ -172,7 +172,7 @@ class Open extends \OpenTHC\Controller\Base
 			), 400);
 		}
 
-		$cre = \RCE::factory($_SESSION['cre']);
+		$cre = \CRE::factory($_SESSION['cre']);
 		$chk = $cre->login($ext, $uid, $pwd);
 
 		// @todo Detect a 500 Layer Response from BioTrack
@@ -235,7 +235,7 @@ class Open extends \OpenTHC\Controller\Base
 			'client-key' => $key,
 		);
 
-		$cre = \RCE::factory($_SESSION['cre']);
+		$cre = \CRE::factory($_SESSION['cre']);
 		$res = $cre->ping();
 
 		if (empty($res)) {
@@ -264,7 +264,7 @@ class Open extends \OpenTHC\Controller\Base
 			'license' => $_POST['license'],
 		);
 
-		$cre = \RCE::factory($_SESSION['cre']);
+		$cre = \CRE::factory($_SESSION['cre']);
 		//_var_dump($cre);
 
 		$res = $cre->ping();

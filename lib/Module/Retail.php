@@ -14,11 +14,11 @@ class Retail extends \OpenTHC\Module\Base
 	{
 
 		$a->get('', function($REQ, $RES, $ARG) {
-			return _from_rce_file('retail/search.php', $RES, $ARG);
+			return _from_cre_file('retail/search.php', $RES, $ARG);
 		});
 
 		$a->post('', function($REQ, $RES, $ARG) {
-			return _from_rce_file('retail/create.php', $RES, $ARG);
+			return _from_cre_file('retail/create.php', $RES, $ARG);
 		});
 
 		$a->get('/{guid:[0-9a-f]+}', function($REQ, $RES, $ARG) {

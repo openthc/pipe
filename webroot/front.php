@@ -34,9 +34,9 @@ $app->group('/auth', function() {
 	$this->get('/back', function($REQ, $RES, $ARG) {
 
 		$_POST['a'] = 'auth-web';
-		$_POST['rce'] = $_SESSION['rce']['engine'];
-		$_POST['license'] = $_SESSION['rce-auth']['license'];
-		$_POST['client-key'] = $_SESSION['rce-auth']['client-key'];
+		$_POST['cre'] = $_SESSION['cre']['engine'];
+		$_POST['license'] = $_SESSION['cre-auth']['license'];
+		$_POST['client-key'] = $_SESSION['cre-auth']['client-key'];
 
 		$C = new App\Controller\Auth\Open($this);
 		$RES = $C->connect($REQ, $RES, $ARG);
@@ -46,7 +46,7 @@ $app->group('/auth', function() {
 
 	//$this->get('/ping', 'OpenTHC\Controller\Auth\Ping');
 	$this->any('/ping', function($REQ, $RES, $ARG) {
-		return _from_rce_file('ping.php', $RES, $ARG);
+		return _from_cre_file('ping.php', $RES, $ARG);
 	});
 
 	$this->get('/shut', 'OpenTHC\Controller\Auth\Shut');
@@ -61,40 +61,39 @@ $app->get('/browse', function($REQ, $RES, $ARG) {
 
 	session_write_close();
 
-	$data = array();
-	$data['rce_auth'] = $_SESSION['rce-auth'];
-	$data['rce_meta_license'] = $_SESSION['rce-auth']['license'];
+	$data['cre_auth'] = $_SESSION['cre-auth'];
+	$data['cre_meta_license'] = $_SESSION['cre-auth']['license'];
 
 	return $this->view->render($RES, 'page/browse.html', $data);
 })
-->add('App\Middleware\RCE')
+->add('App\Middleware\CRE')
 ->add('App\Middleware\Session');
 
 
 // Config/Core Data Stuff
 $app->group('/config', 'App\Module\Config')
-	->add('App\Middleware\RCE')
+	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
 	->add('App\Middleware\Session');
 
 
 // Batch
 $app->group('/batch', 'App\Module\Batch')
-	->add('App\Middleware\RCE')
+	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
 	->add('App\Middleware\Session');
 
 
 // Plant
 $app->group('/plant', 'App\Module\Plant')
-	->add('App\Middleware\RCE')
+	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
 	->add('App\Middleware\Session');
 
 
 // Inventory Lot
 $app->group('/lot', 'App\Module\Lot')
-	->add('App\Middleware\RCE')
+	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
 	->add('App\Middleware\Session');
 
@@ -103,11 +102,11 @@ $app->group('/lot', 'App\Module\Lot')
 $app->group('/qa', function() {
 
 	$this->get('', function($REQ, $RES, $ARG) {
-		return _from_rce_file('qa/search.php', $RES, $ARG);
+		return _from_cre_file('qa/search.php', $RES, $ARG);
 	});
 
 	$this->get('/{guid}', function($REQ, $RES, $ARG) {
-		return _from_rce_file('qa/single.php', $RES, $ARG);
+		return _from_cre_file('qa/single.php', $RES, $ARG);
 	});
 	//->add(function($REQ, $RES, $ncb) {
 	//
@@ -130,7 +129,7 @@ $app->group('/qa', function() {
 	//});
 
 })
-->add('App\Middleware\RCE')
+->add('App\Middleware\CRE')
 ->add('App\Middleware\Database')
 ->add('App\Middleware\Session');
 
@@ -139,15 +138,15 @@ $app->group('/qa', function() {
 $app->group('/transfer', function() {
 
 	$this->get('/outgoing', function($REQ, $RES, $ARG) {
-		return _from_rce_file('transfer/outgoing/search.php', $RES, $ARG);
+		return _from_cre_file('transfer/outgoing/search.php', $RES, $ARG);
 	});
 
 	$this->get('/outgoing/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
-		return _from_rce_file('transfer/outgoing/single.php', $RES, $ARG);
+		return _from_cre_file('transfer/outgoing/single.php', $RES, $ARG);
 	});
 
 	//$this->post('/outgoing/{guid:[\w\.]+}/accept', function($REQ, $RES, $ARG) {
-	//	$f = sprintf('%s/controller/%s/transfer-accept.php', APP_ROOT, $_SESSION['rce-base']);
+	//	$f = sprintf('%s/controller/%s/transfer-accept.php', APP_ROOT, $_SESSION['cre-base']);
 	//	$RES = require_once($f);
 	//	return $RES;
 	//});
@@ -156,33 +155,33 @@ $app->group('/transfer', function() {
 		Incoming Transfers
 	*/
 	$this->get('/incoming', function($REQ, $RES, $ARG) {
-		return _from_rce_file('transfer/incoming/search.php', $RES, $ARG);
+		return _from_cre_file('transfer/incoming/search.php', $RES, $ARG);
 	});
 
 	$this->get('/incoming/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
-		return _from_rce_file('transfer/outgoing/single.php', $RES, $ARG);
+		return _from_cre_file('transfer/outgoing/single.php', $RES, $ARG);
 	});
 
 	$this->post('/incoming/{guid:[\w\.]+}/accept', function($REQ, $RES, $ARG) {
-		return _from_rce_file('transfer/incoming/accept.php', $RES, $ARG);
+		return _from_cre_file('transfer/incoming/accept.php', $RES, $ARG);
 	});
 
 	/*
 		Rejected Transfers
 	*/
 	$this->get('/rejected', function($REQ, $RES, $ARG) {
-		return _from_rce_file('transfer/rejected/search.php', $RES, $ARG);
+		return _from_cre_file('transfer/rejected/search.php', $RES, $ARG);
 	});
 
 })
-->add('App\Middleware\RCE')
+->add('App\Middleware\CRE')
 ->add('App\Middleware\Database')
 ->add('App\Middleware\Session');
 
 
 // Retail Sales
 $app->group('/retail', 'App\Module\Retail')
-	->add('App\Middleware\RCE')
+	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
 	->add('App\Middleware\Session');
 
@@ -191,15 +190,15 @@ $app->group('/retail', 'App\Module\Retail')
 $app->group('/waste', function() {
 
 	$this->get('', function($REQ, $RES, $ARG) {
-		return _from_rce_file('waste/search.php', $RES, $ARG);
+		return _from_cre_file('waste/search.php', $RES, $ARG);
 	});
 
 	$this->get('/{guid}', function($REQ, $RES, $ARG) {
-		return _from_rce_file('waste/single.php', $RES, $ARG);
+		return _from_cre_file('waste/single.php', $RES, $ARG);
 	});
 
 })
-->add('App\Middleware\RCE')
+->add('App\Middleware\CRE')
 ->add('App\Middleware\Database')
 ->add('App\Middleware\Session');
 
@@ -213,9 +212,9 @@ $app->group('/stem', 'App\Module\Stem');
 // Display System Info
 $app->get('/system', function($REQ, $RES, $ARG) {
 
-	// Return a list of supported RCEs
-	$rce_file = sprintf('%s/etc/rce.ini', APP_ROOT);
-	$rce_data = parse_ini_file($rce_file, true, INI_SCANNER_RAW);
+	// Return a list of supported CREs
+	$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
+	$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
 
 	$cfg = array(
 		'headers' => array(
@@ -228,9 +227,9 @@ $app->get('/system', function($REQ, $RES, $ARG) {
 
 	$req_list = array();
 
-	foreach ($rce_data as $rce_info) {
-		//var_dump($rce_info);
-		$url = $rce_info['server'];
+	foreach ($cre_data as $cre_info) {
+		//var_dump($cre_info);
+		$url = $cre_info['server'];
 		$req_list[$url] = $c->getAsync($url);
 
 	}
@@ -268,15 +267,15 @@ $app->get('/system', function($REQ, $RES, $ARG) {
 
 });
 
-$app->get('/system/rce', function($REQ, $RES, $ARG) {
+$app->get('/system/cre', function($REQ, $RES, $ARG) {
 
-	// Return a list of supported RCEs
-	$rce_file = sprintf('%s/etc/rce.ini', APP_ROOT);
-	$rce_data = parse_ini_file($rce_file, true, INI_SCANNER_RAW);
+	// Return a list of supported CREs
+	$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
+	$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
 
 	return $RES->withJSON(array(
 		'status' => 'success',
-		'result' => $rce_data,
+		'result' => $cre_data,
 	), 200, JSON_PRETTY_PRINT);
 
 });

@@ -13,12 +13,12 @@ class Batch extends \OpenTHC\Module\Base
 	function __invoke($a)
 	{
 		$a->get('', function($REQ, $RES, $ARG) {
-			return _from_rce_file('batch/search.php', $RES, $ARG);
+			return _from_cre_file('batch/search.php', $RES, $ARG);
 		});
 
 		// Single
 		$a->get('/{guid}', function($REQ, $RES, $ARG) {
-			return _from_rce_file('batch/single.php', $RES, $ARG);
+			return _from_cre_file('batch/single.php', $RES, $ARG);
 		});
 
 	}
