@@ -1,7 +1,7 @@
 {
 	"name": "openthc/pipe",
-	"description": "OpenTHC RCE API Proxy Service",
-	"license": "MIT",
+	"description": "OpenTHC CRE API Proxy Service",
+	"license": "GPL-3.0-only",
 	"repositories": [
 		{
 			"type": "vcs",
