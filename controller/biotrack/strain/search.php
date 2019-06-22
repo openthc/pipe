@@ -1,9 +1,8 @@
 <?php
 /**
-	Return all Strain - Special Case in BioTrack
-
-	Scan Plant and Inventory for Unique Strain
-*/
+ * Return all Strain - Special Case in BioTrack
+ * Scan Plant and Inventory for Unique Strain
+ */
 
 use Edoceo\Radix\DB\SQL;
 
@@ -21,7 +20,7 @@ if ($res && ($res->rowCount() > 0)) {
 	}
 }
 
-$sql = 'SELECT meta FROM inventory';
+$sql = 'SELECT meta FROM lot';
 $res = SQL::fetch($sql);
 if ($res && ($res->rowCount() > 0)) {
 	foreach ($res as $rec) {
@@ -34,7 +33,7 @@ if ($res && ($res->rowCount() > 0)) {
 
 ksort($res_output);
 
-RCE_Sync::age($obj_name, time());
+CRE_Sync::age($obj_name, time());
 
 // $RES = $RES->withHeader('x-openthc-update', $idx_update);
 
@@ -45,6 +44,3 @@ return $RES->withJSON(array(
 	'detail' => $out_detail,
 	'result' => $out_result,
 ), $ret_code, JSON_PRETTY_PRINT);
-
-
-

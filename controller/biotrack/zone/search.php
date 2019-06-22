@@ -1,7 +1,7 @@
 <?php
 /**
-	Return all Rooms - inventory_room and plant_room
-*/
+ * Return all Rooms - inventory_room and plant_room
+ */
 
 use Edoceo\Radix\DB\SQL;
 
@@ -10,8 +10,7 @@ $obj_name = 'zone';
 $out_detail = array();
 $out_result = array();
 
-$age = RCE_Sync::age($obj_name);
-
+$age = CRE_Sync::age($obj_name);
 
 // Load Cache Data
 $sql = "SELECT guid, hash FROM {$obj_name}";
@@ -19,24 +18,21 @@ $res_cached = SQL::fetch_mix($sql);
 
 
 // Load Fresh Data?
-if ($age >= RCE_Sync::MAX_AGE) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
 	// Load Inventory Rooms
-	$out_detail[] = 'Loading Zone/Inventory';
+	// $out_detail[] = 'Loading Zone/Inventory';
 
 	$rfn = function($src) {
 		$src['_kind'] = 'Inventory';
 		return $src;
 	};
-	$gfn = function($src) {
-		return sprintf('inventory-%s', $src['roomid']);
-	};
 
-	//$idx_update += RCE_Sync::biotrack_pull($rce, 'sync_inventory_room', $rfn, $gfn,
+	//$idx_update += CRE_Sync::biotrack_pull($cre, 'sync_inventory_room', $rfn
 
-	$res_source = $rce->sync_inventory_room(array(
+	$res_source = $cre->sync_inventory_room(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
@@ -44,16 +40,17 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	if (1 == $res_source['success']) {
 		foreach ($res_source['inventory_room'] as $src) {
 
+			$src['roomid'] = sprintf('I%08x', $src['roomid']);
 			$src['_kind'] = 'Inventory';
 
-			$guid = sprintf('inventory-%s', $src['roomid']);
+			$guid = $src['roomid'];
 			$hash = _hash_obj($src);
 
 			if ($hash != $res_cached[ $guid ]) {
 
 				$idx_update++;
 
-				RCE_Sync::save($obj_name, $guid, $hash, $src);
+				CRE_Sync::save($obj_name, $guid, $hash, $src);
 
 			}
 		}
@@ -62,8 +59,8 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	}
 
 	// Load Inventory Rooms
-	$out_detail[] = 'Loading Zone/Plant';
-	$res_source = $rce->sync_plant_room(array(
+	// $out_detail[] = 'Loading Zone/Plant';
+	$res_source = $cre->sync_plant_room(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
@@ -71,16 +68,17 @@ if ($age >= RCE_Sync::MAX_AGE) {
 	if (1 == $res_source['success']) {
 		foreach ($res_source['plant_room'] as $src) {
 
+			$src['roomid'] = sprintf('P%08x', $src['roomid']);
 			$src['_kind'] = 'Plant';
 
-			$guid = sprintf('plant-%s', $src['roomid']);
+			$guid = $src['roomid'];
 			$hash = _hash_obj($src);
 
 			if ($hash != $res_cached[ $guid ]) {
 
 				$idx_update++;
 
-				RCE_Sync::save($obj_name, $guid, $hash, $src);
+				CRE_Sync::save($obj_name, $guid, $hash, $src);
 
 			}
 		}
@@ -88,7 +86,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 		$out_detail[] = $res_source['error'];
 	}
 
-	RCE_Sync::age($obj_name, time());
+	CRE_Sync::age($obj_name, time());
 }
 
 

@@ -10,7 +10,7 @@ $obj_name = 'plant';
 $out_detail = array();
 $out_result = array();
 
-$age = RCE_Sync::age($obj_name);
+$age = CRE_Sync::age($obj_name);
 
 
 // Load Cache Data
@@ -19,19 +19,21 @@ $res_cached = SQL::fetch_mix($sql);
 
 
 // Load Fresh Data?
-if ($age >= RCE_Sync::MAX_AGE) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
 	// Load Primary Licenses
 	$out_detail[] = 'Loading Plant';
-	$res_source = $rce->sync_plant(array(
+	$res_source = $cre->sync_plant(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
 
 	if (1 == $res_source['success']) {
 		foreach ($res_source['plant'] as $src) {
+
+			$src['room'] = sprintf('I%08x', $src['room']);
 
 			$guid = $src['id'];
 			$hash = _hash_obj($src);
@@ -40,7 +42,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 				$idx_update++;
 
-				RCE_Sync::save($obj_name, $guid, $hash, $src);
+				CRE_Sync::save($obj_name, $guid, $hash, $src);
 
 			}
 		}
@@ -48,7 +50,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 		$out_detail[] = $res_source['error'];
 	}
 
-	RCE_Sync::age($obj_name, time());
+	CRE_Sync::age($obj_name, time());
 }
 
 
@@ -58,12 +60,19 @@ $res_source = SQL::fetch_all($sql);
 
 foreach ($res_source as $src) {
 
+	$src['meta'] = json_decode($src['meta'], true);
+
 	$add_source = false;
 
 	$out = array(
 		'guid' => $src['guid'],
 		'hash' => $src['hash'],
+		'room' => array(
+			'guid' => sprintf('P%08x', $src['meta']['room']),
+		)
 	);
+
+	// room
 
 	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
 
@@ -79,7 +88,7 @@ foreach ($res_source as $src) {
 	}
 
 	if ($add_source) {
-		$out['_source'] = json_decode($src['meta'], true);
+		$out['_source'] = $src['meta'];
 	}
 
 	$out_result[] = $out;

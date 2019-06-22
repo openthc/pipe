@@ -10,7 +10,7 @@ $obj_name = 'vehicle';
 $out_detail = array();
 $out_result = array();
 
-$age = RCE_Sync::age($obj_name);
+$age = CRE_Sync::age($obj_name);
 
 
 // Load Cache Data
@@ -19,14 +19,14 @@ $res_cached = SQL::fetch_mix($sql);
 
 
 // Load Fresh Data?
-if ($age >= RCE_Sync::MAX_AGE) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
 
 	// Load Primary Licenses
 	$out_detail[] = 'Loading Vehicle';
-	$res_source = $rce->sync_vehicle(array(
+	$res_source = $cre->sync_vehicle(array(
 		'min' => intval($_GET['min']),
 		'max' => intval($_GET['max']),
 	));
@@ -41,7 +41,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 				$idx_update++;
 
-				RCE_Sync::save($obj_name, $guid, $hash, $src);
+				CRE_Sync::save($obj_name, $guid, $hash, $src);
 
 			}
 		}
@@ -49,7 +49,7 @@ if ($age >= RCE_Sync::MAX_AGE) {
 		$out_detail[] = $res_source['error'];
 	}
 
-	RCE_Sync::age($obj_name, time());
+	CRE_Sync::age($obj_name, time());
 
 }
 

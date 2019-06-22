@@ -1,9 +1,8 @@
 <?php
 /**
-	Return all Products - Special Case in BioTrack
-
-	Scan Inventory for Unique Product Names
-*/
+ * Return all Products - Special Case in BioTrack
+ * Scan Inventory for Unique Product Names
+ */
 
 use Edoceo\Radix\DB\SQL;
 
@@ -14,7 +13,7 @@ $obj_name = 'product';
 $out_detail = array();
 $out_result = array();
 
-$age = RCE_Sync::age($obj_name);
+$age = CRE_Sync::age($obj_name);
 
 $sql = 'SELECT meta FROM lot';
 $res = SQL::fetch($sql);
