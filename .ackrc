@@ -16,12 +16,11 @@
 
 --heading
 
---smart-case
-
 --sort-files
 
 --ignore-dir=.git
 --ignore-dir=doxygen
+--ignore-dir=lib/RBE
 --ignore-dir=node_modules
 --ignore-dir=scrape
 --ignore-dir=var

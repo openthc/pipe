@@ -12,7 +12,7 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 ### BioTrack
 
 	curl \
-		--data 'rce=usa/hi' \
+		--data 'cre=usa/hi' \
 		--data 'username=user@example.com' \
 		--data 'password=DoNotTe11!'
 
@@ -20,7 +20,7 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 ### LeafData
 
 	curl \
-		--data 'rce=usa/wa' \
+		--data 'cre=usa/wa' \
 		--data 'license=A123456' \
 		--data 'license-key=SOMESEQUENCE'
 
@@ -28,14 +28,14 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 ### METRC
 
 	curl \
-		--data 'rce=usa/co' \
+		--data 'cre=usa/co' \
 		--data 'program-key=ABC123' \
 		--data 'license-key=ZYX987'
 
 
 ## Authentication
 
-Authentication must take place with the system to interface with and that information is passed to the OACI for authentication with the Regulatory Compliance Engine ("RCE")
+Authentication must take place with the system to interface with and that information is passed to the OACI for authentication with the Compliance Reporting Engine ("CRE")
 
 
 ## Supported Compliance Engines

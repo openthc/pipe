@@ -1,7 +1,7 @@
 <?php
 /**
-	OpenTHC Pipe Application Bootstrap
-*/
+ * OpenTHC Pipe Application Bootstrap
+ */
 
 define('APP_NAME', 'OpenTHC');
 define('APP_SITE', 'https://pipe.openthc.org');
@@ -23,12 +23,12 @@ require_once(APP_ROOT . '/lib/CRE_Iterator_LeafData.php');
 // My (crappy) AutoLoader
 spl_autoload_register(function($c) {
 
-       $c = str_replace('_', '/', $c);
-       $f = sprintf('%s/lib/%s.php', APP_ROOT, $c);
+	$c = str_replace('_', '/', $c);
+	$f = sprintf('%s/lib/%s.php', APP_ROOT, $c);
 
-       if (is_file($f)) {
-               require_once($f);
-       }
+	if (is_file($f)) {
+		require_once($f);
+	}
 
 }, true, false);
 

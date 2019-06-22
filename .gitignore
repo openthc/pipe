@@ -2,7 +2,7 @@
 composer.lock
 
 etc/app.ini
-etc/rce.ini
+etc/cre.ini
 
 custom/
 lib/RBE/
