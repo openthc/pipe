@@ -2,6 +2,8 @@
 
 {% block body %}
 
+<div class="container">
+
 <h1>Authenticate</h1>
 
 <form autocomplete="x" method="post">
@@ -27,13 +29,13 @@
 </div>
 
 <div class="form-group" data-metrc="true">
-	<label>Vendor API Key:</label>
-	<input autocomplete="x" class="form-control" name="vendor-key" placeholder="METRC" value="{{ cre_vendor_key }}">
+	<label>Program API Key:</label>
+	<input autocomplete="x" class="form-control" name="program-key" placeholder="METRC" value="{{ cre_program_key }}">
 </div>
 
 <div class="form-group" data-leafdata="true" data-metrc="true">
-	<label>Client API Key:</label>
-	<input autocomplete="x" class="form-control" name="client-key" placeholder="LeafData, METRC" value="{{ cre_client_key }}">
+	<label>License API Key:</label>
+	<input autocomplete="x" class="form-control" name="license-key" placeholder="LeafData, METRC" value="{{ cre_license_key }}">
 </div>
 
 <div class="form-group" data-biotrack="true">
@@ -46,9 +48,29 @@
 	<input autocomplete="x" class="form-control" name="password" placeholder="BioTrack" value="{{ cre_password }}">
 </div>
 
+{% if google_recaptcha_v2 %}
+	<div class="form-group">
+		<div class="g-recaptcha" data-sitekey="{{ google_recaptcha_v2.public }}"></div>
+	</div>
+	<script src="https://www.google.com/recaptcha/api.js"></script>
+{% endif %}
+
+{% if google_recaptcha_v3 %}
+	<script src="https://www.google.com/recaptcha/api.js?render={{ google_recaptcha_v3.public }}"></script>
+	<script>
+	grecaptcha.ready(function() {
+		grecaptcha.execute('{{ google_recaptcha_v3.public }}', {action: 'login'}).then(function(token) {
+			$('').val(token);
+		});
+	});
+  </script>
+{% endif %}
+
 <button class="btn btn-lg btn-outline-primary" name="a" type="submit" value="auth-web">Connect</button>
 
 </form>
+
+</div>
 
 {% endblock %}
 

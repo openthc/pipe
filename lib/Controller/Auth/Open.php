@@ -33,6 +33,11 @@ class Open extends \OpenTHC\Controller\Base
 	*/
 	function connect($REQ, $RES, $ARG)
 	{
+		//$RES = $this->validateCaptcha($RES);
+		if (200 != $RES->getStatusCode()) {
+			return $RES;
+		}
+
 		$cre = $this->validateCRE();
 
 		if (empty($cre)) {
@@ -73,6 +78,7 @@ class Open extends \OpenTHC\Controller\Base
 			return $RES->withRedirect($_GET['r']);
 		}
 
+		// Sloppy Shit Right Here /djb
 		if (!empty($_GET['client_id'])) {
 			// Need to Connect to OpenTHC Here
 			// Perhaps this is Middleware?
@@ -80,8 +86,8 @@ class Open extends \OpenTHC\Controller\Base
 			case 'dump.openthc.com':
 				return $RES->withRedirect('https://dump.openthc.com/auth/open?pipe-token=' . session_id());
 				break;
-			case 'qa.openthc.org':
-				return $RES->withRedirect('https://qa.openthc.org/auth/open?pipe-token=' . session_id());
+			case 'lab.openthc.org':
+				return $RES->withRedirect('https://lab.openthc.org/auth/open?pipe-token=' . session_id());
 				break;
 			}
 		}
@@ -108,17 +114,21 @@ class Open extends \OpenTHC\Controller\Base
 		$data['cre_code'] = $_SESSION['cre']['code'];
 		$data['cre_company'] = $_SESSION['cre-auth']['company'];
 		$data['cre_license'] = $_SESSION['cre-auth']['license'];
-		$data['cre_vendor_key'] = $_SESSION['cre-auth']['vendor-key'];
-		$data['cre_client_key'] = $_SESSION['cre-auth']['client-key'];
+		$data['cre_program_key'] = $_SESSION['cre-auth']['program-key'];
+		$data['cre_license_key'] = $_SESSION['cre-auth']['license-key'];
 		$data['cre_username'] = $_SESSION['cre-auth']['username'];
 		$data['cre_password'] = $_SESSION['cre-auth']['password'];
 
+
+		$data['google_recaptcha_v2'] = array();
+		$data['google_recaptcha_v2']['public'] = \OpenTHC\Config::get('google_recaptcha_v2.public');
+
+		$data['google_recaptcha_v3'] = array();
+		$data['google_recaptcha_v3']['public'] = \OpenTHC\Config::get('google_recaptcha_v3.public');
+
+
 		if (!empty($_GET['cre'])) {
 			$data['cre_code'] = $_GET['cre'];
-		}
-
-		if (empty($data['cre_client_api_key'])) {
-			$data['cre_client_api_key'] = $_SESSION['cre-auth']['secret'];
 		}
 
 		return $this->_container->view->render($RES, 'page/auth.html', $data);
@@ -213,7 +223,7 @@ class Open extends \OpenTHC\Controller\Base
 		$lic = trim($_POST['license']);
 		$lic = strtoupper($lic);
 
-		$key = trim($_POST['client-key']);
+		$key = trim($_POST['license-key']);
 
 		if (!preg_match('/^(G|J|L|M|R)\w+$/', $lic)) {
 			return $RES->withJSON(array(
@@ -232,7 +242,7 @@ class Open extends \OpenTHC\Controller\Base
 
 		$_SESSION['cre-auth'] = array(
 			'license' => $lic,
-			'client-key' => $key,
+			'license-key' => $key,
 		);
 
 		$cre = \CRE::factory($_SESSION['cre']);
@@ -259,9 +269,9 @@ class Open extends \OpenTHC\Controller\Base
 	function _metrc($RES)
 	{
 		$_SESSION['cre-auth'] = array(
-			'vendor-key' => $_POST['vendor-key'],
-			'client-key' => $_POST['client-key'],
 			'license' => $_POST['license'],
+			'program-key' => $_POST['program-key'],
+			'license-key' => $_POST['license-key'],
 		);
 
 		$cre = \CRE::factory($_SESSION['cre']);
@@ -283,8 +293,40 @@ class Open extends \OpenTHC\Controller\Base
 	}
 
 	/**
-		Validate the CRE
-	*/
+	 * [validateCaptcha description]
+	 * @param Response $RES [description]
+	 * @return Response [description]
+	 */
+	private function validateCaptcha($RES)
+	{
+		if (empty($_POST['g-recaptcha-response'])) {
+			return $RES->withRedirect('/auth/fail?e=cao290');
+		}
+
+		$url = 'https://www.google.com/recaptcha/api/siteverify';
+		$arg = array('form_params' => array(
+			'secret' => \OpenTHC\Config::get('google_recaptcha.secret'),
+			'response' => $_POST['g-recaptcha-response'],
+			'remoteip' => $_SERVER['REMOTE_ADDR'],
+		));
+		$ghc = new \GuzzleHttp\Client();
+		$res = $ghc->post($url, $arg);
+
+		if (200 != $res->getStatusCode()) {
+			return $RES->withRedirect('/auth/fail?e=cao316');
+		}
+
+		$res = json_decode($res->getBody(), true);
+		if (empty($res['success'])) {
+			return $RES->withRedirect('/auth/fail?e=cao321');
+		}
+
+		return $RES;
+	}
+
+	/**
+	 * Validate the CRE
+	 */
 	private function validateCRE()
 	{
 		$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
