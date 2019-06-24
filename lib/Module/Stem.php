@@ -1,7 +1,7 @@
 <?php
 /**
-	Slim Module for the Stem interface
-*/
+ * Slim Module for the Stem interface
+ */
 
 namespace App\Module;
 

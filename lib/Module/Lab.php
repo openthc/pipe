@@ -5,7 +5,7 @@
 
 namespace App\Module;
 
-class Lot extends \OpenTHC\Module\Base
+class Lab extends \OpenTHC\Module\Base
 {
 	/**
 		@param $a App

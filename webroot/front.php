@@ -33,13 +33,15 @@ $app->group('/auth', function() {
 
 	$this->get('/back', function($REQ, $RES, $ARG) {
 
+		// Fakes a POST
 		$_POST['a'] = 'auth-web';
 		$_POST['cre'] = $_SESSION['cre']['engine'];
 		$_POST['license'] = $_SESSION['cre-auth']['license'];
-		$_POST['client-key'] = $_SESSION['cre-auth']['client-key'];
+		$_POST['license-key'] = $_SESSION['cre-auth']['license-key'];
 
 		$C = new App\Controller\Auth\Open($this);
 		$RES = $C->connect($REQ, $RES, $ARG);
+
 		return $RES;
 
 	});
@@ -99,39 +101,10 @@ $app->group('/lot', 'App\Module\Lot')
 
 
 // QA Group
-$app->group('/qa', function() {
-
-	$this->get('', function($REQ, $RES, $ARG) {
-		return _from_cre_file('qa/search.php', $RES, $ARG);
-	});
-
-	$this->get('/{guid}', function($REQ, $RES, $ARG) {
-		return _from_cre_file('qa/single.php', $RES, $ARG);
-	});
-	//->add(function($REQ, $RES, $ncb) {
-	//
-	//	// guid
-	//	$ri = $REQ->getAttribute('routeInfo');
-	//	$_GET['code'] = $ri[2]['guid'];
-	//	$_GET['code'] = trim($_GET['code']);
-	//
-	//	if (empty($_GET['code'])) {
-	//		return $RES->withJSON(array(
-	//			'status' => 'failure',
-	//			'detail' => 'QCR#283: Invalid Inventory Code',
-	//			'_arg' => $_GET,
-	//		), 400);
-	//	}
-    //
-	//	$RES = $ncb($REQ, $RES);
-    //
-	//	return $RES;
-	//});
-
-})
-->add('App\Middleware\CRE')
-->add('App\Middleware\Database')
-->add('App\Middleware\Session');
+$app->group('/lab', 'App\Module\Lab')
+	->add('App\Middleware\CRE')
+	->add('App\Middleware\Database')
+	->add('App\Middleware\Session');
 
 
 // Transfer Group
@@ -207,7 +180,6 @@ $app->group('/waste', function() {
  * Stem Handlers simply log all requests/responses
  */
 $app->group('/stem', 'App\Module\Stem');
-
 
 // Display System Info
 $app->get('/system', function($REQ, $RES, $ARG) {
