@@ -1,182 +1,230 @@
 ;
-; Regulatory Compliance Engine Definitions
+; Cannabis Reporting/Regulation Engine Definitions
 ;
 
 
 ;
 ; Alaska
-[ak]
+[usa/ak]
 	name = "Alaska / METRC"
-	engine = metrc
+	engine = "metrc"
 	server = "https://api-ak.metrc.com"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
 
 
 ;
-; Alaska Test Engine
-[ak-test]
+; Alaska / Test
+[usa/ak/test]
 	name = "Alaska / METRC / Test"
-	engine = metrc
+	engine = "metrc"
 	server = "https://sandbox-api-ak.metrc.com"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
 
 
 ;
 ; California
-[ca]
+[usa/ca]
 	name = "California / METRC"
-	engine = metrc
+	engine = "metrc"
 	server = "https://api-ca.metrc.com"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
 
 
 ;
-; California/Test
-[ca-test]
+; California / Test
+[usa/ca/test]
 	name = "California / METRC / Test"
-	engine = metrc
+	engine = "metrc"
 	server = "https://sandbox-api-ca.metrc.com"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
 
 
 ;
 ; Colorado
-[co]
+[usa/co]
 	name = "Colorado / METRC"
-	engine = metrc
+	engine = "metrc"
 	server = "https://api-co.metrc.com"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
 
 
 ;
-; Colorado
-[co-test]
+; Colorado / Test
+[usa/co/test]
 	name = "Colorado / METRC / Test"
-	engine = metrc
+	engine = "metrc"
 	server = "https://sandbox-api-co.metrc.com"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
 
 
 ;
 ; Hawaii
-[hi]
+[usa/hi]
 	name = "Hawaii / BioTrack"
-	engine = biotrack
+	engine = "biotrack"
 	server = "https://hicsts.hawaii.gov/serverjson.asp"
+	version = 2014001
 
 
 ;
 ; Illinois
-[il]
+[usa/il]
 	name = "Illinois / BioTrack"
-	engine = biotrack
+	engine = "biotrack"
 	server = "https://mcmonitoring.agr.illinois.gov/serverjson.asp"
+	version = 2014001
+
+
+;
+; Massachusetts
+[usa/ma]
+	name = "Massachusetts / METRC"
+	engine = "metrc"
+	server = ""
+	version = 2015001
 
 
 ;
 ; New Mexico
-[nm]
+[usa/nm]
 	name = "New Mexico / BioTrack"
-	engine = biotrack
+	engine = "biotrack"
 	server = "https://mcp-tracking.nmhealth.org/serverjson.asp"
+	version = 2014001
 
 
 ;
 ; Nevada
-[nv]
+[usa/nv]
 	name = "Nevada / METRC"
-	engine = metrc
+	engine = "metrc"
 	server = "https://api-nv.metrc.com"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
 
 
 ;
-; Nevada
-[nv-test]
+; Nevada / Test
+[usa/nv/test]
 	name = "Nevada / METRC / Test"
-	engine = metrc
+	engine = "metrc"
 	server = "https://sandbox-api-nv.metrc.com"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
+
+
+;
+; Oklahoma
+[usa/ok]
+	name = "Oklahoma / None"
+	engine = ""
+	version = ""
 
 
 ;
 ; Oregon
-[or]
+[usa/or]
 	name = "Oregon / METRC"
-	engine = metrc
+	engine = "metrc"
 	server = "https://api-or.metrc.com"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
 
 
 ;
-; Oregon
-[or-test]
+; Oregon / Test
+[usa/or/test]
 	name = "Oregon / METRC / Test"
-	engine = metrc
+	engine = "metrc"
 	server = "https://sandbox-api-or.metrc.com"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
+
+
+;
+; Pennsylvania
+[usa/pa]
+	name = "Pennsylvania / LeafData"
+	engine = "leafdata"
+	server = "https://pa.leafdatazone.com/api/v1"
+	version = 2018031
+
+
+;
+; Utah (pending)
+[usa/ut]
+	name = "Utah / LeafData"
+	engine = "leafdata"
 
 
 ;
 ; Washington
-[wa/mjf]
+[usa/wa]
 	name = "Washington / LeafData"
-	engine = leafdata
+	engine = "leafdata"
 	server = "https://traceability.lcb.wa.gov/api/v1"
+	server = "https://wa.leafdatazone.com/api/v1"
 
 
 ;
-; Washington
-;[wa/lcb]
-;	name = "Washington / BioTrack / LCB"
-;	engine = biotrack
-;	server = "https://wslcb.mjjtraceability.com/serverjson.asp"
-
-
-;
-; Washington
-[wa/ucs]
-	name = "Washington / BioTrack / UCS"
-	engine = biotrack
-	server = "https://wa.biotrackthc.net/serverjson.asp"
-
-
-;
-; Washington / Licensee Testing Mode
-;[wa-test]
-;	engine = leafdata
-;	base = "https://traceability-training.lcb.wa.gov/api/v1"
-;	host = ""
-
-
-;
-; Washington / Software Provider Testing Mode
-[wa-test]
+; Washington / Test
+[usa/wa/test]
 	name = "Washington / LeafData / Test"
-	engine = leafdata
+	engine = "leafdata"
 	server = "https://watest.leafdatazone.com/api/v1"
 
 
 ;
+; Washington / BioTrack UCS
+[usa/wa/ucs]
+	name = "Washington / BioTrack / UCS"
+	engine = "biotrack"
+	server = "https://wa.biotrackthc.net/serverjson.asp"
+	version = 2017001
+
+
 ;
-[biotrack-mock]
+; Washington @deprecated, reference only
+;[usa/wa]
+;	name = "Washington / BioTrack / LCB"
+;	engine = "biotrack"
+;	server = "https://wslcb.mjjtraceability.com/serverjson.asp"
+
+
+;
+; Mock Interfaces
+;
+
+
+;
+; BioTrack Mock
+[openthc/biotrack/mock]
 	name = "OpenTHC / BioTrack / Mock"
-	engine = biotrack
+	engine = "biotrack"
 	server = "https://bunk.openthc.org/biotrack/v2013/serverjson.asp"
+	version = 2014001
 
 
 ;
-;
-[leafdata-mock]
+; LeafData Mock
+[openthc/leafdata/mock]
 	name = "OpenTHC / LeafData / Mock"
-	engine = leafdata
+	engine = "leafdata"
 	server = "https://bunk.openthc.org/leafdata/v2018"
+	version = 2018031
 
 
 ;
-;
-[metrc-mock]
+; METRC Mock
+[openthc/metrc/mock]
 	name = "OpenTHC / METRC / Mock"
-	engine = metrc
+	engine = "metrc"
 	server = "https://bunk.openthc.org/metrc/v2015"
-	vendor_key = ""
+	version = 2015001
+	program-key = ""
