@@ -1,17 +1,17 @@
 <?php
 /**
-	Handles a Proxy to /packages/v1/{id}
-*/
+ * Handles a Proxy to /packages/v1/{id}
+ */
 
 use Edoceo\Radix\DB\SQL;
 
 $obj_name = 'product';
 
-$age = RCE_Sync::age($obj_name);
+$age = CRE_Sync::age($obj_name);
 
-if ($age >= RCE_Sync::MAX_AGE) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$rce = \CRE::factory($_SESSION['cre']);
 
 	// /items/v1/categories
 	$res = $rce->product()->search('active');

@@ -25,7 +25,7 @@ if ($age >= 240) {
 	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$rce = \CRE::factory($_SESSION['cre']);
 
 	try {
 		$res_source = $rce->plant()->search();

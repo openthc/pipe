@@ -1,10 +1,8 @@
 <?php
 /**
-	Return a List of Licenses
-	@todo Make Licenses a Special / Global Data-Store
-
-	@see https://www.telerik.com/blogs/understanding-http-304-responses
-*/
+ * Return a List of Licenses
+ * @todo Make Licenses a Special / Global Data-Store
+ */
 
 use Edoceo\Radix\DB\SQL;
 
@@ -20,20 +18,20 @@ $sql = sprintf("SELECT val FROM _config WHERE key = 'sync-{$obj_name}-time'");
 $dt1 = intval(SQL::fetch_one($sql));
 $age = $dt0 - $dt1;
 
-if ($age >= 240) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
 	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
 	try {
-		$res_source = $rce->zone()->search();
+		$res_source = $cre->zone()->search();
 	} catch (Exception $e) {
 		if (401 == $e->getCode()) {
 			return $RES->withJSON(array(
 				'status' => 'failure',
-				'detail' => $rce->formatError($res_source),
+				'detail' => $cre->formatError($res_source),
 			), 401);
 		}
 	}
@@ -41,7 +39,7 @@ if ($age >= 240) {
 	if ('success' != $res_source['status']) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
-			'detail' => $rce->formatError($res_source),
+			'detail' => $cre->formatError($res_source),
 		), 500);
 	}
 

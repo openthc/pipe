@@ -17,19 +17,19 @@ $sql = sprintf("SELECT val FROM _config WHERE key = 'sync-{$obj_name}-time'");
 $dt1 = intval(SQL::fetch_one($sql));
 $age = $dt0 - $dt1;
 
-if ($age >= RCE_Sync::MAX_AGE) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
 	$sql = "SELECT guid, hash FROM {$obj_name}";
 	$res_cached = SQL::fetch_mix($sql);
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
-	$res_source = $rce->strain()->search();
+	$res_source = $cre->strain()->search();
 
 	if (200 != $res_source['status']) {
 		return $RES->withJSON(array(
 			'status' => 'failure',
-			'detail' => $rce->formatError($res_source),
+			'detail' => $cre->formatError($res_source),
 		), 500);
 	}
 
@@ -81,7 +81,7 @@ foreach ($res_source as $src) {
 
 		unset($src['hash']);
 
-		RCE_Sync::save($obj_name, $guid, $hash, $src);
+		CRE_Sync::save($obj_name, $guid, $hash, $src);
 
 	}
 
@@ -89,7 +89,7 @@ foreach ($res_source as $src) {
 
 }
 
-RCE_Sync::age($obj_name, time());
+CRE_Sync::age($obj_name, time());
 
 
 $ret_code = ($idx_update ? 200 : 203);

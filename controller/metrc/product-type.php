@@ -1,9 +1,9 @@
 <?php
 /**
-	Return a List of Licenses
-*/
+ * Return a List of Product Types
+ */
 
-$rce = \RCE::factory($_SESSION['rce']);
+$rce = \CRE::factory($_SESSION['cre']);
 
 // /items/v1/categories
 try {

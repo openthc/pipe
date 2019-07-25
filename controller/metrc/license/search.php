@@ -1,15 +1,14 @@
 <?php
 /**
-	Return a List of Licenses
-	In METRC this is only YOUR licenses
-*/
+ * Return a List of Licenses
+ * In METRC this is only YOUR licenses
+ */
 
 use Edoceo\Radix\DB\SQL;
 
 $obj_name = 'license';
 
-$age = RCE_Sync::age($obj_name);
-$age = RCE_Sync::MAX_AGE + 1;
+$age = CRE_Sync::age($obj_name);
 
 // Load Cache Data
 $sql = "SELECT guid, hash FROM {$obj_name}";
@@ -17,13 +16,11 @@ $res_cached = SQL::fetch_mix($sql);
 
 
 // Load Fresh Data?
-if ($age >= RCE_Sync::MAX_AGE) {
+if ($age >= CRE_Sync::MAX_AGE) {
 
-	$rce = \RCE::factory($_SESSION['rce']);
+	$cre = \CRE::factory($_SESSION['cre']);
 
-	$res_source = $rce->license()->search();
-	print_r($res_source);
-	exit;
+	$res_source = $cre->license()->search();
 	$res_source = $res_source['result'];
 
 	foreach ($res_source as $src) {
@@ -35,11 +32,11 @@ if ($age >= RCE_Sync::MAX_AGE) {
 
 			$idx_update++;
 
-			RCE_Sync::save($obj_name, $guid, $hash, $src);
+			CRE_Sync::save($obj_name, $guid, $hash, $src);
 		}
 	}
 
-	RCE_Sync::age($obj_name, time());
+	CRE_Sync::age($obj_name, time());
 
 	$RES = $RES->withHeader('x-openthc-update', $idx_update);
 
