@@ -53,9 +53,12 @@ class Config extends \OpenTHC\Module\Base
 		//		return _from_cre_file('contacts/update.php', $RES, $ARG);
 		//	});
 
-		// Products
+		// Product Type
+		$a->get('/product-type', function($REQ, $RES, $ARG) {
+			return _from_cre_file('product-type.php', $RES, $ARG);
+		});
 
-		// Search
+		// Product Search
 		$a->get('/product', function($REQ, $RES, $ARG) {
 			return _from_cre_file('product/search.php', $RES, $ARG);
 		})
@@ -63,16 +66,10 @@ class Config extends \OpenTHC\Module\Base
 			//->add('App\Middleware\Output\CSV')
 			;
 
-		// Product Type
-		$a->get('/product-type', function($REQ, $RES, $ARG) {
-			return _from_cre_file('product-type.php', $RES, $ARG);
+		// Product Create
+		$a->post('/product', function($REQ, $RES, $ARG) {
+			return _from_cre_file('product/create.php', $RES, $ARG);
 		});
-
-
-		// Create
-		//$a->post('/product', function($REQ, $RES, $ARG) {
-		//	return _from_cre_file('product/create.php', $RES, $ARG);
-		//});
 
 		// Single
 		$a->get('/product/{guid}', function($REQ, $RES, $ARG) {
@@ -80,9 +77,9 @@ class Config extends \OpenTHC\Module\Base
 		});
 
 		// Modify
-		//$this->post('/product/{guid}', function($REQ, $RES, $ARG) {
-		//	return _from_cre_file('product/update.php', $RES, $ARG);
-		//});
+		$a->post('/product/{guid}', function($REQ, $RES, $ARG) {
+			return _from_cre_file('product/update.php', $RES, $ARG);
+		});
 
 		// Delete
 		$a->delete('/product/{guid}', function($REQ, $RES, $ARG) {

@@ -82,6 +82,15 @@
 
 
 ;
+; Maine
+[usa/me]
+	name = "Maine / BioTrack / BETA"
+	engine = "biotrack"
+	server = "https://me-qa01.biotrackthc.net/serverjson.asp"
+	version = 2019270
+
+
+;
 ; Massachusetts
 [usa/ma]
 	name = "Massachusetts / METRC"
@@ -161,6 +170,8 @@
 [usa/ut]
 	name = "Utah / LeafData"
 	engine = "leafdata"
+	server = ""
+	version = ""
 
 
 ;

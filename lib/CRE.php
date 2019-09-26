@@ -1,6 +1,6 @@
 <?php
 /**
- * An CRE Factory
+ * A CRE Factory
  */
 
 class CRE
@@ -21,6 +21,9 @@ class CRE
 				break;
 			case 'usa/il':
 				$cre = new RBE_BioTrack_IL($sid);
+				break;
+			case 'usa/me':
+				$cre = new RBE_BioTrack_ME($sid);
 				break;
 			case 'usa/nd':
 				$cre = new RBE_BioTrack_ND($sid);
@@ -45,7 +48,7 @@ class CRE
 			// $l['id'] = null;
 			// $l['code'] = $cre_auth['license'];
 			// $cre_auth['license'] = $l;
-			$cre_auth['secret'] = $cre_auth['client-key'];
+			$cre_auth['secret'] = $cre_auth['license-key'];
 
 			$cre = new RBE_LeafData($cre_auth);
 
@@ -60,38 +63,38 @@ class CRE
 		case 'metrc':
 
 			switch ($cfg['code']) {
-			case 'ak':
+			case 'usa/ak':
 				$cre = new RBE_Metrc_AK($_SESSION['cre-auth']);
 				break;
-			case 'ak-test':
+			case 'usa/ak/test':
 				$cre = new RBE_Metrc_AK($_SESSION['cre-auth']);
 				$cre->setTestMode();
 				break;
-			case 'ca':
+			case 'usa/ca':
 				$cre = new RBE_Metrc_CA($_SESSION['cre-auth']);
 				break;
-			case 'ca-test':
+			case 'usa/ca/test':
 				$cre = new RBE_Metrc_CA($_SESSION['cre-auth']);
 				$cre->setTestMode();
 				break;
-			case 'co':
+			case 'usa/co':
 				$cre = new RBE_Metrc_CO($_SESSION['cre-auth']);
 				break;
-			case 'co-test':
+			case 'usa/co/test':
 				$cre = new RBE_Metrc_CO($_SESSION['cre-auth']);
 				$cre->setTestMode();
 				break;
-			case 'nv':
+			case 'usa/nv':
 				$cre = new RBE_Metrc_NV($_SESSION['cre-auth']);
 				break;
-			case 'nv-test':
+			case 'usa/nv/test':
 				$cre = new RBE_Metrc_NV($_SESSION['cre-auth']);
 				$cre->setTestMode();
 				break;
-			case 'or':
+			case 'usa/or':
 				$cre = new RBE_Metrc_OR($_SESSION['cre-auth']);
 				break;
-			case 'or-test':
+			case 'usa/or/test':
 				$cre = new RBE_Metrc_OR($_SESSION['cre-auth']);
 				$cre->setTestMode();
 				break;

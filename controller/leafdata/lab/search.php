@@ -7,9 +7,10 @@ use Edoceo\Radix\DB\SQL;
 
 session_write_close();
 
-$obj_name = 'qa';
+$obj_name = 'lab_result';
 
 $age = CRE_Sync::age($obj_name);
+$age = CRE_Sync::MAX_AGE + 1;
 
 // Load Cache Data
 $sql = "SELECT guid, hash FROM {$obj_name}";

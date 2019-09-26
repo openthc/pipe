@@ -33,12 +33,12 @@ class Database
 			SQL::query('CREATE TABLE contact (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE license (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE batch (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
+			SQL::query('CREATE TABLE lab_result (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE lot (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE lot_delta (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE plant (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE plant_collect (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE product (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE qa (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE retail (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE strain (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
 			SQL::query('CREATE TABLE transfer_incoming (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');

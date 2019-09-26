@@ -12,7 +12,7 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 ### BioTrack
 
 	curl \
-		--data 'cre=usa/hi' \
+		--data 'cre=usa/me' \
 		--data 'username=user@example.com' \
 		--data 'password=DoNotTe11!'
 
@@ -35,20 +35,21 @@ Currently this system provides a READ-ONLY interface which is (or should be) com
 
 ## Authentication
 
-Authentication must take place with the system to interface with and that information is passed to the OACI for authentication with the Compliance Reporting Engine ("CRE")
+Authentication must take place with the system to interface with and that information is passed to the Pipe for authentication with the Compliance Reporting Engine ("CRE")
 
 
 ## Supported Compliance Engines
 
- * BioTrackTHC ("BT") - Delaware*, Hawaii, New Mexico, North Dakota, Illinois, Puerto Rico
- * LeafData ("LD") - Washington
- * METRC ("FM") - Alaska, California, Colorado, Nevada, Oregon
+ * BioTrackTHC ("BT") - Delaware*, Hawaii, Maine, New Mexico, North Dakota, Illinois, Puerto Rico
+ * Akerna/MJ Freeway/LeafData ("LD") - Washington, Utah*
+ * METRC ("FM") - Alaska, California, Colorado, Massachusetts, Nevada, Oregon
 
 
 ## Supported Objects
 
  * Plants - (BT, LD, FM)
  * Inventory Lots (BT, LD, FM)
+ * Laboratory Result (BT, LD, FM)
  * Products (LD, FM)
  * Zones (aka: Areas, Rooms) - (BT, LD, FM)
  * Vehicles - BT
@@ -78,12 +79,6 @@ Authentication must take place with the system to interface with and that inform
 	curl /transfer?filter=and
 	curl /transfer?filter=or
 
-
-### Supported Systems
-
- * BioTrackTHC - Hawaii, Illinois, North Dakota, New Mexico, Washington (UCS)
- * LeafData - Washington
- * METRC - Alaska, California, Colorado, Nevada, Oregon
 
 ## Behat
 

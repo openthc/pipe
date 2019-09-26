@@ -5,7 +5,7 @@
 
 use Edoceo\Radix\DB\SQL;
 
-$obj_name = 'qa';
+$obj_name = 'lab_result';
 
 $out_detail = array();
 $out_result = array();
