@@ -275,7 +275,6 @@ class Open extends \OpenTHC\Controller\Base
 		);
 
 		$cre = \CRE::factory($_SESSION['cre']);
-		//_var_dump($cre);
 
 		$res = $cre->ping();
 		if ($res) {
@@ -334,14 +333,6 @@ class Open extends \OpenTHC\Controller\Base
 		// var_dump($cre_data);
 
 		$cre_want = strtolower(trim($_POST['cre']));
-		switch ($cre_want) {
-		case 'leafdata':
-		case 'wa/leaf':
-		case 'wa':
-			$cre_want = 'usa/wa';
-			break;
-		}
-
 		$cre_info = $cre_data[ $cre_want ];
 
 		if (!empty($cre_info)) {

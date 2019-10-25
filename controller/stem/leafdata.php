@@ -56,12 +56,17 @@ if (200 != $RES->getStatusCode()) {
 
 // Audit Log Database
 $sql_hash = crc32($_SERVER['HTTP_X_MJF_MME_CODE'] . $_SERVER['HTTP_X_MJF_KEY']);
-$sql_file = sprintf('%s/var/stem-leafdata-%08x.sqlite', APP_ROOT, $sql_hash);
+$sql_file = sprintf('%s/var/stem%s/leafdata-%08x.sqlite', APP_ROOT, date('Ymd'), $sql_hash);
+$sql_path = dirname($sql_file);
+if (!is_dir($sql_path)) {
+	mkdir($sql_path, 0755, true);
+}
+
 $sql_good = is_file($sql_file);
 
 SQL::init('sqlite:' . $sql_file);
 if (!$sql_good) {
-	SQL::query("CREATE TABLE log_audit (cts not null default (strftime('%s','now')), code, path, req, res, err)");
+	SQL::query("CREATE TABLE log_audit (cts not null default CURRENT_TIMESTAMP, code, path, req, res, err)");
 }
 
 
@@ -116,6 +121,10 @@ case 'POST':
 	break;
 
 }
+
+
+// LeafData sets this garbage, so we mimic
+$RES = $RES->withHeader('content-type', 'text/json; charset=UTF-8');
 
 
 // var_dump($res);
