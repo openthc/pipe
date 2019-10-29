@@ -13,14 +13,6 @@ $app = new \OpenTHC\App($cfg);
 
 // 404 Handler
 $con = $app->getContainer();
-$con['notFoundHandler'] = function($c) {
-	return function ($REQ, $RES) {
-		return $RES->withJSON(array(
-			'status' => 'failure',
-			'detail' => 'Not Found',
-		), 404);
-	};
-};
 
 
 // Authentication
@@ -53,7 +45,7 @@ $app->group('/auth', function() {
 
 	$this->get('/shut', 'OpenTHC\Controller\Auth\Shut');
 
-})->add('App\Middleware\Session');
+})->add('OpenTHC\Middleware\Session');
 
 
 /**
@@ -69,42 +61,42 @@ $app->get('/browse', function($REQ, $RES, $ARG) {
 	return $this->view->render($RES, 'page/browse.html', $data);
 })
 ->add('App\Middleware\CRE')
-->add('App\Middleware\Session');
+->add('OpenTHC\Middleware\Session');
 
 
 // Config/Core Data Stuff
 $app->group('/config', 'App\Module\Config')
 	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
-	->add('App\Middleware\Session');
+	->add('OpenTHC\Middleware\Session');
 
 
 // Batch
 $app->group('/batch', 'App\Module\Batch')
 	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
-	->add('App\Middleware\Session');
+	->add('OpenTHC\Middleware\Session');
 
 
 // Plant
 $app->group('/plant', 'App\Module\Plant')
 	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
-	->add('App\Middleware\Session');
+	->add('OpenTHC\Middleware\Session');
 
 
 // Inventory Lot
 $app->group('/lot', 'App\Module\Lot')
 	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
-	->add('App\Middleware\Session');
+	->add('OpenTHC\Middleware\Session');
 
 
 // QA Group
 $app->group('/lab', 'App\Module\Lab')
 	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
-	->add('App\Middleware\Session');
+	->add('OpenTHC\Middleware\Session');
 
 
 // Transfer Group
@@ -149,14 +141,14 @@ $app->group('/transfer', function() {
 })
 ->add('App\Middleware\CRE')
 ->add('App\Middleware\Database')
-->add('App\Middleware\Session');
+->add('OpenTHC\Middleware\Session');
 
 
 // Retail Sales
 $app->group('/retail', 'App\Module\Retail')
 	->add('App\Middleware\CRE')
 	->add('App\Middleware\Database')
-	->add('App\Middleware\Session');
+	->add('OpenTHC\Middleware\Session');
 
 
 // Waste Group
@@ -173,7 +165,7 @@ $app->group('/waste', function() {
 })
 ->add('App\Middleware\CRE')
 ->add('App\Middleware\Database')
-->add('App\Middleware\Session');
+->add('OpenTHC\Middleware\Session');
 
 
 /**
