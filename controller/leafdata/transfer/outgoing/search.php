@@ -52,22 +52,24 @@ $res_source = SQL::fetch_all($sql);
 
 foreach ($res_source as $src) {
 
+	$src['meta'] = json_decode($src['meta'], true);
+
 	$out = array(
 		'guid' => $src['guid'],
 		'hash' => $src['hash'],
 		//'status' => VOID|LIVE/$src['status'],
 		//	$obj['status'] = $src['status'];
 		//	$obj['status_void'] = $src['void'];
-		'source_license_guid' => $src['global_from_mme_id'],
-		'target_license_guid' => $src['global_to_mme_id'],
+		'source_license_guid' => $src['meta']['global_from_mme_id'],
+		'target_license_guid' => $src['meta']['global_to_mme_id'],
 		//'carrier_license_guid' => $src['global_transporting_mme_id'];
 	);
 
 	if ($out['hash'] != $res_cached[ $out['guid'] ]) {
 		$out['_updated'] = 1;
-		$out['_source'] = json_decode($src['meta'], true);
+		$out['_source'] = $src['meta'];
 	} elseif ('true' == $_GET['source']) {
-		$out['_source'] = json_decode($src['meta'], true);
+		$out['_source'] = $src['meta'];
 	}
 
 	$res_output[] = $out;
