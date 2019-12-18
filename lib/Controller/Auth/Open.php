@@ -110,6 +110,7 @@ class Open extends \OpenTHC\Controller\Base
 		$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
 
 		$data = array();
+		$data['Page'] = [ 'title' => 'Authenticate' ];
 		$data['cre_list'] = $cre_data;
 		$data['cre_code'] = $_SESSION['cre']['code'];
 		$data['cre_company'] = $_SESSION['cre-auth']['company'];

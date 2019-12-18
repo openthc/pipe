@@ -2,11 +2,12 @@
 
 {% block body %}
 
-<div class="container">
-
-<h1>Authenticate</h1>
-
 <form autocomplete="x" method="post">
+<div class="auth-wrap">
+<div class="card">
+
+	<h1 class="card-header">{{ Page.title }}</h1>
+	<div class="card-body">
 
 <div class="form-group">
 	<label>CRE:</label>
@@ -66,11 +67,14 @@
   </script>
 {% endif %}
 
-<button class="btn btn-lg btn-outline-primary" name="a" type="submit" value="auth-web">Connect</button>
+	</div>
 
-</form>
-
+	<div class="card-footer">
+		<button class="btn btn-lg btn-outline-primary" name="a" type="submit" value="auth-web">Connect</button>
+	</div>
 </div>
+</div>
+</form>
 
 {% endblock %}
 
