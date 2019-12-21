@@ -28,6 +28,10 @@ class Stem extends \OpenTHC\Module\Base
 			return require_once(APP_ROOT . '/controller/stem/metrc.php');
 		});
 
+		$a->get('/log', function($REQ, $RES, $ARG) {
+			return require_once(APP_ROOT . '/controller/stem/log.php');
+		});
+
 	}
 
 	function _load_cre($REQ, $RES, $NMW)
