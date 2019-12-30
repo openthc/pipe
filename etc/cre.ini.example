@@ -100,6 +100,28 @@
 
 
 ;
+; Montana
+[usa/mt]
+	name = "Montana / METRC"
+	region = "mt"
+	engine = "metrc"
+	server = "https://api-mt.metrc.com"
+	version = 2015001
+	program-key = ""
+
+
+;
+; Montana/TEST
+[usa/mt/test]
+	name = "Montana / METRC / Test"
+	region = "mt"
+	engine = "metrc"
+	server = "https://sandbox-api-co.metrc.com"
+	version = 2015001
+	program-key = ""
+
+
+;
 ; New Mexico
 [usa/nm]
 	name = "New Mexico / BioTrack"
