@@ -43,6 +43,8 @@ if ($age >= CRE_Sync::MAX_AGE) {
 			$src['phone'] = null;
 		}
 
+		$src['email_contact'] = strtolower($src['email_contact']);
+
 		// Unset Junk
 		unset($src['bio_license_number']);
 		unset($src['bio_location_id']);
