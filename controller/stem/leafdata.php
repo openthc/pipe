@@ -66,7 +66,7 @@ $sql_good = is_file($sql_file);
 
 SQL::init('sqlite:' . $sql_file);
 if (!$sql_good) {
-	SQL::query("CREATE TABLE log_audit (cts not null default CURRENT_TIMESTAMP, code, path, req, res, err)");
+	SQL::query("CREATE TABLE log_audit (cts not null default (strftime('%Y-%m-%d %H:%M:%f')), code, path, req, res, err)");
 }
 
 

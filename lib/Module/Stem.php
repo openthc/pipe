@@ -24,7 +24,7 @@ class Stem extends \OpenTHC\Module\Base
 			return require_once(APP_ROOT . '/controller/stem/leafdata.php');
 		});
 
-		$a->map([ 'GET', 'POST' ], '/metrc/{system}/{path:.*}', function($REQ, $RES, $ARG) {
+		$a->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{system}/{path:.*}', function($REQ, $RES, $ARG) {
 			return require_once(APP_ROOT . '/controller/stem/metrc.php');
 		});
 

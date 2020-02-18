@@ -100,11 +100,9 @@ $cre_http = new CRE_HTTP(array(
 // Forward
 switch ($_SERVER['REQUEST_METHOD']) {
 case 'DELETE':
-	_exit_text('Not Implemented', 501);
-	break;
 case 'GET':
 
-	$req = new GuzzleHttp\Psr7\Request('GET', $req_path);
+	$req = new GuzzleHttp\Psr7\Request($_SERVER['REQUEST_METHOD'], $req_path);
 	$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
 	$req = $req->withHeader('host', $cre_host);
 

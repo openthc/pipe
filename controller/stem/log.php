@@ -63,6 +63,7 @@ tr.tr3 {
 $idx = 0;
 $sql = <<<SQL
 SELECT * FROM log_audit
+-- WHERE req LIKE '%lab_results%'
 ORDER BY cts DESC limit 50
 SQL;
 $res = $dbc->fetchAll($sql);
@@ -86,12 +87,12 @@ foreach ($res as $rec) {
 	$req = explode("\r\n\r\n", $rec['req']);
 	$req[0] = preg_replace('/^x\-mjf\-key:.+$/im', 'x-mjf-key: ********', $req[0]);
 	$req[0] = preg_replace('/^authorization:.+$/im', 'authorization: ********', $req[0]);
-	// if ('pretty' == $_GET['f']) {
-	// 	if (!empty($req[1])) {
-	// 		$req[1] = json_decode($req[1], true);
-	// 		$req[1] = json_encode($req[1], JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-	// 	}
-	// }
+	if ('pretty' == $_GET['f']) {
+		if (!empty($req[1])) {
+			$req[1] = json_decode($req[1], true);
+			$req[1] = json_encode($req[1], JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+		}
+	}
 
 	echo sprintf('<tr class="tr2" id="row-%d-2">', $idx);
 	echo '<td colspan="4">';
