@@ -36,7 +36,7 @@ class CRE_HTTP extends \GuzzleHttp\Client
 		$cfg = array(
 			'handler' => $chs,
 			'headers' => array(
-				'user-agent' => 'OpenTHC/420.18.230 (Pipe-Stem)',
+				'user-agent' => 'OpenTHC/420.20.102 (pipe-stem)',
 			),
 			'http_errors' => false
 		);
@@ -72,20 +72,21 @@ class CRE_HTTP extends \GuzzleHttp\Client
 
 				$fmt = new GuzzleHttp\MessageFormatter(GuzzleHttp\MessageFormatter::DEBUG);
 
-				// Before Request
+				// Success Handler
 				$success = function($res) use ($req, $fmt) {
 
 					SQL::insert('log_audit', array(
 						'code' => $res->getStatusCode(),
 						'path' => $req->getRequestTarget(),
 						'req' => GuzzleHttp\Psr7\str($req),
-						'res' => ($res ? GuzzleHttp\Psr7\str($res) : null)
+						'res' => ($res ? GuzzleHttp\Psr7\str($res) : null),
 					));
 
 					return $res;
 
 				};
 
+				// Failure Handler
 				$failure = function($err) use ($req, $fmt) {
 
 					$res = $err instanceof GuzzleHttp\Exception\RequestException ? $err->getResponse() : null;
@@ -104,8 +105,6 @@ class CRE_HTTP extends \GuzzleHttp\Client
 
 				// Use a Promise to view the details at the END of the request/response cycle
 				$res = $handler($req, $opt)->then($success, $failure);
-
-				// After Request
 
 				return $res;
 
