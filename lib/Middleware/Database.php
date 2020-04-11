@@ -12,10 +12,10 @@ class Database
 	public function __invoke($REQ, $RES, $NMW)
 	{
 		if (empty($_SESSION['sql-hash'])) {
-			return $RES->withJSON(array(
-				'status' => 'failure',
-				'detail' => 'Invalid Authentication State [LMD#017]',
-			), 403);
+			return $RES->withJSON([
+				'data' => null,
+				'meta' => [ 'detail' => 'Invalid Authentication State [LMD#017]' ]
+			], 403);
 		}
 
 		$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $_SESSION['sql-hash']);

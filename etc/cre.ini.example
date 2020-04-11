@@ -184,7 +184,7 @@
 	name = "Pennsylvania / LeafData"
 	engine = "leafdata"
 	server = "https://pa.leafdatazone.com/api/v1"
-	version = 2018031
+	version = 2019157
 
 
 ;
@@ -203,6 +203,7 @@
 	engine = "leafdata"
 	server = "https://traceability.lcb.wa.gov/api/v1"
 	server = "https://wa.leafdatazone.com/api/v1"
+	version = "2019157"
 
 
 ;
@@ -240,7 +241,7 @@
 [openthc/biotrack/mock]
 	name = "OpenTHC / BioTrack / Mock"
 	engine = "biotrack"
-	server = "https://bunk.openthc.org/biotrack/v2013/serverjson.asp"
+	server = "https://bunk.openthc.dev/biotrack/v2013/serverjson.asp"
 	version = 2014001
 
 
@@ -249,7 +250,7 @@
 [openthc/leafdata/mock]
 	name = "OpenTHC / LeafData / Mock"
 	engine = "leafdata"
-	server = "https://bunk.openthc.org/leafdata/v2018"
+	server = "https://bunk.openthc.dev/leafdata/v2018"
 	version = 2018031
 
 
@@ -258,6 +259,6 @@
 [openthc/metrc/mock]
 	name = "OpenTHC / METRC / Mock"
 	engine = "metrc"
-	server = "https://bunk.openthc.org/metrc/v2015"
+	server = "https://bunk.openthc.dev/metrc/v2015"
 	version = 2015001
 	program-key = ""

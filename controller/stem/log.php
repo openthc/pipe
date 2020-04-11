@@ -60,13 +60,18 @@ tr.tr3 {
 <body>
 <table>
 <?php
+
+$arg = [];
+$sql = 'SELECT * FROM log_audit';
+if (!empty($_GET['q'])) {
+	$sql.= ' WHERE req LIKE :q0 OR res LIKE :q1';
+	$arg[':q0'] = sprintf('%%%s%%', $_GET['q']);
+	$arg[':q1'] = sprintf('%%%s%%', $_GET['q']);
+}
+$sql.= ' ORDER BY cts DESC limit 50';
+
 $idx = 0;
-$sql = <<<SQL
-SELECT * FROM log_audit
--- WHERE req LIKE '%lab_results%'
-ORDER BY cts DESC limit 50
-SQL;
-$res = $dbc->fetchAll($sql);
+$res = $dbc->fetchAll($sql, $arg);
 foreach ($res as $rec) {
 
 	$idx++;
@@ -85,8 +90,6 @@ foreach ($res as $rec) {
 	echo '</tr>';
 
 	$req = explode("\r\n\r\n", $rec['req']);
-	$req[0] = preg_replace('/^x\-mjf\-key:.+$/im', 'x-mjf-key: ********', $req[0]);
-	$req[0] = preg_replace('/^authorization:.+$/im', 'authorization: ********', $req[0]);
 	if ('pretty' == $_GET['f']) {
 		if (!empty($req[1])) {
 			$req[1] = json_decode($req[1], true);
@@ -97,11 +100,11 @@ foreach ($res as $rec) {
 	echo sprintf('<tr class="tr2" id="row-%d-2">', $idx);
 	echo '<td colspan="4">';
 	echo '<pre>';
-	echo h($req[0]);
+	echo h(_view_data_scrub($req[0]));
 	echo "\n";
 	// echo '\r\n';
 	echo "\n";
-	echo h($req[1]);
+	echo h(_view_data_scrub($req[1]));
 	echo '</pre>';
 	echo '</td>';
 	echo '</tr>';
@@ -117,11 +120,11 @@ foreach ($res as $rec) {
 	echo sprintf('<tr class="tr3" id="row-%d-3">', $idx);
 	echo '<td colspan="4">';
 	echo '<pre>';
-	echo h($res[0]);
+	echo h(_view_data_scrub($res[0]));
 	echo "\n";
 	// echo '\r\n';
 	echo "\n";
-	echo h($res[1]);
+	echo h(_view_data_scrub($res[1]));
 	echo '</pre>';
 	echo '</td>';
 	echo '</tr>';
@@ -172,3 +175,24 @@ $(function() {
 </script>
 </body>
 </html>
+
+<?php
+/**
+ * Sanatize REQ or RES
+ */
+function _view_data_scrub($x)
+{
+	$x = preg_replace('/^x\-mjf\-key:.+$/im', 'x-mjf-key: **redacted**', $x);
+	$x = preg_replace('/^authorization:.+$/im', 'authorization: **redacted**', $x);
+
+	$x = preg_replace('/^set\-cookie:.+$/im', 'set-cookie: **redacted**', $x);
+
+	$x = preg_replace('/"transporter_name1":\s*"[^"]+"/im', '"transporter_name1":"**redacted**"', $x);
+	$x = preg_replace('/"transporter_name2":\s*"[^"]+"/im', '"transporter_name2":"**redacted**"', $x);
+
+	$x = preg_replace('/"vehicle_license_plate":\s*"[^"]+"/im', '"vehicle_license_plate":"**redacted**"', $x);
+	$x = preg_replace('/"vehicle_vin":\s*"[^"]+"/im', '"vehicle_license_plate":"**redacted**"', $x);
+
+	return $x;
+
+}

@@ -6,14 +6,11 @@
 require_once(dirname(dirname(__FILE__)) . '/boot.php');
 
 // Slim Application
-//$cfg = array();
-$cfg = array('debug' => true);
+$cfg = [];
+// $cfg['debug'] = true;
 $app = new \OpenTHC\App($cfg);
 
-
-// 404 Handler
 $con = $app->getContainer();
-
 
 // Authentication
 $app->group('/auth', function() {
@@ -21,11 +18,11 @@ $app->group('/auth', function() {
 	$this->get('/open', 'App\Controller\Auth\Open');
 	$this->post('/open', 'App\Controller\Auth\Open');
 
-	$this->get('/connect', 'OpenTHC\Controller\Auth\Connect');
+	// $this->get('/connect', 'OpenTHC\Controller\Auth\Connect');
 
 	$this->get('/back', function($REQ, $RES, $ARG) {
 
-		// Fakes a POST
+		// Fakes a POST to sub controller
 		$_POST['a'] = 'auth-web';
 		$_POST['cre'] = $_SESSION['cre']['engine'];
 		$_POST['license'] = $_SESSION['cre-auth']['license'];
@@ -38,7 +35,6 @@ $app->group('/auth', function() {
 
 	});
 
-	//$this->get('/ping', 'OpenTHC\Controller\Auth\Ping');
 	$this->any('/ping', function($REQ, $RES, $ARG) {
 		return _from_cre_file('ping.php', $RES, $ARG);
 	});
@@ -243,6 +239,13 @@ $app->get('/system/cre', function($REQ, $RES, $ARG) {
 	), 200, JSON_PRETTY_PRINT);
 
 });
+
+
+// Custom Middleware?
+$f = sprintf('%s/Custom/boot.php', APP_ROOT);
+if (is_file($f)) {
+	require_once($f);
+}
 
 
 // Run the App
