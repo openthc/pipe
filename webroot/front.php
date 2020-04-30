@@ -173,8 +173,7 @@ $app->group('/stem', 'App\Module\Stem');
 $app->get('/system', function($REQ, $RES, $ARG) {
 
 	// Return a list of supported CREs
-	$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
-	$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
+	$cre_list = CRE::listEngines();
 
 	$cfg = array(
 		'headers' => array(
@@ -187,7 +186,7 @@ $app->get('/system', function($REQ, $RES, $ARG) {
 
 	$req_list = array();
 
-	foreach ($cre_data as $cre_info) {
+	foreach ($cre_list as $cre_info) {
 		//var_dump($cre_info);
 		$url = $cre_info['server'];
 		$req_list[$url] = $c->getAsync($url);
@@ -227,16 +226,15 @@ $app->get('/system', function($REQ, $RES, $ARG) {
 
 });
 
+// Return a list of supported CREs
 $app->get('/system/cre', function($REQ, $RES, $ARG) {
 
-	// Return a list of supported CREs
-	$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
-	$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
+	$cre_list = CRE::listEngines();
 
-	return $RES->withJSON(array(
-		'status' => 'success',
-		'result' => $cre_data,
-	), 200, JSON_PRETTY_PRINT);
+	return $RES->withJSON([
+		'data' => $cre_list,
+		'meta' => [],
+	], 200, JSON_PRETTY_PRINT);
 
 });
 

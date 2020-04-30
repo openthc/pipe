@@ -64,40 +64,41 @@ class CRE
 
 			switch ($cfg['code']) {
 			case 'usa/ak':
-				$cre = new RBE_Metrc_AK($_SESSION['cre-auth']);
-				break;
 			case 'usa/ak/test':
 				$cre = new RBE_Metrc_AK($_SESSION['cre-auth']);
-				$cre->setTestMode();
 				break;
 			case 'usa/ca':
-				$cre = new RBE_Metrc_CA($_SESSION['cre-auth']);
-				break;
 			case 'usa/ca/test':
 				$cre = new RBE_Metrc_CA($_SESSION['cre-auth']);
-				$cre->setTestMode();
 				break;
 			case 'usa/co':
-				$cre = new RBE_Metrc_CO($_SESSION['cre-auth']);
-				break;
 			case 'usa/co/test':
 				$cre = new RBE_Metrc_CO($_SESSION['cre-auth']);
-				$cre->setTestMode();
+				break;
+			case 'usa/me':
+			case 'usa/me/test':
+				$cre = new RBE_Metrc_ME($_SESSION['cre-auth']);
+				break;
+			case 'usa/mi':
+			case 'usa/mi/test':
+				$cre = new RBE_Metrc_MI($_SESSION['cre-auth']);
+				break;
+			case 'usa/mt':
+			case 'usa/mt/test':
+				$cre = new RBE_Metrc_MT($_SESSION['cre-auth']);
 				break;
 			case 'usa/nv':
-				$cre = new RBE_Metrc_NV($_SESSION['cre-auth']);
-				break;
 			case 'usa/nv/test':
 				$cre = new RBE_Metrc_NV($_SESSION['cre-auth']);
-				$cre->setTestMode();
 				break;
 			case 'usa/or':
-				$cre = new RBE_Metrc_OR($_SESSION['cre-auth']);
-				break;
 			case 'usa/or/test':
 				$cre = new RBE_Metrc_OR($_SESSION['cre-auth']);
-				$cre->setTestMode();
 				break;
+			}
+
+			if ('test' == basename($cfg['code'])) {
+				$cre->setTestMode();
 			}
 
 			break;
@@ -109,6 +110,24 @@ class CRE
 		}
 
 		return $cre;
+
+	}
+
+	static function listEngines()
+	{
+		$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
+		if (!is_file($cre_file)) {
+			throw new \Exception('Create "etc/cre.ini" for CRE definitions');
+		}
+
+		$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
+
+		$key_list = array_keys($cre_data);
+		foreach ($key_list as $k) {
+			$cre_data[$k]['code'] = $k;
+		}
+
+		return $cre_data;
 
 	}
 

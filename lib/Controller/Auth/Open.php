@@ -41,10 +41,10 @@ class Open extends \OpenTHC\Controller\Base
 		$cre = $this->validateCRE();
 
 		if (empty($cre)) {
-			return $RES->withJson(array(
-				'status' => 'failure',
-				'detail' => sprintf('Invalid CRE: "%s" [CAC#017]', strtolower(trim($_POST['cre']))),
-			), 400);
+			return $RES->withJson([
+				'data' => null,
+				'meta' => [ 'detail' => sprintf('Invalid CRE: "%s" [CAC#017]', strtolower(trim($_POST['cre']))) ],
+			], 400);
 		}
 
 		$_SESSION['cre'] = $cre;
@@ -101,17 +101,14 @@ class Open extends \OpenTHC\Controller\Base
 	}
 
 	/**
-		Render the Connection Form
-	*/
+	 * Render the Connection Form
+	 */
 	function renderForm($REQ, $RES, $ARG)
 	{
 
-		$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
-		$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
-
-		$data = array();
+		$data = [];
 		$data['Page'] = [ 'title' => 'Authenticate' ];
-		$data['cre_list'] = $cre_data;
+		$data['cre_list'] = CRE::listEngines();
 		$data['cre_code'] = $_SESSION['cre']['code'];
 		$data['cre_company'] = $_SESSION['cre-auth']['company'];
 		$data['cre_license'] = $_SESSION['cre-auth']['license'];
@@ -120,11 +117,10 @@ class Open extends \OpenTHC\Controller\Base
 		$data['cre_username'] = $_SESSION['cre-auth']['username'];
 		$data['cre_password'] = $_SESSION['cre-auth']['password'];
 
-
-		$data['google_recaptcha_v2'] = array();
+		$data['google_recaptcha_v2'] = [];
 		$data['google_recaptcha_v2']['public'] = \OpenTHC\Config::get('google_recaptcha_v2.public');
 
-		$data['google_recaptcha_v3'] = array();
+		$data['google_recaptcha_v3'] = [];
 		$data['google_recaptcha_v3']['public'] = \OpenTHC\Config::get('google_recaptcha_v3.public');
 
 
@@ -137,8 +133,8 @@ class Open extends \OpenTHC\Controller\Base
 	}
 
 	/**
-		Connect to a BT system
-	*/
+	 * Connect to a BT system
+	 */
 	function _biotrack($RES)
 	{
 		if (!empty($_POST['sid'])) {
@@ -154,15 +150,15 @@ class Open extends \OpenTHC\Controller\Base
 			return $RES;
 		}
 
-		$uid = strtolower(trim($_POST['username']));
-
-		if (!preg_match('/\w+@\w+/', $uid)) {
-			return $RES->withJson(array(
-				'status' => 'failure',
-				'detail' => 'OCA#023: Invalid Username',
-				'_post' => $_POST,
-			), 400);
-		}
+		$uid = trim($_POST['username']);
+		// $uid = strtolower($uid);
+		// if (!preg_match('/\w+@\w+/', $uid)) {
+		// 	return $RES->withJson(array(
+		// 		'status' => 'failure',
+		// 		'detail' => 'OCA#023: Invalid Username',
+		// 		'_post' => $_POST,
+		// 	), 400);
+		// }
 
 		// Password
 		$pwd = trim($_POST['password']);
@@ -173,27 +169,30 @@ class Open extends \OpenTHC\Controller\Base
 			), 400);
 		}
 
-		$ext = preg_replace('/[^\d]+/', null, $_POST['company']);
-		$ext = substr($ext, 0, 9);
-
-		if (!preg_match('/^\d{9}$/', $ext)) {
-			return $RES->withJson(array(
-				'status' => 'failure',
-				'detail' => 'OCA#060: Provide UBI in the cre-company field',
-			), 400);
-		}
+		$ext = trim($_POST['company']);
+		// $ext = preg_replace('/[^\d]+/', null, $ext);
+		// $ext = substr($ext, 0, 9);
+		// if (!preg_match('/^\d{9}$/', $ext)) {
+		// 	return $RES->withJson(array(
+		// 		'status' => 'failure',
+		// 		'detail' => 'OCA#060: Provide UBI in the cre-company field',
+		// 	), 400);
+		// }
 
 		$cre = \CRE::factory($_SESSION['cre']);
+		// $cre->setTestMode();
 		$chk = $cre->login($ext, $uid, $pwd);
+		// var_dump($cre); die("FSDFS");
+		// exit;
 
 		// @todo Detect a 500 Layer Response from BioTrack
 
 		switch (intval($chk['success'])) {
 		case 0:
+
 			return $RES->withJson(array(
-				'status' => 'failure',
-				'detail' => 'Invalid Username or Password [CAO#184]',
-				'result' => $chk,
+				'meta' => [ 'detail' => 'Invalid Username or Password [CAO#184]' ],
+				'data' => $chk,
 			), 400);
 
 			break;
@@ -206,9 +205,8 @@ class Open extends \OpenTHC\Controller\Base
 			$_SESSION['cre-auth']['session'] = $chk['sessionid'];
 
 			return $RES->withJson(array(
-				'status' => 'success',
-				'detail' => 'Session Established',
-				'result' => session_id(),
+				'meta' => [ 'detail' => 'Session Established' ],
+				'data' => session_id(),
 			));
 
 			break;
@@ -257,10 +255,12 @@ class Open extends \OpenTHC\Controller\Base
 			), 403);
 		}
 
-		return $RES->withJSON(array(
+		return $RES->withJSON([
+			'data' => session_id(),
+			'meta' => [],
 			'status' => 'success',
 			'result' => session_id(),
-		));
+		]);
 
 	}
 
@@ -329,16 +329,16 @@ class Open extends \OpenTHC\Controller\Base
 	 */
 	private function validateCRE()
 	{
-		$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
-		$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
-		// var_dump($cre_data);
+		$cre_list = CRE::listEngines();
 
 		$cre_want = strtolower(trim($_POST['cre']));
-		$cre_info = $cre_data[ $cre_want ];
+		$cre_info = $cre_list[ $cre_want ];
 
 		if (!empty($cre_info)) {
-			$cre_info['code'] = $cre_want;
 			return $cre_info;
 		}
+
+		return false;
+
 	}
 }
