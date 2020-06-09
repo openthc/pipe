@@ -108,7 +108,7 @@ class Open extends \OpenTHC\Controller\Base
 
 		$data = [];
 		$data['Page'] = [ 'title' => 'Authenticate' ];
-		$data['cre_list'] = CRE::listEngines();
+		$data['cre_list'] = \CRE::listEngines();
 		$data['cre_code'] = $_SESSION['cre']['code'];
 		$data['cre_company'] = $_SESSION['cre-auth']['company'];
 		$data['cre_license'] = $_SESSION['cre-auth']['license'];
@@ -329,7 +329,7 @@ class Open extends \OpenTHC\Controller\Base
 	 */
 	private function validateCRE()
 	{
-		$cre_list = CRE::listEngines();
+		$cre_list = \CRE::listEngines();
 
 		$cre_want = strtolower(trim($_POST['cre']));
 		$cre_info = $cre_list[ $cre_want ];
