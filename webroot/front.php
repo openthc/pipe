@@ -21,14 +21,14 @@ $app->get('/log', function($REQ, $RES, $ARG) {
 });
 
 $app->map([ 'GET', 'POST' ], '/biotrack/{system}', function($REQ, $RES, $ARG) {
-	return require_once(APP_ROOT . '/controller/stem/biotrack.php');
+	return require_once(APP_ROOT . '/controller/biotrack.php');
 })->add('OpenTHC\Middleware\Session');
 
 $app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', function($REQ, $RES, $ARG) {
-	return require_once(APP_ROOT . '/controller/stem/leafdata.php');
+	return require_once(APP_ROOT . '/controller/leafdata.php');
 });
 $app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{system}/{path:.*}', function($REQ, $RES, $ARG) {
-	return require_once(APP_ROOT . '/controller/stem/metrc.php');
+	return require_once(APP_ROOT . '/controller/metrc.php');
 });
 
 
