@@ -1,6 +1,6 @@
 <?php
 /**
- * OpenTHC Pipe Front Controller
+ * OpenTHC PIPE Front Controller
  */
 
 require_once(dirname(dirname(__FILE__)) . '/boot.php');
@@ -11,232 +11,37 @@ $cfg = [];
 $app = new \OpenTHC\App($cfg);
 
 $con = $app->getContainer();
+if (!empty($cfg['debug'])) {
+	unset($con['errorHandler']);
+	unset($con['phpErrorHandler']);
+}
 
-// Authentication
-$app->group('/auth', function() {
+$app->get('/info', function($REQ, $RES, $ARG) {
+	return $this->view->render($RES, 'page/stem.html', array());
+});
 
-	$this->get('/open', 'App\Controller\Auth\Open');
-	$this->post('/open', 'App\Controller\Auth\Open');
-
-	// $this->get('/connect', 'OpenTHC\Controller\Auth\Connect');
-
-	$this->get('/back', function($REQ, $RES, $ARG) {
-
-		// Fakes a POST to sub controller
-		$_POST['a'] = 'auth-web';
-		$_POST['cre'] = $_SESSION['cre']['engine'];
-		$_POST['license'] = $_SESSION['cre-auth']['license'];
-		$_POST['license-key'] = $_SESSION['cre-auth']['license-key'];
-
-		$C = new App\Controller\Auth\Open($this);
-		$RES = $C->connect($REQ, $RES, $ARG);
-
-		return $RES;
-
-	});
-
-	$this->any('/ping', function($REQ, $RES, $ARG) {
-		return _from_cre_file('ping.php', $RES, $ARG);
-	});
-
-	$this->get('/shut', 'OpenTHC\Controller\Auth\Shut');
-
+$app->map([ 'GET', 'POST' ], '/biotrack/{system}', function($REQ, $RES, $ARG) {
+	return require_once(APP_ROOT . '/controller/stem/biotrack.php');
 })->add('OpenTHC\Middleware\Session');
 
+$app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{system}/{path:.*}', function($REQ, $RES, $ARG) {
+	return require_once(APP_ROOT . '/controller/stem/leafdata.php');
+});
 
-/**
- * A Very Simple Object Browser
- */
-$app->get('/browse', function($REQ, $RES, $ARG) {
+$app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{system}/{path:.*}', function($REQ, $RES, $ARG) {
+	return require_once(APP_ROOT . '/controller/stem/metrc.php');
+});
 
-	session_write_close();
-
-	$data['cre_auth'] = $_SESSION['cre-auth'];
-	$data['cre_meta_license'] = $_SESSION['cre-auth']['license'];
-
-	return $this->view->render($RES, 'page/browse.html', $data);
-})
-->add('App\Middleware\CRE')
-->add('OpenTHC\Middleware\Session');
-
-
-// Config/Core Data Stuff
-$app->group('/config', 'App\Module\Config')
-	->add('App\Middleware\CRE')
-	->add('App\Middleware\Database')
-	->add('OpenTHC\Middleware\Session');
-
-
-// Batch
-$app->group('/batch', 'App\Module\Batch')
-	->add('App\Middleware\CRE')
-	->add('App\Middleware\Database')
-	->add('OpenTHC\Middleware\Session');
-
-
-// Plant
-$app->group('/plant', 'App\Module\Plant')
-	->add('App\Middleware\CRE')
-	->add('App\Middleware\Database')
-	->add('OpenTHC\Middleware\Session');
-
-
-// Inventory Lot
-$app->group('/lot', 'App\Module\Lot')
-	->add('App\Middleware\CRE')
-	->add('App\Middleware\Database')
-	->add('OpenTHC\Middleware\Session');
-
-
-// QA Group
-$app->group('/lab', 'App\Module\Lab')
-	->add('App\Middleware\CRE')
-	->add('App\Middleware\Database')
-	->add('OpenTHC\Middleware\Session');
-
-
-// Transfer Group
-$app->group('/transfer', function() {
-
-	$this->get('/outgoing', function($REQ, $RES, $ARG) {
-		return _from_cre_file('transfer/outgoing/search.php', $RES, $ARG);
-	});
-
-	$this->get('/outgoing/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
-		return _from_cre_file('transfer/outgoing/single.php', $RES, $ARG);
-	});
-
-	//$this->post('/outgoing/{guid:[\w\.]+}/accept', function($REQ, $RES, $ARG) {
-	//	$f = sprintf('%s/controller/%s/transfer-accept.php', APP_ROOT, $_SESSION['cre-base']);
-	//	$RES = require_once($f);
-	//	return $RES;
-	//});
-
-	/*
-		Incoming Transfers
-	*/
-	$this->get('/incoming', function($REQ, $RES, $ARG) {
-		return _from_cre_file('transfer/incoming/search.php', $RES, $ARG);
-	});
-
-	$this->get('/incoming/{guid:[\w\.]+}', function($REQ, $RES, $ARG) {
-		return _from_cre_file('transfer/outgoing/single.php', $RES, $ARG);
-	});
-
-	$this->post('/incoming/{guid:[\w\.]+}/accept', function($REQ, $RES, $ARG) {
-		return _from_cre_file('transfer/incoming/accept.php', $RES, $ARG);
-	});
-
-	/*
-		Rejected Transfers
-	*/
-	$this->get('/rejected', function($REQ, $RES, $ARG) {
-		return _from_cre_file('transfer/rejected/search.php', $RES, $ARG);
-	});
-
-})
-->add('App\Middleware\CRE')
-->add('App\Middleware\Database')
-->add('OpenTHC\Middleware\Session');
-
-
-// Retail Sales
-$app->group('/retail', 'App\Module\Retail')
-	->add('App\Middleware\CRE')
-	->add('App\Middleware\Database')
-	->add('OpenTHC\Middleware\Session');
-
-
-// Waste Group
-$app->group('/waste', function() {
-
-	$this->get('', function($REQ, $RES, $ARG) {
-		return _from_cre_file('waste/search.php', $RES, $ARG);
-	});
-
-	$this->get('/{guid}', function($REQ, $RES, $ARG) {
-		return _from_cre_file('waste/single.php', $RES, $ARG);
-	});
-
-})
-->add('App\Middleware\CRE')
-->add('App\Middleware\Database')
-->add('OpenTHC\Middleware\Session');
+$app->get('/log', function($REQ, $RES, $ARG) {
+	return require_once(APP_ROOT . '/controller/stem/log.php');
+});
 
 
 /**
+ * @deprecated
  * Stem Handlers simply log all requests/responses
  */
-$app->group('/stem', 'App\Module\Stem');
-
-// Display System Info
-$app->get('/system', function($REQ, $RES, $ARG) {
-
-	// Return a list of supported CREs
-	$cre_list = CRE::listEngines();
-
-	$cfg = array(
-		'headers' => array(
-			'user-agent' => 'OpenTHC/420.18.230 (Pipe-Stem-Ping)',
-		),
-		'http_errors' => false
-	);
-
-	$c = new \GuzzleHttp\Client($cfg);
-
-	$req_list = array();
-
-	foreach ($cre_list as $cre_info) {
-		//var_dump($cre_info);
-		$url = $cre_info['server'];
-		$req_list[$url] = $c->getAsync($url);
-
-	}
-
-	$res_list = \GuzzleHttp\Promise\settle($req_list)->wait();
-
-	foreach ($res_list as $key => $res) {
-
-		//var_dump($key);
-		//var_dump($res);
-
-		echo "Connect: $key<br>";
-
-		switch ($res['state']) {
-		case 'fulfilled':
-
-			$res = $res['value'];
-			$c = $res->getStatusCode();
-
-			//echo $res->() . "\n";
-
-			echo "$c<br>";
-			echo '<pre>';
-			// var_dump($res->getHeaders());
-			echo h($res->getBody());
-			echo '</pre>';
-			break;
-
-		case 'rejected':
-			// Problem
-			break;
-		}
-
-	}
-
-});
-
-// Return a list of supported CREs
-$app->get('/system/cre', function($REQ, $RES, $ARG) {
-
-	$cre_list = CRE::listEngines();
-
-	return $RES->withJSON([
-		'data' => $cre_list,
-		'meta' => [],
-	], 200, JSON_PRETTY_PRINT);
-
-});
+$app->group('/stem', 'App\Module\Stem'); // @deprecated
 
 
 // Custom Middleware?
