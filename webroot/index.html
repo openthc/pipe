@@ -1,19 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="initial-scale=1, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#247420">
-<link rel="stylesheet" href="https://cdn.openthc.com/bootstrap/4.3.1/bootstrap.css" crossorigin="anonymous">
-<title>OpenTHC :: Pipe</title>
-</head>
-<body style="padding-top: 2em;">
+<title>OpenTHC :: PIPE</title>
+<style>
+#img-wrap {
+	margin: 10vh auto;
+	padding: 0;
+	text-align:center;
+}
 
-<div class="container">
-<div class="jumbotron">
-	<h1>OpenTHC :: Pipe</h1>
+body {
+	background: #101010;
+	color: #fdfdfd;
+	font-family:sans-serif;
+	margin: 0;
+	padding: 0;
+}
+a {
+	color: #247420;
+	font-weight: bold;
+}
+h1 {
+	text-align: center;
+	margin: 0 0 1em 0;
+}
+p {
+	text-align:center;
+	margin: 0 0 1em 0;
+}
+
+</style>
+</head>
+<body>
+
+<div id="img-wrap">
+	<img src="https://cdn.openthc.com/img/icon.png">
 </div>
-</div>
+
+<h1>PIPE</h1>
+<p>Proxy Intermediary for Payload Examination</p>
+<p>More information at <a href="https://openthc.com/pipe">openthc.com/pipe</a></p>
+
+<script>
+var usp = new URLSearchParams(window.location.search);
+if (usp.has('h')) {
+	var h = document.querySelector('h1');
+	if (h) {
+		h.innerText = usp.get('h');
+	}
+}
+if (usp.has('r')) {
+	debugger;
+	var r = usp.get('r');
+
+	var f = document.querySelector('footer');
+	if (f) {
+		f.innerText = 'Sending you to: ' + r;
+	}
+
+	window.location = r;
+}
+</script>
 
 </body>
 </html>
