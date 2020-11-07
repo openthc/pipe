@@ -18,7 +18,7 @@ class Stem extends \OpenTHC\Module\Base
 			return require_once(APP_ROOT . '/controller/stem/biotrack.php');
 		})->add('App\Middleware\Session');
 
-		$a->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{system}/{path:.*}', function($REQ, $RES, $ARG) {
+		$a->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', function($REQ, $RES, $ARG) {
 			return require_once(APP_ROOT . '/controller/stem/leafdata.php');
 		});
 
@@ -27,7 +27,7 @@ class Stem extends \OpenTHC\Module\Base
 		});
 
 		$a->get('/log', function($REQ, $RES, $ARG) {
-			return require_once(APP_ROOT . '/controller/stem/log.php');
+			return require_once(APP_ROOT . '/controller/log.php');
 		});
 
 	}

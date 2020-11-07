@@ -16,24 +16,19 @@ if (!empty($cfg['debug'])) {
 	unset($con['phpErrorHandler']);
 }
 
-$app->get('/info', function($REQ, $RES, $ARG) {
-	return $this->view->render($RES, 'page/stem.html', array());
+$app->get('/log', function($REQ, $RES, $ARG) {
+	return require_once(APP_ROOT . '/controller/log.php');
 });
 
 $app->map([ 'GET', 'POST' ], '/biotrack/{system}', function($REQ, $RES, $ARG) {
 	return require_once(APP_ROOT . '/controller/stem/biotrack.php');
 })->add('OpenTHC\Middleware\Session');
 
-$app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{system}/{path:.*}', function($REQ, $RES, $ARG) {
+$app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', function($REQ, $RES, $ARG) {
 	return require_once(APP_ROOT . '/controller/stem/leafdata.php');
 });
-
 $app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{system}/{path:.*}', function($REQ, $RES, $ARG) {
 	return require_once(APP_ROOT . '/controller/stem/metrc.php');
-});
-
-$app->get('/log', function($REQ, $RES, $ARG) {
-	return require_once(APP_ROOT . '/controller/stem/log.php');
 });
 
 

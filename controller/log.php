@@ -3,18 +3,46 @@
  * View the Logs from the STEM service
  */
 
-$date = date('Ymd');
-if (!empty($_GET['date'])) {
-	$date = $_GET['date'];
-}
-$hash = $_GET['hash'];
+use Edoceo\Radix\DB\SQL;
 
-$sql_file = sprintf('%s/var/stem%s/%s.sqlite', APP_ROOT, $date, $hash);
+if (empty($_GET['d'])) {
+	$text = <<<TEXT
+The PIPE Log Parameters
+
+Data File:
+  d= <system>/<date>/<hash>
+
+Formatting:
+  f= normal* | pretty
+
+Query:
+  q= search query
+
+Records:
+  o= offset 0*|int
+  l= limit  20*|int
+
+
+Example:
+
+  https://{$_SERVER['SERVER_NAME']}/log?d=biotrack%2F20140101%2FHASH1234&f=pretty&q=Blue%20Dream&o=100&l=10
+
+TEXT;
+	_exit_text($text);
+}
+
+
+$file = $_GET['d'];
+if (!preg_match('/^(biotrack|leafdata|metrc)\/(\d+)\/(\w+)/', $file)) {
+	_exit_text("Invalid Log File\nUse '\$system/\$date/\$hash' pattern", 400);
+}
+
+$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $file);
 if (!is_file($sql_file)) {
 	_exit_text("No File: $sql_file", 400);
 }
 
-$dbc = new \Edoceo\Radix\DB\SQL('sqlite:' . $sql_file);
+$dbc = new SQL('sqlite:' . $sql_file);
 
 ?>
 <html>
@@ -45,6 +73,9 @@ td {
 	font-size: 8pt;
 	vertical-align: top;
 }
+td.r {
+	text-align: right;
+}
 tr.tr1:hover {
 	background: #ff0;
 }
@@ -59,6 +90,14 @@ tr.tr3 {
 </head>
 <body>
 <table>
+<thead>
+	<tr>
+		<th>Date</th>
+		<th>Path</th>
+		<th>HTTP Status</th>
+	</tr>
+</thead>
+<tbody>
 <?php
 
 $arg = [];
@@ -82,11 +121,10 @@ foreach ($res as $rec) {
 	$res = strtok($rec['res'], "\n");
 
 	echo sprintf('<tr class="tr1" id="row-%d-1">', $idx);
-	echo '<td>' . _date('H:i:s.v', $rec['cts']) . '</td>';
+	echo '<td>' . _date('m/d H:i:s', $rec['cts']) . '</td>';
 	echo '<td>' . h($req) . '</td>';
-	echo '<td>' . h($res) . '</td>';
-	echo '<td>' . $rec['code'] . '</td>';
-	// echo '<td>' . $rec['err'] . '</td>';
+	echo '<td class="r">' . h($res) . '</td>';
+	echo '<td class="r">' . strlen($rec['res']) . ' bytes</td>';
 	echo '</tr>';
 
 	$req = explode("\r\n\r\n", $rec['req']);
@@ -139,7 +177,9 @@ foreach ($res as $rec) {
 	echo '</tr>';
 }
 ?>
+</tbody>
 </table>
+
 <script>
 var tr1 = null;
 var tr2 = null;
