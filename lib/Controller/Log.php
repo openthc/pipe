@@ -5,7 +5,14 @@
 
 use Edoceo\Radix\DB\SQL;
 
-if (empty($_GET['d'])) {
+namespace App\Controller;
+
+class Log extends \OpenTHC\Controller\Base
+{
+	function __invoke($REQ, $RES, $ARG)
+	{
+
+		if (empty($_GET['d'])) {
 	$text = <<<TEXT
 The PIPE Log Parameters
 
@@ -28,21 +35,20 @@ Example:
   https://{$_SERVER['SERVER_NAME']}/log?d=biotrack%2F20140101%2FHASH1234&f=pretty&q=Blue%20Dream&o=100&l=10
 
 TEXT;
-	_exit_text($text);
-}
+			_exit_text($text);
+		}
 
+		$file = $_GET['d'];
+		if (!preg_match('/^(biotrack|leafdata|metrc)\/(\d+)\/(\w+)/', $file)) {
+			_exit_text("Invalid Log File\nUse '\$system/\$date/\$hash' pattern", 400);
+		}
 
-$file = $_GET['d'];
-if (!preg_match('/^(biotrack|leafdata|metrc)\/(\d+)\/(\w+)/', $file)) {
-	_exit_text("Invalid Log File\nUse '\$system/\$date/\$hash' pattern", 400);
-}
+		$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $file);
+		if (!is_file($sql_file)) {
+			_exit_text("No File: $sql_file", 400);
+		}
 
-$sql_file = sprintf('%s/var/%s.sqlite', APP_ROOT, $file);
-if (!is_file($sql_file)) {
-	_exit_text("No File: $sql_file", 400);
-}
-
-$dbc = new SQL('sqlite:' . $sql_file);
+		$dbc = new SQL('sqlite:' . $sql_file);
 
 ?>
 <html>
@@ -217,6 +223,9 @@ $(function() {
 </html>
 
 <?php
+	}
+}
+
 /**
  * Sanatize REQ or RES
  */

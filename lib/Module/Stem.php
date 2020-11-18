@@ -8,27 +8,12 @@ namespace App\Module;
 
 class Stem extends \OpenTHC\Module\Base
 {
-	function __invoke($a)
+	function __invoke($app)
 	{
-		$a->get('', function($REQ, $RES, $ARG) {
-			return $this->view->render($RES, 'page/stem.html', array());
-		});
+		$app->map([ 'GET', 'POST' ], '/biotrack/{system}', 'App\Controller\BioTrack')->add('OpenTHC\Middleware\Session');
 
-		$a->map([ 'GET', 'POST' ], '/biotrack/{system}', function($REQ, $RES, $ARG) {
-			return require_once(APP_ROOT . '/controller/biotrack.php');
-		})->add('App\Middleware\Session');
+		$app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', 'App\Controller\Leafdata');
 
-		$a->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', function($REQ, $RES, $ARG) {
-			return require_once(APP_ROOT . '/controller/leafdata.php');
-		});
-
-		$a->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{system}/{path:.*}', function($REQ, $RES, $ARG) {
-			return require_once(APP_ROOT . '/controller/metrc.php');
-		});
-
-		$a->get('/log', function($REQ, $RES, $ARG) {
-			return require_once(APP_ROOT . '/controller/log.php');
-		});
-
+		$app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{path:.*}', 'App\Controller\METRC');
 	}
 }

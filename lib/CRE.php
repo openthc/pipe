@@ -3,7 +3,9 @@
  * A CRE Factory
  */
 
-class CRE
+namespace App;
+
+class CRE extends \OpenTHC\CRE\Base
 {
 	/**
 
@@ -112,23 +114,4 @@ class CRE
 		return $cre;
 
 	}
-
-	static function listEngines()
-	{
-		$cre_file = sprintf('%s/etc/cre.ini', APP_ROOT);
-		if (!is_file($cre_file)) {
-			throw new \Exception('Create "etc/cre.ini" for CRE definitions');
-		}
-
-		$cre_data = parse_ini_file($cre_file, true, INI_SCANNER_RAW);
-
-		$key_list = array_keys($cre_data);
-		foreach ($key_list as $k) {
-			$cre_data[$k]['code'] = $k;
-		}
-
-		return $cre_data;
-
-	}
-
 }
