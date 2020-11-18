@@ -10,12 +10,6 @@
 	},
 	"require": {
 		"php": ">=7.3.0",
-		"ext-curl": "*",
-		"ext-date": "*",
-		"ext-json": "*",
-		"ext-PDO": "*",
-		"ext-session": "*",
-		"ext-sockets": "*",
 		"edoceo/radix": "dev-master",
 		"openthc/common": "dev-master",
 		"openthc/cre-adapter": "dev-master"
