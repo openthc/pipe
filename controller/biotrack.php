@@ -9,17 +9,8 @@
  * Return Sanatized Response
  */
 
-use Edoceo\Radix\DB\SQL;
-
 $sql_hash = $_SESSION['sql-hash'];
-$sql_file = sprintf('%s/var/stem-biotrack-%08x.sqlite', APP_ROOT, $sql_hash);
-$sql_good = is_file($sql_file);
-
-SQL::init('sqlite:' . $sql_file);
-if (!$sql_good) {
-	SQL::query("CREATE TABLE log_audit (cts not null default (strftime('%s','now')), code, path, req, res, err)");
-}
-
+$sql_file = _database_create_open('biotrack', $sql_hash);
 
 $cre_base = 'https://wa.biotrackthc.net/serverjson.asp';
 //$cre_base = 'http://localhost:8080';
