@@ -44,12 +44,10 @@
 
 	<testsuites>
 		<testsuite name="All">
-			<directory>0_Core/</directory>
-			<directory>1_Auth/</directory>
-			<directory>2_Account/</directory>
-			<directory>3_oAuth2/</directory>
+			<directory>.</directory>
 		</testsuite>
 	</testsuites>
+	
 	<logging>
 		<!-- <log type="coverage-html" target="../webroot/test-output" /> -->
 		<junit outputFile="../webroot/test-output/output.xml" />
