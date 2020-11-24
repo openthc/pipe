@@ -92,12 +92,12 @@ class LeafData extends \OpenTHC\Controller\Base
 		$sql_file = _database_create_open('leafdata', $sql_hash);
 
 		// Forward
-		$cre_http = new CRE_HTTP();
+		$cre_http = new \CRE_HTTP();
 
 		switch ($_SERVER['REQUEST_METHOD']) {
 		case 'DELETE':
 
-			$req = new GuzzleHttp\Psr7\Request('DELETE', $req_path);
+			$req = new \GuzzleHttp\Psr7\Request('DELETE', $req_path);
 			$req = $req->withHeader('host', $cre_host);
 			$req = $req->withHeader('x-mjf-mme-code', $_SERVER['HTTP_X_MJF_MME_CODE']);
 			$req = $req->withHeader('x-mjf-key', $_SERVER['HTTP_X_MJF_KEY']);
@@ -108,7 +108,7 @@ class LeafData extends \OpenTHC\Controller\Base
 
 		case 'GET':
 
-			$req = new GuzzleHttp\Psr7\Request('GET', $req_path);
+			$req = new \GuzzleHttp\Psr7\Request('GET', $req_path);
 			$req = $req->withHeader('host', $cre_host);
 			$req = $req->withHeader('x-mjf-mme-code', $_SERVER['HTTP_X_MJF_MME_CODE']);
 			$req = $req->withHeader('x-mjf-key', $_SERVER['HTTP_X_MJF_KEY']);
@@ -122,7 +122,7 @@ class LeafData extends \OpenTHC\Controller\Base
 			$src_json = file_get_contents('php://input');
 			$src_json = json_decode($src_json, true);
 
-			$req = new GuzzleHttp\Psr7\Request('POST', $req_path);
+			$req = new \GuzzleHttp\Psr7\Request('POST', $req_path);
 			$req = $req->withHeader('host', $cre_host);
 			$req = $req->withHeader('x-mjf-mme-code', $_SERVER['HTTP_X_MJF_MME_CODE']);
 			$req = $req->withHeader('x-mjf-key', $_SERVER['HTTP_X_MJF_KEY']);

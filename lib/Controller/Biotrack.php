@@ -117,7 +117,7 @@ class BioTrack extends \OpenTHC\Controller\Base
 		// Now Just Forward to BioTrack
 
 		// Resolve Path
-		$cre_http = new CRE_HTTP(array(
+		$cre_http = new \CRE_HTTP(array(
 			'base_uri' => $cre_base
 		));
 
@@ -126,7 +126,7 @@ class BioTrack extends \OpenTHC\Controller\Base
 		switch ($_SERVER['REQUEST_METHOD']) {
 		case 'POST':
 
-			$req = new GuzzleHttp\Psr7\Request('POST', '');
+			$req = new \GuzzleHttp\Psr7\Request('POST', '');
 			$req = $req->withHeader('host', $cre_host);
 			$req = $req->withHeader('content-type', 'text/JSON');
 
