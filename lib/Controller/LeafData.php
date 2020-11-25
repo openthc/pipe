@@ -59,10 +59,13 @@ class LeafData extends \OpenTHC\Controller\Base
 			$cre_base = 'https://watest.leafdatazone.com/api/v1';
 			break;
 		default:
-			return $RES->withJSON(array(
-				'status' => 'failure',
-				'detail' => 'Invalid System [CSL#033]'
-			), 400);
+			return $RES->withJSON([
+				'data' => null,
+				'meta' => [
+					'origin' => 'openthc',
+					'detail' => 'Invalid System [CSL#033]',
+				]
+			], 400);
 		}
 		// From URL if not already set
 		if (empty($cre_host)) {

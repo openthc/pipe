@@ -16,25 +16,36 @@ if (!empty($cfg['debug'])) {
 	unset($con['phpErrorHandler']);
 }
 
-$app->get('/log', function($REQ, $RES, $ARG) {
-	return require_once(APP_ROOT . '/controller/log.php');
-});
+// Engine Specific Controllers
+$app->map([ 'GET', 'POST' ], '/biotrack/{system}', 'App\Controller\BioTrack')->add('OpenTHC\Middleware\Session');
 
-$app->map([ 'GET', 'POST' ], '/biotrack/{system}', function($REQ, $RES, $ARG) {
-	return require_once(APP_ROOT . '/controller/biotrack.php');
-})->add('OpenTHC\Middleware\Session');
+$app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', 'App\Controller\LeafData');
 
-$app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', function($REQ, $RES, $ARG) {
-	return require_once(APP_ROOT . '/controller/leafdata.php');
-});
-$app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{system}/{path:.*}', function($REQ, $RES, $ARG) {
-	return require_once(APP_ROOT . '/controller/metrc.php');
+$app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{path:.*}', 'App\Controller\METRC');
+
+// Log Access
+$app->get('/log', 'App\Controller\Log');
+
+// Engine Details
+$app->get('/engines', function() {
+	$out_text = [];
+	$cre_list = \App\CRE::getEngineList();
+	ksort($cre_list);
+	foreach ($cre_list as $cre) {
+		$cre['hostname'] = parse_url($cre['server'], PHP_URL_HOST);
+		$out_text[] = sprintf('% 20s    %s', $cre['code'], $cre['server']);
+		$out_text[] = '                        /' . $cre['engine'] . '/' . $cre['hostname'];;
+		$out_text[] = '';
+	}
+	$out_text = implode("\n", $out_text);
+	_exit_text($out_text);
+	// exit;
 });
 
 
 /**
  * @deprecated
- * Stem Handlers simply log all requests/responses
+ * Legacy Path for STEM
  */
 $app->group('/stem', 'App\Module\Stem'); // @deprecated
 

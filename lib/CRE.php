@@ -15,29 +15,26 @@ class CRE extends \OpenTHC\CRE\Base
 		switch ($cfg['engine']) {
 		case 'biotrack':
 
-			$sid = $_SESSION['cre-auth']['session'];
+			$sid = $cfg['session_id'];
 
 			switch ($cfg['code']) {
 			case 'usa/hi':
-				$cre = new RBE_BioTrack_HI($sid);
+				$cre = new \OpenTHC\CRE\BioTrack\Hawaii($sid);
 				break;
 			case 'usa/il':
-				$cre = new RBE_BioTrack_IL($sid);
-				break;
-			case 'usa/me':
-				$cre = new RBE_BioTrack_ME($sid);
+				$cre = new \OpenTHC\CRE\BioTrack\Illinois($sid);
 				break;
 			case 'usa/nd':
-				$cre = new RBE_BioTrack_ND($sid);
+				$cre = new \OpenTHC\CRE\BioTrack\NorthDakota($sid);
 				break;
 			case 'usa/nm':
-				$cre = new RBE_BioTrack_NM($sid);
+				$cre = new \OpenTHC\CRE\BioTrack\NewMexico($sid);
 				break;
 			case 'usa/pr':
-				$cre = new RBE_BioTrack_PR($sid);
+				$cre = new \OpenTHC\CRE\BioTrack\PuertoRico($sid);
 				break;
 			case 'usa/wa/ucs':
-				$cre = new RBE_BioTrack_WAUCS($sid);
+				$cre = new \OpenTHC\CRE\BioTrack\WAUCS($sid);
 				break;
 			}
 
@@ -52,7 +49,7 @@ class CRE extends \OpenTHC\CRE\Base
 			// $cre_auth['license'] = $l;
 			$cre_auth['secret'] = $cre_auth['license-key'];
 
-			$cre = new RBE_LeafData($cre_auth);
+			$cre = new \OpenTHC\CRE\LeafData($cre_auth);
 
 			switch ($cfg['code']) {
 			case 'usa/wa/test':
@@ -67,35 +64,39 @@ class CRE extends \OpenTHC\CRE\Base
 			switch ($cfg['code']) {
 			case 'usa/ak':
 			case 'usa/ak/test':
-				$cre = new RBE_Metrc_AK($_SESSION['cre-auth']);
+				$cre = new \OpenTHC\CRE\Metrc\Alaska($cfg);
 				break;
 			case 'usa/ca':
 			case 'usa/ca/test':
-				$cre = new RBE_Metrc_CA($_SESSION['cre-auth']);
+				$cre = new \OpenTHC\CRE\Metrc\California($cfg);
 				break;
 			case 'usa/co':
 			case 'usa/co/test':
-				$cre = new RBE_Metrc_CO($_SESSION['cre-auth']);
+				$cre = new \OpenTHC\CRE\Metrc\Colorado($cfg);
+				break;
+			case 'usa/ma':
+			case 'usa/ma/test':
+				$cre = new \OpenTHC\CRE\Metrc\Massachusetts($cfg);
 				break;
 			case 'usa/me':
 			case 'usa/me/test':
-				$cre = new RBE_Metrc_ME($_SESSION['cre-auth']);
+				$cre = new \OpenTHC\CRE\Metrc\Maine($cfg);
 				break;
 			case 'usa/mi':
 			case 'usa/mi/test':
-				$cre = new RBE_Metrc_MI($_SESSION['cre-auth']);
+				$cre = new \OpenTHC\CRE\Metrc\Michigan($cfg);
 				break;
 			case 'usa/mt':
 			case 'usa/mt/test':
-				$cre = new RBE_Metrc_MT($_SESSION['cre-auth']);
+				$cre = new \OpenTHC\CRE\Metrc\Montana($cfg);
 				break;
 			case 'usa/nv':
 			case 'usa/nv/test':
-				$cre = new RBE_Metrc_NV($_SESSION['cre-auth']);
+				$cre = new \OpenTHC\CRE\Metrc\Nevada($cfg);
 				break;
 			case 'usa/or':
 			case 'usa/or/test':
-				$cre = new RBE_Metrc_OR($_SESSION['cre-auth']);
+				$cre = new \OpenTHC\CRE\Metrc\Oregon($cfg);
 				break;
 			}
 
