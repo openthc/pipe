@@ -3,9 +3,9 @@
  * View the Logs from the STEM service
  */
 
-use Edoceo\Radix\DB\SQL;
-
 namespace App\Controller;
+
+use Edoceo\Radix\DB\SQL;
 
 class Log extends \OpenTHC\Controller\Base
 {
