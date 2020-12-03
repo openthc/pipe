@@ -12,22 +12,7 @@ use Edoceo\Radix\DB\SQL;
 
 class CRE_HTTP extends \GuzzleHttp\Client
 {
-	/**
-		Simulate the old _curl_* functions from old CRE code
-	*/
-	static function _curl_init()
-	{
-
-
-	}
-
-	/**
-		Simulate the old _curl_* functions from old CRE code
-	*/
-	static function _curl_exec()
-	{
-
-	}
+	const MAX_RESPONSE_SIZE = 65535;
 
 	function __construct($opt = null)
 	{
@@ -75,12 +60,19 @@ class CRE_HTTP extends \GuzzleHttp\Client
 				// Success Handler
 				$success = function($res) use ($req, $fmt) {
 
-					SQL::insert('log_audit', array(
+					$rec = [
 						'code' => $res->getStatusCode(),
 						'path' => $req->getRequestTarget(),
 						'req' => GuzzleHttp\Psr7\str($req),
 						'res' => ($res ? GuzzleHttp\Psr7\str($res) : null),
-					));
+					];
+
+					// Truncate HUGE responses to save log space
+					if (strlen($rec['res']) > self::MAX_RESPONSE_SIZE) {
+						$rec['res'] = '***TRUNCATED***';
+					}
+
+					SQL::insert('log_audit', $rec);
 
 					return $res;
 
