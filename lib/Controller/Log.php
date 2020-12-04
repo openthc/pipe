@@ -113,7 +113,9 @@ if (!empty($_GET['q'])) {
 	$arg[':q0'] = sprintf('%%%s%%', $_GET['q']);
 	$arg[':q1'] = sprintf('%%%s%%', $_GET['q']);
 }
-$sql.= ' ORDER BY cts DESC limit 50';
+$sql.= ' ORDER BY cts DESC';
+$sql.= ' LIMIT 50';
+$sql.= sprintf(' OFFSET %d', $_GET['o']);
 
 $idx = 0;
 $res = $dbc->fetchAll($sql, $arg);
@@ -137,7 +139,7 @@ foreach ($res as $rec) {
 	if ('pretty' == $_GET['f']) {
 		if (!empty($req[1])) {
 			$req[1] = json_decode($req[1], true);
-			$req[1] = json_encode($req[1], JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+			$req[1] = json_encode($req[1], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 		}
 	}
 
@@ -157,7 +159,7 @@ foreach ($res as $rec) {
 	if ('pretty' == $_GET['f']) {
 		if (!empty($res[1])) {
 			$res[1] = json_decode($res[1], true);
-			$res[1] = json_encode($res[1], JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+			$res[1] = json_encode($res[1], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 		}
 	}
 
