@@ -4,16 +4,24 @@
  */
 
  // Early Error Handler
-set_error_handler(function($en, $em, $ef=null, $l=null, $ec=null) {
+set_error_handler(function($en, $em, $ef=null, $el=null, $ec=null) {
 
 	while (ob_get_level() > 0) { ob_end_clean(); }
 
-	$rl = error_reporting();
-	$hf = sprintf('%08x', $er & $rl);
-
 	header('HTTP/1.1 500 Internal Error', true, 500);
 	header('content-type: text/plain');
-	echo "Internal Error [CWF-009]:\nLevel: $en / $rl = $hf\nMessage: $em\n";
+
+	$msg = [];
+	$msg[] = 'Internal Error [CWF-015]';
+	$msg[] = sprintf('Message: %s [%d]', $em, $en);
+	if (!empty($ef)) {
+		$ef = substr($ef, strlen($ef) / 2); // don't show full path
+		$msg[] = sprintf('File: ...%s:%d', $ef, $el);
+	}
+
+	error_log(implode('; ', $msg));
+
+	echo implode("\n", $msg);
 
 	exit(1);
 
@@ -24,11 +32,16 @@ set_exception_handler(function($ex) {
 
 	while (ob_get_level() > 0) { ob_end_clean(); }
 
-	$ex = $ex->getMessage();
-
 	header('HTTP/1.1 500 Internal Error', true, 500);
 	header('content-type: text/plain');
-	echo "Internal Error [CWF-016]:\nMessage: $ex\n";
+
+	$msg = [];
+	$msg[] = 'Internal Error [CWF-039]';
+	$msg[] = $ex->__toString();
+
+	error_log(implode('; ', $msg));
+
+	echo implode("\n", $msg);
 
 	exit(1);
 });
