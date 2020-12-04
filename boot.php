@@ -12,11 +12,7 @@ error_reporting(E_ALL & ~ E_NOTICE);
 openlog('openthc-pipe', LOG_ODELAY|LOG_PID, LOG_LOCAL0);
 
 require_once(APP_ROOT . '/vendor/autoload.php');
-require_once(APP_ROOT . '/lib/CRE.php');
 require_once(APP_ROOT . '/lib/CRE_HTTP.php');
-require_once(APP_ROOT . '/lib/CRE_Sync.php');
-require_once(APP_ROOT . '/lib/CRE_Iterator.php');
-require_once(APP_ROOT . '/lib/CRE_Iterator_LeafData.php');
 
 
 /**
