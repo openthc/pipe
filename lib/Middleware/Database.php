@@ -14,7 +14,7 @@ class Database
 		if (empty($_SESSION['sql-hash'])) {
 			return $RES->withJSON([
 				'data' => null,
-				'meta' => [ 'detail' => 'Invalid Authentication State [LMD#017]' ]
+				'meta' => [ 'detail' => 'Invalid Authentication State [LMD-017]' ]
 			], 403);
 		}
 
@@ -28,28 +28,12 @@ class Database
 			// Create Database
 			SQL::query('CREATE TABLE _config (key TEXT PRIMARY KEY, val TEXT)');
 			SQL::query("CREATE TABLE _log_alert (cts not null default (strftime('%s','now')), code, meta TEXT)");
-			SQL::query("CREATE TABLE _log_audit (cts not null default (strftime('%s','now')), code, meta TEXT)");
-			SQL::query("CREATE TABLE _log_delta (cts not null default (strftime('%s','now')), code, meta TEXT)");
-			SQL::query('CREATE TABLE contact (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE license (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE batch (guid TEXT PRIMARY KEY, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE lab_result (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE lot (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE lot_delta (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE plant (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE plant_collect (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE product (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE retail (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE strain (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE transfer_incoming (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE transfer_outgoing (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE waste (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE vehicle (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
-			SQL::query('CREATE TABLE zone (guid TEXT PRIMARY KEY, stat INT, hash TEXT, meta TEXT)');
+			SQL::query("CREATE TABLE _log_audit (cts not null default (strftime('%s','now')), code, path, req, res, err)");
 
 			SQL::query('INSERT INTO _config VALUES (?, ?)', array('Created', date(\DateTime::RFC3339)));
-			SQL::query('INSERT INTO _log_audit (code, meta) VALUES (?, ?)', array('App Created', date(\DateTime::RFC3339)));
-			SQL::query('INSERT INTO _log_audit (code, meta) VALUES (?, ?)', array('App Session', json_encode($_SESSION)));
+			SQL::query('INSERT INTO _config VALUES (?, ?)', array('SESSION', json_encode($_SESSION)));
+			SQL::query('INSERT INTO _log_alert (code, meta) VALUES (?, ?)', array('App Created', date(\DateTime::RFC3339)));
+			SQL::query('INSERT INTO _log_alert (code, meta) VALUES (?, ?)', array('App Session', json_encode($_SESSION)));
 
 		}
 

@@ -63,7 +63,7 @@ class LeafData extends \OpenTHC\Controller\Base
 				'data' => null,
 				'meta' => [
 					'origin' => 'openthc',
-					'detail' => 'Invalid System [CSL#033]',
+					'detail' => 'Invalid System [CSL-033]',
 				]
 			], 400);
 		}
@@ -166,7 +166,7 @@ class LeafData extends \OpenTHC\Controller\Base
 		if (empty($lic) || empty($key)) {
 			return $RES->withJSON([
 				'data' => null,
-				'meta' => [ 'detail' => 'License or Key missing [CSL#025]' ]
+				'meta' => [ 'detail' => 'License or Key missing [CSL-025]' ]
 			], 400);
 		}
 

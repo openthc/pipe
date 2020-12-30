@@ -109,7 +109,7 @@ class CRE extends \OpenTHC\CRE\Base
 		}
 
 		if (empty($cre)) {
-			throw new \Exception(sprintf('Invalid CRE "%s" [ALR#099]', $cfg['code']));
+			throw new \Exception(sprintf('Invalid CRE "%s" [ALR-099]', $cfg['code']));
 		}
 
 		return $cre;

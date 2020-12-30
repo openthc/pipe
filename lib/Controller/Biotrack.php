@@ -20,25 +20,20 @@ class BioTrack extends \OpenTHC\Controller\Base
 		$sql_file = _database_create_open('biotrack', $sql_hash);
 
 		$cre_base = 'https://wa.biotrackthc.net/serverjson.asp';
-		//$cre_base = 'http://localhost:8080';
-		//if (!empty($_SERVER['HTTP_OPENTHC_CRE_BASE'])) {
-		//	$cre_base = $_SERVER['HTTP_OPENTHC_CRE_BASE'];
-		//}
 		$cre_host = parse_url($cre_base, PHP_URL_HOST);
-
 
 		// Deny
 		if (count($_GET) != 0) {
 			return $RES->withJSON(array(
 				'success' => 0,
-				'_detail' => 'No Query String parameters are accepted [CSB#040]',
+				'_detail' => 'No Query String parameters are accepted [CSB-040]',
 			), 400);
 		}
 
 		if ('POST' != $_SERVER['REQUEST_METHOD']) {
 			return $RES->withJSON(array(
 				'success' => 0,
-				'_detail' => 'Only a POST is allowed here [CSB#045]',
+				'_detail' => 'Only a POST is allowed here [CSB-045]',
 			), 405);
 		}
 
@@ -50,15 +45,15 @@ class BioTrack extends \OpenTHC\Controller\Base
 			// Accurate for BioTrack System
 			break;
 		case 'text/json': // OK?
-			$ret['warn'][] = 'Set Content-Type to "text/JSON"';
+			$ret['warn'][] = 'Set content-type to "text/JSON"';
 			break;
 		case 'application/json': // The RFC one
-			$ret['warn'][] = 'Set Content-Type to "text/JSON", application/json is only for application that work properly';
+			$ret['warn'][] = 'Set content-type to "text/JSON", application/json is only for application that work properly';
 			break;
 		default:
 			return $RES->withJSON(array(
-				'success' => 0,
-				'_detail' => 'Specify "Content-Type: text/JSON" [CSB#067]',
+				'data' => null,
+				'meta' => [ 'detail' => 'Specify "content-type: text/JSON" [CSB-067]' ]
 			), 400);
 		}
 
@@ -68,10 +63,12 @@ class BioTrack extends \OpenTHC\Controller\Base
 		$src_json = json_decode($src_json, true);
 		if (empty($src_json)) {
 			return $RES->withJSON(array(
-				'success' => 0,
-				'_detail' => 'Error Decoding Input [CSB#034]',
-				'_errors' => json_last_error_msg(),
-			));
+				'data' => null,
+				'meta' => [
+					'detail' => 'Error Decoding Input [CSB-034]',
+					'error' => json_last_error_msg(),
+				]
+			), 400);
 		}
 
 
@@ -98,7 +95,7 @@ class BioTrack extends \OpenTHC\Controller\Base
 		if (!preg_match('/^\w+$/', $src_json['action'])) {
 			return $RES->withJSON(array(
 				'success' => 0,
-				'_detail' => 'Invalid "action" parameter [CSB#098]',
+				'_detail' => 'Invalid "action" parameter [CSB-098]',
 			), 400);
 		}
 
@@ -108,7 +105,7 @@ class BioTrack extends \OpenTHC\Controller\Base
 			if ('login' != $src_json['action']) {
 				return $RES->withJSON(array(
 					'success' => 0,
-					'_detail' => 'A "sessionid" must be provided [CSB#109]',
+					'_detail' => 'A "sessionid" must be provided [CSB-109]',
 				), 400);
 			}
 		}
