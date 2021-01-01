@@ -17,6 +17,20 @@ class BioTrack extends \App\Controller\Base
 	{
 		parent::__invoke($REQ, $RES, $ARG);
 
+		// Our special end-point
+		$chk = basename($ARG['path']);
+		if ('ping' == $chk) {
+			return $RES->withJSON([
+				'data' => 'PONG',
+				'meta' => [
+					'detail' => 'Responding to a Test Ping',
+					'source' => 'openthc',
+					'cre' => $ARG['path'],
+					'cre_base' => 'biotrack....',
+				]
+			]);
+		}
+
 		$cre_base = 'https://wa.biotrackthc.net/serverjson.asp';
 		$cre_host = parse_url($cre_base, PHP_URL_HOST);
 

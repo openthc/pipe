@@ -13,35 +13,82 @@ namespace Test\Core;
 
 class A_CRE_Ping_Test extends \Test\OpenTHC_Test_Case_Base
 {
-	public function test_load_cre()
+	public function test_ping_engine()
 	{
-		$cre_list = \App\CRE::getEngineList();
-		$this->assertCount(21, $cre_list);
+		$engine_list = [
+			'biotrack',
+			'leafdata',
+			'metrc',
+		];
 
-		foreach ($cre_list as $cre_conf) {
-			// print_r($cre_conf);
-			$cre_conf['service-key'] = 'TEST_SERVICE_KEY';
-			$cre_conf['license-key'] = 'TEST_LICENSE_KEY';
-			$cre = \App\CRE::factory($cre_conf);
-			$this->assertNotEmpty($cre);
-			$this->assertTrue($cre instanceof \OpenTHC\CRE\Base);
+		foreach ($engine_list as $engine) {
+
+			$url = sprintf('https://%s/%s/ping', $_ENV['test-host'], $engine);
+			$req = _curl_init($url);
+			$res = curl_exec($req);
+			$inf = curl_getinfo($req);
+			curl_close($req);
+
+			$this->assertEquals(200, $inf['http_code']);
+			$this->assertNotEmpty($res);
+
 		}
+
+		// $cre_list = \OpenTHC\CRE\Base::getEngineList();
+		// $this->assertCount(20, $cre_list);
+
+		// foreach ($cre_list as $cre_conf) {
+		// 	// print_r($cre_conf);
+		// 	// $cre_conf['service-key'] = 'TEST_SERVICE_KEY';
+		// 	// $cre_conf['license-key'] = 'TEST_LICENSE_KEY';
+		// 	// $cre = \App\CRE::factory($cre_conf);
+		// 	// $this->assertNotEmpty($cre);
+		// 	// $this->assertTrue($cre instanceof \OpenTHC\CRE\Base);
+		// }
 	}
 
 	public function test_ping_cre()
 	{
-		$cre_list = \App\CRE::getEngineList();
-		foreach ($cre_list as $cre_conf) {
-			$cre_conf['service-key'] = 'TEST_SERVICE_KEY';
-			$cre_conf['license-key'] = 'TEST_LICENSE_KEY';
-			$cre = \App\CRE::factory($cre_conf);
-			$res = $cre->ping();
+		$cre_list = [
+			'biotrack/hi',
+			'biotrack/il',
+			'leafdata/wa',
+			'leafdata/wa/test',
+			'metrc/ak',
+			'metrc/ca',
+			'metrc/co',
+			'metrc/la',
+			'metrc/ma',
+			'metrc/md',
+			'metrc/me',
+			'metrc/mi',
+			'metrc/mo',
+			'metrc/nv',
+			'metrc/or',
+		];
+
+		foreach ($cre_list as $cre) {
+
+			$url = sprintf('https://%s/%s/ping', $_ENV['test-host'], $cre);
+			$req = _curl_init($url);
+			$res = curl_exec($req);
+			// var_dump($res);
+
+			$inf = curl_getinfo($req);
+			curl_close($req);
+
+			$this->assertEquals(200, $inf['http_code']);
+			$this->assertNotEmpty($res);
+			$res = json_decode($res, true);
 			$this->assertIsArray($res);
-			$this->assertCount(3, $res);
-			$this->assertArrayHasKey('code', $res);
-			$this->assertArrayHasKey('data', $res);
-			$this->assertArrayHasKey('meta', $res);
+			$this->assertCount(2, $res);
+			$this->assertIsArray($res['meta']);
+			$this->assertNotEmpty($res['meta']['detail']);
+			$this->assertNotEmpty($res['meta']['source']);
+			$this->assertEquals('openthc', $res['meta']['source']);
+			$this->assertNotEmpty($res['meta']['cre']);
+			$this->assertNotEmpty($res['meta']['cre_base']);
+
 		}
 	}
-
 }

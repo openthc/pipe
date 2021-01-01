@@ -67,7 +67,7 @@ if (!empty($cfg['debug'])) {
 }
 
 // Engine Specific Controllers
-$app->map([ 'GET', 'POST' ], '/biotrack/{system}', 'App\Controller\BioTrack')->add('OpenTHC\Middleware\Session');
+$app->map([ 'GET', 'POST' ], '/biotrack/{path:.*}', 'App\Controller\BioTrack')->add('OpenTHC\Middleware\Session');
 
 $app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', 'App\Controller\LeafData');
 

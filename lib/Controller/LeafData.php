@@ -24,14 +24,31 @@ class LeafData extends \App\Controller\Base
 	{
 		parent::__invoke($REQ, $RES, $ARG);
 
+		// Our special end-point
+		$chk = basename($ARG['path']);
+		if ('ping' == $chk) {
+
+			$this->_check_cre($RES);
+
+			return $RES->withJSON([
+				'data' => 'PONG',
+				'meta' => [
+					'detail' => 'Responding to a Test Ping',
+					'source' => 'openthc',
+					'cre' => $this->cre,
+					'cre_base' => $this->cre_base,
+				]
+			]);
+		}
+
 		// Auth Headers
 		$RES = $this->_check_auth($RES);
 		if (200 != $RES->getStatusCode()) {
 			return $RES;
 		}
 
-		// System
-		$RES = $this->_check_system($RES);
+		// cre
+		$RES = $this->_check_cre($RES);
 		if (200 != $RES->getStatusCode()) {
 			return $RES;
 		}
@@ -65,8 +82,7 @@ class LeafData extends \App\Controller\Base
 			sprintf('x-mjf-key: %s', $_SERVER['HTTP_X_MJF_KEY']),
 		];
 
-		$cre = new \App\CRE();
-		$req = $cre->curl_init($url, $req_head);
+		$req = $this->curl_init($url, $req_head);
 
 		switch ($_SERVER['REQUEST_METHOD']) {
 		case 'DELETE':
@@ -92,24 +108,22 @@ class LeafData extends \App\Controller\Base
 
 		}
 
-		$res_body = $cre->curl_exec($req);
+		$this->curl_exec($req);
 		$dbc->query('UPDATE log_audit SET res_time = now() WHERE id = :l', [ ':l' => $this->req_ulid ]);
-
-		$res_info = $cre->getResponseInfo();
 
 		// Update Response
 		$dbc->update('log_audit', [
-			'req_head' => $cre->getRequestHead(),
+			'req_head' => $this->req_head,
 			// 'res_time' => 'now()',
-			'res_info' => json_encode($res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-			'res_head' => $cre->getResponseHead(),
-			'res_body' => $res_body,
+			'res_info' => json_encode($this->res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+			'res_head' => $this->res_head,
+			'res_body' => $this->res_body,
 		], [ 'id' => $this->req_ulid ]);
 
 		// Try to be Smart with Response Code?
-		$RES = $RES->withStatus($res_info['http_code'] ?: 500);
+		$RES = $RES->withStatus($this->res_info['http_code'] ?: 500);
 		$RES = $RES->withHeader('content-type', 'application/json; charset=utf-8');
-		$RES = $RES->write($res_body);
+		$RES = $RES->write($this->res_body);
 
 		return $RES;
 	}
@@ -138,20 +152,20 @@ class LeafData extends \App\Controller\Base
 	}
 
 	/**
-	 * Parse the System from the Path, Mutates $this
+	 * Parse the CRE from the Path, Mutates $this
 	 */
-	function _check_system($RES)
+	function _check_cre($RES)
 	{
-		$system = [];
-		$system[] = array_shift($this->src_path);
+		$cre = [];
+		$cre[] = array_shift($this->src_path);
 		if ('test' == $this->src_path[0]) {
-			$system[] = array_shift($this->src_path);
+			$cre[] = array_shift($this->src_path);
 		}
 
-		$this->system = implode('/', $system);
+		$this->cre = implode('/', $cre);
 
-		// Requested System
-		switch ($this->system) {
+		// Requested CRE
+		switch ($this->cre) {
 			case 'pa':
 			case 'pa/test':
 				return $RES->withJSON([
@@ -178,7 +192,7 @@ class LeafData extends \App\Controller\Base
 					'data' => null,
 					'meta' => [
 						'source' => 'openthc',
-						'detail' => 'Invalid System [CSL-033]',
+						'detail' => 'Invalid CRE [CSL-033]',
 					]
 				], 400);
 		}

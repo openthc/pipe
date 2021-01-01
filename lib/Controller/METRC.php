@@ -13,14 +13,31 @@ class METRC extends \App\Controller\Base
 	{
 		parent::__invoke($REQ, $RES, $ARG);
 
-		$RES = $this->_check_system($RES);
+		// Our special end-point
+		$chk = basename($ARG['path']);
+		if ('ping' == $chk) {
+
+			$this->_check_cre($RES);
+
+			return $RES->withJSON([
+				'data' => 'PONG',
+				'meta' => [
+					'detail' => 'Responding to a Test Ping',
+					'source' => 'openthc',
+					'cre' => $this->cre,
+					'cre_base' => $this->cre_base,
+				]
+			]);
+		}
+
+		$RES = $this->_check_cre($RES);
 		if (200 != $RES->getStatusCode()) {
 			return $RES;
 		}
 
 		// Resolve Path
-		$src_path = implode('/', $src_path);
-		$req_path = sprintf('/%s?%s', $src_path, $_SERVER['QUERY_STRING']);
+		$req_path = implode('/', $this->src_path);
+		$req_path = sprintf('/%s?%s', $req_path, $_SERVER['QUERY_STRING']);
 		$req_path = trim($req_path, '?');
 
 
@@ -117,12 +134,27 @@ class METRC extends \App\Controller\Base
 	/**
 	 * Parse the System from the Path, Mutates $this
 	 */
-	function _check_system($RES)
+	function _check_cre($RES)
 	{
-		$this->system = array_shift($this->src_path);
+		$this->cre = array_shift($this->src_path);
 
 		// Requested System
-		switch ($this->system) {
+		switch ($this->cre) {
+		case 'ak':
+		case 'ca':
+		case 'co':
+		case 'la':
+		case 'ma':
+		case 'md':
+		case 'me':
+		case 'mi':
+		case 'mo':
+		case 'mt':
+		case 'nv':
+		case 'oh':
+		case 'or':
+			$this->cre_base = sprintf('https://api-%s.metrc.com', $this->cre);
+		break;
 		case 'api-ak.metrc.com':
 		case 'api-ca.metrc.com':
 		case 'api-co.metrc.com':
@@ -135,8 +167,8 @@ class METRC extends \App\Controller\Base
 		case 'api-nv.metrc.com':
 		case 'api-oh.metrc.com':
 		case 'api-or.metrc.com':
-			$this->cre_base = sprintf('https://%s', $this->system);
-			break;
+			$this->cre_base = sprintf('https://%s', $this->cre);
+		break;
 		case 'sandbox-api-or.metrc.com':
 		case 'sandbox-api-co.metrc.com':
 		case 'sandbox-api-md.metrc.com':
@@ -144,12 +176,12 @@ class METRC extends \App\Controller\Base
 			// SubSwitch
 			// so external users can use a canonical name and we'll adjust back here
 			// based on the switching the METRC might do with their sandox endpoints
-			switch ($this->system) {
+			switch ($this->cre) {
 				case 'sandbox-api-me.metrc.com':
-					$this->system = 'sandbox-api-md.metrc.com'; // re-maps to Maryland
+					$this->cre = 'sandbox-api-md.metrc.com'; // re-maps to Maryland
 				break;
 			}
-			$this->cre_base = sprintf('https://%s', $system);
+			$this->cre_base = sprintf('https://%s', $cre);
 			break;
 		default:
 			return $RES->withJSON([

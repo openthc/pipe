@@ -11,8 +11,7 @@
 	"require": {
 		"php": ">=7.3.0",
 		"edoceo/radix": "dev-master",
-		"openthc/common": "dev-master",
-		"openthc/cre-adapter": "dev-master"
+		"openthc/common": "dev-master"
 	},
 	"require-dev": {
 		"behat/behat": "3.7.0",
