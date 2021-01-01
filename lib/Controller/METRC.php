@@ -7,63 +7,20 @@ use Edoceo\Radix\DB\SQL;
 
 namespace App\Controller;
 
-class METRC extends \OpenTHC\Controller\Base
+class METRC extends \App\Controller\Base
 {
 	function __invoke($REQ, $RES, $ARG)
 	{
+		parent::__invoke($REQ, $RES, $ARG);
 
-		$cre_base = null;
-		$cre_host = null;
-
-		$src_path = explode('/', $ARG['path']);
-
-		$system = array_shift($src_path);
-
-		// Requested System
-		switch ($system) {
-		case 'api-ak.metrc.com':
-		case 'api-ca.metrc.com':
-		case 'api-co.metrc.com':
-		case 'api-la.metrc.com':
-		case 'api-ma.metrc.com':
-		case 'api-md.metrc.com':
-		case 'api-mi.metrc.com':
-		case 'api-mo.metrc.com':
-		case 'api-mt.metrc.com':
-		case 'api-nv.metrc.com':
-		case 'api-oh.metrc.com':
-		case 'api-or.metrc.com':
-			$cre_base = sprintf('https://%s', $system);
-			break;
-		case 'sandbox-api-or.metrc.com':
-		case 'sandbox-api-co.metrc.com':
-		case 'sandbox-api-md.metrc.com':
-		case 'sandbox-api-me.metrc.com':
-			// SubSwitch
-			// so external users can use a canonical name and we'll adjust back here
-			// based on the switching the METRC might do with their sandox endpoints
-			switch ($system) {
-				case 'sandbox-api-me.metrc.com':
-					$system = 'sandbox-api-md.metrc.com'; // re-maps to Maryland
-				break;
-			}
-			$cre_base = sprintf('https://%s', $system);
-			break;
-		default:
-			return $RES->withJSON([
-				'data' => null,
-				'meta' => [ 'detail' => 'CRE Not Found [LCM-055]' ],
-			], 404);
-		}
-
-		// From URL if not already set
-		if (empty($cre_host)) {
-			$cre_host = parse_url($cre_base, PHP_URL_HOST);
+		$RES = $this->_check_system($RES);
+		if (200 != $RES->getStatusCode()) {
+			return $RES;
 		}
 
 		// Resolve Path
 		$src_path = implode('/', $src_path);
-		$req_path = $cre_base . '/' . $src_path . '?' . $_SERVER['QUERY_STRING'];
+		$req_path = sprintf('/%s?%s', $src_path, $_SERVER['QUERY_STRING']);
 		$req_path = trim($req_path, '?');
 
 
@@ -99,51 +56,107 @@ class METRC extends \OpenTHC\Controller\Base
 		}
 
 		// Database
-		$sql_hash = crc32($_SERVER['HTTP_AUTHORIZATION']);
-		$sql_file = _database_create_open('metrc', $sql_hash);
+		$url = $this->cre_base . $req_path;
+		$req_head = [
+			'accept: application/json',
+			sprintf('authorization: %s', $_SERVER['HTTP_AUTHORIZATION']),
+		];
 
-
-		$cre_http = new \CRE_HTTP(array(
-			'base_uri' => $cre_base
-		));
-
+		$cre = new \App\CRE();
+		$req = $cre->curl_init($cre_base . $req_path);
 
 		// Forward
 		switch ($_SERVER['REQUEST_METHOD']) {
 		case 'DELETE':
+			curl_setopt($req, CURLOPT_CUSTOMREQUEST, 'DELETE');
+		break;
 		case 'GET':
-
-			$req = new \GuzzleHttp\Psr7\Request($_SERVER['REQUEST_METHOD'], $req_path);
-			$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
-			$req = $req->withHeader('host', $cre_host);
-
-			$res = $cre_http->send($req);
-
+			// Nothing
 			break;
 
 		case 'POST':
 		case 'PUT':
 
 			$src_json = file_get_contents('php://input');
+			$src_json = json_decode($src_json, true);
 
-			$req = new \GuzzleHttp\Psr7\Request($_SERVER['REQUEST_METHOD'], $req_path);
-			$req = $req->withHeader('authorization', $_SERVER['HTTP_AUTHORIZATION']);
-			$req = $req->withHeader('content-type', 'application/json');
-			$req = $req->withHeader('host', $cre_host);
+			$req_body = json_encode($src_json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+			$dbc->update('log_audit', [ 'req_body' => $req_body ], [ 'id' => $this->req_ulid ]);
 
-			$res = $cre_http->send($req, array('body' => $src_json));
+			curl_setopt($req, CURLOPT_CUSTOMREQUEST, $_SERVER['REQUEST_METHOD']);
+			curl_setopt($req, CURLOPT_POSTFIELDS, $req_body);
+
+			$req_head[] = 'content-type: application/json';
+			curl_setopt($req, CURLOPT_HTTPHEADER, $req_head);
 
 			break;
 
 		}
 
-		// var_dump($res);
-		$code = ($res ? $res->getStatusCode() : 500);
-		$body = ($res ? $res->getBody() : null);
+		$res_body = $cre->curl_exec($req);
+		$dbc->query('UPDATE log_audit SET res_time = now() WHERE id = :l', [ ':l' => $this->req_ulid ]);
 
-		$RES = $RES->withStatus($code);
-		$RES = $RES->withHeader('content-type', $res->getHeader('content-type'));
-		$RES = $RES->write($body);
+		$res_info = $cre->getResponseInfo();
+
+		// Update Response
+		$dbc->update('log_audit', [
+			'req_head' => $cre->getRequestHead(),
+			'res_info' => json_encode($res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+			'res_head' => $cre->getResponseHead(),
+			'res_body' => $res_body,
+		], [ 'id' => $this->req_ulid ]);
+
+		// Try to be Smart with Response Code?
+		$RES = $RES->withStatus($res_info['http_code'] ?: 500);
+		$RES = $RES->withHeader('content-type', 'application/json; charset=utf-8');
+		$RES = $RES->write($res_body);
+
+		return $RES;
+	}
+
+	/**
+	 * Parse the System from the Path, Mutates $this
+	 */
+	function _check_system($RES)
+	{
+		$this->system = array_shift($this->src_path);
+
+		// Requested System
+		switch ($this->system) {
+		case 'api-ak.metrc.com':
+		case 'api-ca.metrc.com':
+		case 'api-co.metrc.com':
+		case 'api-la.metrc.com':
+		case 'api-ma.metrc.com':
+		case 'api-md.metrc.com':
+		case 'api-mi.metrc.com':
+		case 'api-mo.metrc.com':
+		case 'api-mt.metrc.com':
+		case 'api-nv.metrc.com':
+		case 'api-oh.metrc.com':
+		case 'api-or.metrc.com':
+			$this->cre_base = sprintf('https://%s', $this->system);
+			break;
+		case 'sandbox-api-or.metrc.com':
+		case 'sandbox-api-co.metrc.com':
+		case 'sandbox-api-md.metrc.com':
+		case 'sandbox-api-me.metrc.com':
+			// SubSwitch
+			// so external users can use a canonical name and we'll adjust back here
+			// based on the switching the METRC might do with their sandox endpoints
+			switch ($this->system) {
+				case 'sandbox-api-me.metrc.com':
+					$this->system = 'sandbox-api-md.metrc.com'; // re-maps to Maryland
+				break;
+			}
+			$this->cre_base = sprintf('https://%s', $system);
+			break;
+		default:
+			return $RES->withJSON([
+				'data' => null,
+				'meta' => [ 'detail' => 'CRE Not Found [LCM-055]' ],
+			], 404);
+		}
 
 		return $RES;
 	}

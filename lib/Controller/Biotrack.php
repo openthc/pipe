@@ -11,13 +11,11 @@
 
 namespace App\Controller;
 
-class BioTrack extends \OpenTHC\Controller\Base
+class BioTrack extends \App\Controller\Base
 {
 	function __invoke($REQ, $RES, $ARG)
 	{
-
-		$sql_hash = $_SESSION['sql-hash'];
-		$sql_file = _database_create_open('biotrack', $sql_hash);
+		parent::__invoke($REQ, $RES, $ARG);
 
 		$cre_base = 'https://wa.biotrackthc.net/serverjson.asp';
 		$cre_host = parse_url($cre_base, PHP_URL_HOST);
@@ -112,12 +110,17 @@ class BioTrack extends \OpenTHC\Controller\Base
 
 
 		// Now Just Forward to BioTrack
+		// $dbc->insert('log_audit', [
+		// 	'id' => $this->req_ulid,
+		// 	'req_head' => '',
+		// 	'req_body' => '',
+		// ]);
 
 		// Resolve Path
 		$cre_http = new \CRE_HTTP(array(
 			'base_uri' => $cre_base
 		));
-
+		// $req = _curl_init($url);
 
 		// Forward
 		switch ($_SERVER['REQUEST_METHOD']) {
@@ -136,9 +139,18 @@ class BioTrack extends \OpenTHC\Controller\Base
 		//$_raw = str_replace('Content-Type: text/plain', null, $_raw);
 		//$_raw = trim($_raw);
 
-		// var_dump($res);
+		$dbc->update('log_audit', [
+			'req_head' => $cre->getRequestHead(),
+			// 'res_time' => 'now()',
+			'res_info' => json_encode($res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+			'res_head' => $cre->getResponseHead(),
+			'res_body' => $res_body,
+		], [ 'id' => $this->req_ulid ]);
+
 		$code = ($res ? $res->getStatusCode() : 500);
+		// $code = curl_getinfo($req, )
 		$body = ($res ? $res->getBody() : null);
+		// $body = curl_exec($req);
 
 		$RES = $RES->withStatus($code);
 		$RES = $RES->withHeader('content-type', $res->getHeader('content-type'));
@@ -147,4 +159,7 @@ class BioTrack extends \OpenTHC\Controller\Base
 		return $RES;
 
 	}
+
+	// function _do_request()
+
 }

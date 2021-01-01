@@ -13,139 +13,103 @@
 	Return Sanatized Response
 */
 
-use Edoceo\Radix\DB\SQL;
-
 namespace App\Controller;
 
-class LeafData extends \OpenTHC\Controller\Base
+class LeafData extends \App\Controller\Base
 {
+	// Default
+	protected $cre_base = 'https://bunk.openthc.dev/leafdata/v2017';
+
 	function __invoke($REQ, $RES, $ARG)
 	{
-		// Default
-		$cre_base = 'https://bunk.openthc.org/leafdata/v2017';
-		$cre_host = null;
+		parent::__invoke($REQ, $RES, $ARG);
 
-		$src_path = explode('/', $ARG['path']);
-
-		// Calculate System
-		$system = [];
-		$system[] = array_shift($src_path);
-		if ('test' == $src_path[0]) {
-			$system[] = array_shift($src_path);
-		}
-		$system = implode('/', $system);
-
-		// Requested System
-		switch ($system) {
-		case 'pa':
-		case 'pa/test':
-			return $RES->withJSON([
-				'data' => null,
-				'meta' => [ 'detail' => 'Not Implemented' ],
-			], 501);
-		case 'ut':
-		case 'ut/test':
-			return $RES->withJSON([
-				'data' => null,
-				'meta' => [ 'detail' => 'Not Implemented' ],
-			], 501);
-		case 'wa':
-		case 'wa-live':
-			$cre_base = 'https://traceability.lcb.wa.gov/api/v1';
-			break;
-		case 'wa/test':
-		case 'test':
-		case 'wa-test':
-			$cre_base = 'https://watest.leafdatazone.com/api/v1';
-			break;
-		default:
-			return $RES->withJSON([
-				'data' => null,
-				'meta' => [
-					'origin' => 'openthc',
-					'detail' => 'Invalid System [CSL-033]',
-				]
-			], 400);
-		}
-		// From URL if not already set
-		if (empty($cre_host)) {
-			$cre_host = parse_url($cre_base, PHP_URL_HOST);
-		}
-
-		// Resolve Path
-		// Clean these if the Client Added Them
-		if ('api' == $src_path[0]) {
-			array_shift($src_path); // drop it
-		}
-		if ('v1' == $src_path[0]) {
-			array_shift($src_path); // drop it
-		}
-		$src_path = implode('/', $src_path);
-		$req_path = $cre_base . '/' . $src_path . '?' . $_SERVER['QUERY_STRING'];
-		$req_path = trim($req_path, '?');
-
-		// Auth
+		// Auth Headers
 		$RES = $this->_check_auth($RES);
 		if (200 != $RES->getStatusCode()) {
 			return $RES;
 		}
 
+		// System
+		$RES = $this->_check_system($RES);
+		if (200 != $RES->getStatusCode()) {
+			return $RES;
+		}
+
+		// Resolve Path
+		// Clean these if the Client Added Them
+		if ('api' == $this->src_path[0]) {
+			array_shift($this->src_path); // drop it
+		}
+		if ('v1' == $this->src_path[0]) {
+			array_shift($this->src_path); // drop it
+		}
+		$req_path = implode('/', $this->src_path);
+		$req_path = sprintf('/%s?%s', $req_path, $_SERVER['QUERY_STRING']);
+		$req_path = trim($req_path, '?');
+
 		// Database
-		$sql_hash = md5($_SERVER['HTTP_X_MJF_MME_CODE']);
-		$sql_file = _database_create_open('leafdata', $sql_hash);
+		$dbc = _dbc();
+		$dbc->insert('log_audit', [
+			'id' => $this->req_ulid,
+			'lic_hash' => md5($_SERVER['HTTP_X_MJF_MME_CODE']),
+			'req_head' => sprintf('%s %s HTTP/1.1', $_SERVER['REQUEST_METHOD'], $req_path),
+		]);
 
 		// Forward
-		$cre_http = new \CRE_HTTP();
+		$url = $this->cre_base . $req_path;
+		$req_head = [
+			'accept: application/json',
+			// 'content-type: application/json',
+			sprintf('x-mjf-mme-code: %s', $_SERVER['HTTP_X_MJF_MME_CODE']),
+			sprintf('x-mjf-key: %s', $_SERVER['HTTP_X_MJF_KEY']),
+		];
+
+		$cre = new \App\CRE();
+		$req = $cre->curl_init($url, $req_head);
 
 		switch ($_SERVER['REQUEST_METHOD']) {
 		case 'DELETE':
-
-			$req = new \GuzzleHttp\Psr7\Request('DELETE', $req_path);
-			$req = $req->withHeader('host', $cre_host);
-			$req = $req->withHeader('x-mjf-mme-code', $_SERVER['HTTP_X_MJF_MME_CODE']);
-			$req = $req->withHeader('x-mjf-key', $_SERVER['HTTP_X_MJF_KEY']);
-
-			$res = $cre_http->send($req);
-
+			curl_setopt($req, CURLOPT_CUSTOMREQUEST, 'DELETE');
 			break;
-
 		case 'GET':
-
-			$req = new \GuzzleHttp\Psr7\Request('GET', $req_path);
-			$req = $req->withHeader('host', $cre_host);
-			$req = $req->withHeader('x-mjf-mme-code', $_SERVER['HTTP_X_MJF_MME_CODE']);
-			$req = $req->withHeader('x-mjf-key', $_SERVER['HTTP_X_MJF_KEY']);
-
-			$res = $cre_http->send($req);
-
+			// Nothing
 			break;
-
 		case 'POST':
 
 			$src_json = file_get_contents('php://input');
 			$src_json = json_decode($src_json, true);
 
-			$req = new \GuzzleHttp\Psr7\Request('POST', $req_path);
-			$req = $req->withHeader('host', $cre_host);
-			$req = $req->withHeader('x-mjf-mme-code', $_SERVER['HTTP_X_MJF_MME_CODE']);
-			$req = $req->withHeader('x-mjf-key', $_SERVER['HTTP_X_MJF_KEY']);
+			$req_body = json_encode($src_json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+			$dbc->update('log_audit', [ 'req_body' => $req_body ], [ 'id' => $this->req_ulid ]);
 
-			$res = $cre_http->send($req, array('json' => $src_json));
+			curl_setopt($req, CURLOPT_POST, true);
+			curl_setopt($req, CURLOPT_POSTFIELDS, $req_body);
+			$req_head[] = 'content-type: application/json';
+			curl_setopt($req, CURLOPT_HTTPHEADER, $req_head);
 
 			break;
 
 		}
 
+		$res_body = $cre->curl_exec($req);
+		$dbc->query('UPDATE log_audit SET res_time = now() WHERE id = :l', [ ':l' => $this->req_ulid ]);
 
-		// Corecting the MIME Type
-		$RES = $RES->withHeader('content-type', 'application/json; charset=utf-8');
+		$res_info = $cre->getResponseInfo();
+
+		// Update Response
+		$dbc->update('log_audit', [
+			'req_head' => $cre->getRequestHead(),
+			// 'res_time' => 'now()',
+			'res_info' => json_encode($res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+			'res_head' => $cre->getResponseHead(),
+			'res_body' => $res_body,
+		], [ 'id' => $this->req_ulid ]);
 
 		// Try to be Smart with Response Code?
-		$code = ($res ? $res->getStatusCode() : 500);
-		$body = ($res ? $res->getBody()->__toString() : null);
-
-		$RES = $RES->withStatus($code);
-		$RES = $RES->write($body);
+		$RES = $RES->withStatus($res_info['http_code'] ?: 500);
+		$RES = $RES->withHeader('content-type', 'application/json; charset=utf-8');
+		$RES = $RES->write($res_body);
 
 		return $RES;
 	}
@@ -168,6 +132,55 @@ class LeafData extends \OpenTHC\Controller\Base
 				'data' => null,
 				'meta' => [ 'detail' => 'License or Key missing [CSL-025]' ]
 			], 400);
+		}
+
+		return $RES;
+	}
+
+	/**
+	 * Parse the System from the Path, Mutates $this
+	 */
+	function _check_system($RES)
+	{
+		$system = [];
+		$system[] = array_shift($this->src_path);
+		if ('test' == $this->src_path[0]) {
+			$system[] = array_shift($this->src_path);
+		}
+
+		$this->system = implode('/', $system);
+
+		// Requested System
+		switch ($this->system) {
+			case 'pa':
+			case 'pa/test':
+				return $RES->withJSON([
+					'data' => null,
+					'meta' => [ 'detail' => 'Not Implemented [ACL-161]' ],
+				], 501);
+			case 'ut':
+			case 'ut/test':
+				return $RES->withJSON([
+					'data' => null,
+					'meta' => [ 'detail' => 'Not Implemented [ACL-167]' ],
+				], 501);
+			case 'wa':
+			case 'wa-live':
+				$this->cre_base = 'https://traceability.lcb.wa.gov/api/v1';
+				break;
+			case 'wa/test':
+			case 'test':
+			case 'wa-test':
+				$this->cre_base = 'https://watest.leafdatazone.com/api/v1';
+				break;
+			default:
+				return $RES->withJSON([
+					'data' => null,
+					'meta' => [
+						'source' => 'openthc',
+						'detail' => 'Invalid System [CSL-033]',
+					]
+				], 400);
 		}
 
 		return $RES;

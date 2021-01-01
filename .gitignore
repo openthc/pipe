@@ -5,7 +5,5 @@ etc/app.ini
 etc/cre.ini
 
 Custom/
-custom/
-lib/RBE/
 var/
 vendor/
