@@ -33,12 +33,13 @@ $tz = new \DateTimezone('America/Los_Angeles');
 	<div>
 		<button type="submit">Go</button>
 	</div>
+	<div>
+		<button formtarget="_blank" name="a" type="submit" value="snap">Snap</button>
+	</div>
 </div>
 </form>
 
-<div>
-<?= h($this->sql_debug) ?>
-</div>
+<div class="sql-debug"><?= h($this->sql_debug) ?></div>
 
 <table>
 <thead>

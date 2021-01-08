@@ -5,12 +5,13 @@
 
 namespace App\Controller;
 
-use Edoceo\Radix\DB\SQL;
-
 class Log extends \OpenTHC\Controller\Base
 {
 	private $sql_debug;
 
+	/**
+	 *
+	 */
 	function __invoke($REQ, $RES, $ARG)
 	{
 		$res = [];
@@ -18,13 +19,30 @@ class Log extends \OpenTHC\Controller\Base
 		if (0 == count($_GET)) {
 			// No Query
 		} else {
-			$res = $this->_sql_query($sql, $arg);
+			$res = $this->_sql_query();
 		}
 
+		ob_start();
 		require_once(APP_ROOT . '/view/log.php');
+		$output_html = ob_get_clean();
+
+		if ('snap' == $_GET['a']) {
+			$output_snap = _ulid();
+			$output_file = sprintf('%s/webroot/snap/%s.html', APP_ROOT, $output_snap);
+			$output_link = sprintf('/snap/%s.html', $output_snap);
+			$output_html = preg_replace('/<form.+<\/form>/', '', $output_html);
+			$output_html = preg_replace('/<div class="sql-debug">.+?<\/div>/', '', $output_html);
+			file_put_contents($output_file, $output_html);
+			return $RES->withRedirect($output_link);
+		}
+
+		_exit_html($output_html);
 
 	}
 
+	/**
+	 * Run the Actual Query
+	 */
 	function _sql_query()
 	{
 		$dbc = _dbc();
@@ -82,7 +100,7 @@ class Log extends \OpenTHC\Controller\Base
 		$sql.= ' LIMIT 100';
 		$sql.= sprintf(' OFFSET %d', $_GET['o']);
 
-		$this->_sql_debug = $dbc->_sql_debug($sql, $arg);
+		$this->sql_debug = $dbc->_sql_debug($sql, $arg);
 
 		$res = $dbc->fetchAll($sql, $arg);
 
