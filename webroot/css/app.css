@@ -1,0 +1,101 @@
+/**
+ * Simple Stylesheet for Pipe
+ */
+
+* {
+	box-sizing: border-box;
+}
+body {
+	font-family: monospace;
+	font-size: 1em;
+	margin: 0;
+	padding: 0.5em;
+}
+h1, h2, h3 {
+	margin: 0;
+	padding: 0;
+}
+pre {
+	background: #303030;
+	margin: 0;
+	outline: 1px solid #000;
+	padding: 0.25rem;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+pre.head {
+	color: #ccc;
+	margin-bottom: 0.5em;
+}
+pre.body {
+	color: #00cc00;
+}
+table {
+	border-collapse: collapse;
+	font-size: 1.2em;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+thead {
+	background: #333;
+	color: #fdfdfd;
+}
+td {
+	border-left: 1px solid #333;
+	border-right: 1px solid #333;
+	vertical-align: top;
+}
+td.c {
+	text-align: center;
+}
+td.r {
+	text-align: right;
+}
+tr.tr1 {
+	border-top: 1px solid #333;
+}
+tr.tr1:hover {
+	background: #ff0;
+}
+tr.tr2 {
+	display: none;
+}
+tr.tr3 {
+	display: none;
+}
+
+/**
+ * Form Elements
+ */
+form {
+	margin: 0;
+	padding: 0;
+}
+button {
+	border: 1px solid #333;
+	display: block;
+	height: 1.5rem;
+	line-height: 1.25;
+	margin: 0;
+	padding: 0.25rem;
+}
+input {
+	border: 1px solid #333;
+	display: block;
+	font-size: 1.1rem;
+	height: 1.5rem;
+	line-height: 1.25;
+	margin: 0;
+	padding: 0.25rem;
+}
+
+/**
+ * Search Filter
+ */
+.search-filter {
+	align-items: center;
+	display:flex;
+	flex-direction: row;
+	/* justify-content: center; */
+}
