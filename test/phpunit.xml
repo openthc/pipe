@@ -14,14 +14,14 @@
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
 	processIsolation="false"
-	stopOnError="false"
-	stopOnFailure="false"
-	stopOnRisky="false"
+	stopOnError="true"
+	stopOnFailure="true"
+	stopOnRisky="true"
 	timeoutForSmallTests="1"
 	timeoutForMediumTests="10"
 	timeoutForLargeTests="60"
 	verbose="false"
->
+	>
 
 	<coverage />
 

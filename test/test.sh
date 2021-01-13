@@ -3,7 +3,7 @@
 # OpenTHC Test Runner
 #
 
-#set -o errexit
+set -o errexit
 set -o nounset
 # set -o pipefail
 
@@ -14,13 +14,14 @@ dt=$(date)
 cd "$d"
 
 output_path="../webroot/test-output"
+output_main="$output_path/index.html"
+
 if [ ! -d "$output_path" ]
 then
 	mkdir "$output_path"
 fi
 
-output_main="$output_path/index.html"
-
+# Hint
 echo '<h1>Tests Started</h1>' > "$output_main"
 
 
