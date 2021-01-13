@@ -57,11 +57,7 @@ class Log extends \OpenTHC\Controller\Base
 			$arg[':l0'] = $_GET['l'];
 		}
 
-		if (!empty($_GET['q'])) {
-			$sql_filter[] = '(req_head LIKE :q0 OR req_body LIKE :q0 OR res_head LIKE :q1 OR res_body LIKE :q1)';
-			$arg[':q0'] = sprintf('%%%s%%', $_GET['q']);
-			$arg[':q1'] = sprintf('%%%s%%', $_GET['q']);
-		}
+		// Date Lo
 		if (!empty($_GET['dt0'])) {
 
 			$dt = new \DateTime($_GET['dt0']);
@@ -74,6 +70,8 @@ class Log extends \OpenTHC\Controller\Base
 			$arg[':pk0'] = $u1;
 
 		}
+
+		// Date Hi
 		if (!empty($_GET['dt1'])) {
 
 			$dt = new \DateTime($_GET['dt1']);
@@ -87,8 +85,14 @@ class Log extends \OpenTHC\Controller\Base
 
 		}
 
-		$sql_filter[] = "res_head NOT LIKE '%HTTP/1.1 504 Gateway Time-out%'";
+		// Search
+		if (!empty($_GET['q'])) {
+			$sql_filter[] = '(req_head LIKE :q0 OR req_body LIKE :q0 OR res_head LIKE :q1 OR res_body LIKE :q1)';
+			$arg[':q0'] = sprintf('%%%s%%', $_GET['q']);
+			$arg[':q1'] = sprintf('%%%s%%', $_GET['q']);
+		}
 
+		// Build Filter
 		if (count($sql_filter)) {
 			$sql_filter = implode(' AND ' , $sql_filter);
 			$sql = str_replace('{WHERE}', sprintf('WHERE %s', $sql_filter), $sql);
