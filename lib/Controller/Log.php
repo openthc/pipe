@@ -61,7 +61,7 @@ class Log extends \OpenTHC\Controller\Base
 		if (empty($_SESSION['acl-log-view'])) {
 
 			ob_start();
-			require_once(APP_ROOT . '/view/log-auth.php');
+			require_once(APP_ROOT . '/view/auth.php');
 			$output_html = ob_get_clean();
 
 			_exit_html($output_html);
