@@ -7,6 +7,8 @@ namespace App\Controller;
 
 class Log extends \OpenTHC\Controller\Base
 {
+	private $query_limit = 25;
+
 	private $sql_debug;
 
 	/**
@@ -14,6 +16,8 @@ class Log extends \OpenTHC\Controller\Base
 	 */
 	function __invoke($REQ, $RES, $ARG)
 	{
+		$this->_auth_check();
+
 		$res = [];
 
 		if (0 == count($_GET)) {
@@ -41,6 +45,32 @@ class Log extends \OpenTHC\Controller\Base
 	}
 
 	/**
+	 * Check Authentication
+	 */
+	function _auth_check()
+	{
+		if ('POST' == $_SERVER['REQUEST_METHOD']) {
+			$psk = \OpenTHC\Config::get('psk');
+			if (!empty($psk) && !empty($_POST['a'])) {
+				if ($_POST['a'] == $psk) {
+					$_SESSION['acl-log-view'] = true;
+				}
+			}
+		}
+
+		if (empty($_SESSION['acl-log-view'])) {
+
+			ob_start();
+			require_once(APP_ROOT . '/view/log-auth.php');
+			$output_html = ob_get_clean();
+
+			_exit_html($output_html);
+
+		}
+
+	}
+
+	/**
 	 * Run the Actual Query
 	 */
 	function _sql_query()
@@ -50,6 +80,15 @@ class Log extends \OpenTHC\Controller\Base
 		$arg = [];
 		$sql = 'SELECT * FROM log_audit {WHERE} ';
 		$sql_filter = [];
+
+		// Specific ID?
+		if (!empty($_GET['id'])) {
+			$sql = str_replace('{WHERE}', 'WHERE id = :pk', $sql);
+			$arg = [ ':pk' => $_GET['id'] ];
+			$this->sql_debug = $dbc->_sql_debug($sql, $arg);
+			$res = $dbc->fetchAll($sql, $arg);
+			return $res;
+		}
 
 		// License Filter
 		if (!empty($_GET['l'])) {
@@ -101,7 +140,7 @@ class Log extends \OpenTHC\Controller\Base
 		}
 
 		$sql.= ' ORDER BY req_time DESC';
-		$sql.= ' LIMIT 100';
+		$sql.= sprintf(' LIMIT %d', $this->query_limit);
 		$sql.= sprintf(' OFFSET %d', $_GET['o']);
 
 		$this->sql_debug = $dbc->_sql_debug($sql, $arg);

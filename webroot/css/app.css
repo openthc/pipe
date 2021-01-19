@@ -74,11 +74,13 @@ form {
 }
 button {
 	border: 1px solid #333;
+	cursor: pointer;
 	display: block;
+	font-weight: bold;
 	height: 1.5rem;
 	line-height: 1.25;
 	margin: 0;
-	padding: 0.25rem;
+	padding: 0.25rem 1rem;
 }
 input {
 	border: 1px solid #333;
@@ -98,4 +100,11 @@ input {
 	display:flex;
 	flex-direction: row;
 	/* justify-content: center; */
+}
+
+.sql-debug {
+	background: #101010;
+	color: #00cc00;
+	margin: 0;
+	padding: 0.50rem;
 }

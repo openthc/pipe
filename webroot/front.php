@@ -74,7 +74,7 @@ $app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', 'App\Controller\Le
 $app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{path:.*}', 'App\Controller\METRC');
 
 // Log Access
-$app->get('/log', 'App\Controller\Log');
+$app->map([ 'GET', 'POST' ], '/log', 'App\Controller\Log')->add('OpenTHC\Middleware\Session');
 
 // Engine Details
 $app->get('/engines', function() {

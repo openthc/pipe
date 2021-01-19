@@ -3,7 +3,14 @@
  *
  */
 
-$tz = new \DateTimezone('America/Los_Angeles');
+$tz = \OpenTHC\Config::get('tz');
+$tz = new \DateTimezone($tz);
+
+$l = $this->query_limit;
+$offset = intval($_GET['o']);
+
+$link_back = http_build_query(array_merge($_GET, [ 'o' => max(0, $offset - $l) ] ));
+$link_next = http_build_query(array_merge($_GET, [ 'o' => $offset + $l ] ));
 
 ?>
 <html>
@@ -19,10 +26,10 @@ $tz = new \DateTimezone('America/Los_Angeles');
 <form autocomplete="off">
 <div class="search-filter">
 	<div>
-		<input autocomplete="off" autofocus name="q" placeholder="search" value="<?= h($_GET['q']) ?>">
+		<input autocomplete="off" name="l" placeholder="license hash" value="<?= h($_GET['l']) ?>">
 	</div>
 	<div>
-		<input autocomplete="off" name="l" placeholder="license hash" value="<?= h($_GET['l']) ?>">
+		<input autocomplete="off" autofocus name="q" placeholder="search" value="<?= h($_GET['q']) ?>">
 	</div>
 	<div>
 		<input name="dt0" placeholder="after" type="date" value="<?= h($_GET['dt0']) ?>">
@@ -36,10 +43,13 @@ $tz = new \DateTimezone('America/Los_Angeles');
 	<div>
 		<button formtarget="_blank" name="a" type="submit" value="snap">Snap</button>
 	</div>
+	<div style="padding: 0 0.50rem;">
+		<a href="?<?= $link_back ?>">Back</a> | <a href="?<?= $link_next ?>">Next</a>
+	</div>
 </div>
 </form>
 
-<div class="sql-debug"><?= h($this->sql_debug) ?></div>
+<div class="sql-debug"><?= h(trim($this->sql_debug)) ?></div>
 
 <table>
 <thead>
@@ -53,13 +63,19 @@ $tz = new \DateTimezone('America/Los_Angeles');
 </thead>
 <tbody>
 <?php
-$idx = 0;
+$idx = $offset;
 foreach ($res as $rec) {
 
 	$idx++;
 
 	$dt0 = new \DateTime($rec['req_time']);
 	$dt0->setTimezone($tz);
+
+	$dt1 = new \DateTime($rec['res_time']);
+	$dt1->setTimezone($tz);
+
+	$diX = $dt1->diff($dt0);
+	$res_wait = ($diX->i * 60) + $diX->s + $diX->f;
 
 	$len = strlen($rec['res_body']);
 
@@ -79,17 +95,17 @@ foreach ($res as $rec) {
 	$req = strtok($rec['req_head'], "\n");
 	$res = strtok($rec['res_head'], "\n");
 
-	echo sprintf('<tr class="tr1" id="row-%d-1">', $idx);
-	echo sprintf('<td class="c">%d</td>', $idx);
+	printf('<tr class="tr1" id="row-%d-1">', $idx);
+	printf('<td class="c"><a href="/log?id=%s">%d</a></td>', $rec['id'], $idx);
 	// echo '<td>' . _date('m/d H:i:s', $rec['req_time']) . '</td>';
 	// echo '<td>' . h($rec['req_time']) . '</td>';
-	echo sprintf('<td title="%s">%s</td>', h($rec['req_time']), $dt0->format('m/d H:i:s'));
+	printf('<td title="%s">%s [%0.1f s]</td>', h($rec['req_time']), $dt0->format('m/d H:i:s'), $res_wait);
 	echo '<td>' . h($req) . '</td>';
 	echo '<td>' . h($res) . '</td>';
 	echo '<td class="r">' . strlen($rec['res_body']) . ' bytes</td>';
 	echo '</tr>';
 
-	echo sprintf('<tr class="tr2" id="row-%d-2">', $idx);
+	printf('<tr class="tr2" id="row-%d-2">', $idx);
 	echo '<td></td>';
 	echo '<td colspan="4">';
 	echo '<div style="align-item: flex-start; display: flex; flex-direction: row; justify-content: space-around;">';
@@ -109,31 +125,6 @@ foreach ($res as $rec) {
 	echo '</div>';
 	echo '</td>';
 	echo '</tr>';
-
-	// Request Row
-	// echo sprintf('<tr class="tr2" id="row-%d-2">', $idx);
-	// echo '<td colspan="4">';
-	// echo '<pre>';
-	// echo h(_view_data_scrub($rec['req_head']));
-	// echo "\n";
-	// // echo '\r\n';
-	// echo "\n";
-	// echo h(_view_data_scrub($rec['req_body']));
-	// echo '</pre>';
-	// echo '</td>';
-	// echo '</tr>';
-
-	// echo sprintf('<tr class="tr3" id="row-%d-3">', $idx);
-	// echo '<td colspan="4">';
-	// echo '<pre>';
-	// echo h(_view_data_scrub($rec['res_head']));
-	// echo "\n";
-	// // echo '\r\n';
-	// echo "\n";
-	// echo h(_view_data_scrub($rec['res_body']));
-	// echo '</pre>';
-	// echo '</td>';
-	// echo '</tr>';
 
 }
 ?>
