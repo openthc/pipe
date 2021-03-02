@@ -1,9 +1,11 @@
-
-composer.lock
-
-etc/app.ini
-etc/cre.ini
+#
+# OpenTHC PIPE .gitignore
+#
 
 Custom/
+etc/
 var/
 vendor/
+
+composer.lock
+.env*
