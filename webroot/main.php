@@ -57,14 +57,9 @@ $cfg = [];
 $app = new \OpenTHC\App($cfg);
 
 $con = $app->getContainer();
-if (!empty($cfg['debug'])) {
-	// Clears Slim Handlers
-	unset($con['errorHandler']);
-	unset($con['phpErrorHandler']);
-	// Remove the Early ones from the stack too?
-	// restore_error_handler();
-	// restore_exception_handler();
-}
+// Clears Slim Handlers
+unset($con['errorHandler']);
+unset($con['phpErrorHandler']);
 
 // Engine Specific Controllers
 $app->map([ 'GET', 'POST' ], '/biotrack/{path:.*}', 'App\Controller\BioTrack')->add('OpenTHC\Middleware\Session');
