@@ -13,6 +13,8 @@ openlog('openthc-pipe', LOG_ODELAY|LOG_PID, LOG_LOCAL0);
 
 require_once(APP_ROOT . '/vendor/autoload.php');
 
+\OpenTHC\Config::init(APP_ROOT);
+
 /**
  * Database Connection
  */
@@ -22,12 +24,9 @@ function _dbc()
 
 	if (empty($ret)) {
 
-		$url = getenv('POSTGRES_URL');
-		$url = parse_url($url);
-		$url['path'] = trim($url['path'], '/');
-
-		$dsn = sprintf('pgsql:host=%s;dbname=%s', $url['host'], $url['path']);
-		$ret = new SQL($dsn, $url['user'], $url['pass']);
+		$cfg = \OpenTHC\Config::get('database');
+		$dsn = sprintf('pgsql:host=%s;dbname=%s', $cfg['hostname'], $cfg['database']);
+		$ret = new SQL($dsn, $cfg['username'], $cfg['password']);
 
 	}
 

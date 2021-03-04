@@ -1,17 +1,7 @@
 <?php
 /**
-	Stem pass-thru handler for LeafData systems
-	Accept the Request, Sanatize It, Process Response and Sanatize Objects
-
-	To use the Passthru Configure this as the URL Base
-
-	https://pipe.openthc.com/stem/leafdata
-
-	Forward to:
-		https://traceability.lcb.wa.gov/api/v1
-
-	Return Sanatized Response
-*/
+ * LeafData passthru
+ */
 
 namespace App\Controller;
 
@@ -99,8 +89,9 @@ class LeafData extends \App\Controller\Base
 			$req_body = json_encode($src_json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 			$dbc->update('log_audit', [ 'req_body' => $req_body ], [ 'id' => $this->req_ulid ]);
 
-			curl_setopt($req, CURLOPT_POST, true);
+			curl_setopt($req, CURLOPT_CUSTOMREQUEST, $_SERVER['REQUEST_METHOD']);
 			curl_setopt($req, CURLOPT_POSTFIELDS, $req_body);
+
 			$req_head[] = 'content-type: application/json';
 			curl_setopt($req, CURLOPT_HTTPHEADER, $req_head);
 
@@ -109,12 +100,11 @@ class LeafData extends \App\Controller\Base
 		}
 
 		$this->curl_exec($req);
-		$dbc->query('UPDATE log_audit SET res_time = now() WHERE id = :l', [ ':l' => $this->req_ulid ]);
 
 		// Update Response
 		$dbc->update('log_audit', [
 			'req_head' => $this->req_head,
-			// 'res_time' => 'now()',
+			'res_time' => date_format(new \DateTime(), \DateTime::RFC3339_EXTENDED),
 			'res_info' => json_encode($this->res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
 			'res_head' => $this->res_head,
 			'res_body' => $this->res_body,
