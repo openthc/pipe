@@ -55,10 +55,10 @@ These systems use a License ID and a Contact Key
 		--data 'license-key=SOMESEQUENCE'
 
 
-### METRC
+### Metrc
 
 These system require a program key and contact key.
-The program key is given to the software provider by METRC and is configured in cre.ini.
+The program key is given to the software provider by Metrc and is configured in cre.ini.
 The contact key is from the licensee, its permissions will be determined by the user which acquires it.
 For best results, use a key from an administrator / super-user type role.
 
@@ -75,7 +75,7 @@ For best results, use a key from an administrator / super-user type role.
 
  * BioTrackTHC ("BT") - Delaware*, Hawaii, Maine, New Mexico, North Dakota, Illinois, Puerto Rico
  * Akerna/MJ Freeway/LeafData ("LD") - Washington, Utah*
- * METRC ("FM") - Alaska, California, Colorado, Massachusetts, Nevada, Oregon
+ * Metrc ("FM") - Alaska, California, Colorado, Massachusetts, Nevada, Oregon
 
 
 ## Supported Objects
@@ -116,3 +116,7 @@ For best results, use a key from an administrator / super-user type role.
 ## Behat
 
 	./vendor/bin/behat --snippets-for
+
+### See Also
+
+* https://news.ycombinator.com/item?id=22482031

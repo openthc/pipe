@@ -66,7 +66,7 @@ $app->map([ 'GET', 'POST' ], '/biotrack/{path:.*}', 'App\Controller\BioTrack')->
 
 $app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', 'App\Controller\LeafData');
 
-$app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{path:.*}', 'App\Controller\METRC');
+$app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{path:.*}', 'App\Controller\Metrc');
 
 // Log Access
 $app->map([ 'GET', 'POST' ], '/log', 'App\Controller\Log')->add('OpenTHC\Middleware\Session');
@@ -85,13 +85,6 @@ $app->get('/engines', function() {
 	$out_text = implode("\n", $out_text);
 	_exit_text($out_text);
 });
-
-
-/**
- * @deprecated
- * Legacy Path for STEM
- */
-$app->group('/stem', 'App\Module\Stem'); // @deprecated
 
 
 // Custom Middleware?

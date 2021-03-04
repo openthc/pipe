@@ -5,7 +5,7 @@
 
 namespace App\Controller;
 
-class METRC extends \App\Controller\Base
+class Metrc extends \App\Controller\Base
 {
 	function __invoke($REQ, $RES, $ARG)
 	{
@@ -177,7 +177,7 @@ class METRC extends \App\Controller\Base
 		case 'sandbox-api-ok.metrc.com':
 			// SubSwitch
 			// so external users can use a canonical name and we'll adjust back here
-			// based on the switching the METRC might do with their sandox endpoints
+			// based on the switching the Metrc might do with their sandox endpoints
 			switch ($this->cre) {
 				case 'sandbox-api-me.metrc.com':
 					$this->cre = 'sandbox-api-md.metrc.com'; // re-maps to Maryland
