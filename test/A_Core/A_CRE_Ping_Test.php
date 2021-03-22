@@ -9,9 +9,9 @@
  *
  */
 
-namespace Test\Core;
+namespace Test\A_Core;
 
-class A_CRE_Ping_Test extends \Test\OpenTHC_Test_Case_Base
+class A_CRE_Ping_Test extends \Test\Base_Case
 {
 	public function test_ping_engine()
 	{
@@ -23,7 +23,7 @@ class A_CRE_Ping_Test extends \Test\OpenTHC_Test_Case_Base
 
 		foreach ($engine_list as $engine) {
 
-			$url = sprintf('https://%s/%s/ping', $_ENV['test-host'], $engine);
+			$url = sprintf('https://%s/%s/ping', getenv('OPENTHC_TEST_HOST'), $engine);
 			$req = _curl_init($url);
 			$res = curl_exec($req);
 			$inf = curl_getinfo($req);
@@ -69,7 +69,7 @@ class A_CRE_Ping_Test extends \Test\OpenTHC_Test_Case_Base
 
 		foreach ($cre_list as $cre) {
 
-			$url = sprintf('https://%s/%s/ping', $_ENV['test-host'], $cre);
+			$url = sprintf('https://%s/%s/ping', getenv('OPENTHC_TEST_HOST'), $cre);
 			$req = _curl_init($url);
 			$res = curl_exec($req);
 			// var_dump($res);

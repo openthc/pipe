@@ -26,11 +26,7 @@
 	<coverage />
 
 	<php>
-
-		<env name="debug-http" value="false"/>
-
-		<env name="test-host" value="pipe.openthc.dev"/>
-
+		<env name="debug-http" value="false" />
 	</php>
 
 	<testsuites>
@@ -38,9 +34,5 @@
 			<directory>.</directory>
 		</testsuite>
 	</testsuites>
-
-	<logging>
-		<junit outputFile="../webroot/test-output/output.xml" />
-	</logging>
 
 </phpunit>
