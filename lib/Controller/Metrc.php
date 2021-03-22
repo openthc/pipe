@@ -40,17 +40,17 @@ class Metrc extends \App\Controller\Base
 
 		// A cheap-ass, incomplete filter
 		switch ($req_path) {
-		case 'facilities/v1':
-		case 'harvests/v1/waste/types':
-		case 'items/v1/categories':
-		case 'labtests/v1/states':
-		case 'labtests/v1/types':
-		case 'packages/v1/types':
-		case 'plantbatches/v1/types':
-		case 'plants/v1/additives/types':
-		case 'plants/v1/waste/methods':
-		case 'sales/v1/customertypes':
-		case 'unitsofmeasure/v1/active':
+		case '/facilities/v1':
+		case '/harvests/v1/waste/types':
+		case '/items/v1/categories':
+		case '/labtests/v1/states':
+		case '/labtests/v1/types':
+		case '/packages/v1/types':
+		case '/plantbatches/v1/types':
+		case '/plants/v1/additives/types':
+		case '/plants/v1/waste/methods':
+		case '/sales/v1/customertypes':
+		case '/unitsofmeasure/v1/active':
 			// These don't require a licenseNumber
 			break;
 		default:
@@ -74,6 +74,7 @@ class Metrc extends \App\Controller\Base
 		$dbc->insert('log_audit', [
 			'id' => $this->req_ulid,
 			'lic_hash' => md5($_SERVER['HTTP_AUTHORIZATION']),
+			'req_time' => date_format(new \DateTime(), \DateTime::RFC3339_EXTENDED),
 			'req_head' => sprintf('%s %s HTTP/1.1', $_SERVER['REQUEST_METHOD'], $req_path),
 		]);
 
@@ -125,7 +126,7 @@ class Metrc extends \App\Controller\Base
 
 		// Try to be Smart with Response Code?
 		$RES = $RES->withStatus($this->res_info['http_code'] ?: 500);
-		$RES = $RES->withHeader('content-type', 'application/json; charset=utf-8');
+		$RES = $RES->withHeader('content-type', 'application/json');
 		$RES = $RES->write($this->res_body);
 
 		return $RES;
@@ -170,19 +171,10 @@ class Metrc extends \App\Controller\Base
 		case 'api-or.metrc.com':
 			$this->cre_base = sprintf('https://%s', $this->cre);
 		break;
-		case 'sandbox-api-or.metrc.com':
 		case 'sandbox-api-co.metrc.com':
 		case 'sandbox-api-md.metrc.com':
-		case 'sandbox-api-me.metrc.com':
 		case 'sandbox-api-ok.metrc.com':
-			// SubSwitch
-			// so external users can use a canonical name and we'll adjust back here
-			// based on the switching the Metrc might do with their sandox endpoints
-			switch ($this->cre) {
-				case 'sandbox-api-me.metrc.com':
-					$this->cre = 'sandbox-api-md.metrc.com'; // re-maps to Maryland
-				break;
-			}
+		case 'sandbox-api-or.metrc.com':
 			$this->cre_base = sprintf('https://%s', $this->cre);
 			break;
 		default:

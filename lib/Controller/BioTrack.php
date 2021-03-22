@@ -1,9 +1,9 @@
 <?php
 /**
- * Stem pass-thru handler for BioTrack systems
+ * BioTrack pass-thru
  * Accept the Request, Sanatize It, Process Response and Sanatize Objects
  * To use the Passthru Configure this as the URL Base
- * $BASE/stem/biotrack
+ * $BASE/biotrack/<SYSTEM>
  * Forward to:
  * https://wa.biotrack.com/serverjson.asp
  * Return Sanatized Response
