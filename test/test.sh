@@ -22,19 +22,19 @@ echo '<h1>Linting...</h1>' > "$output_main"
 find ../bin/ ../lib/ ../sbin/ ../view/ -type f -name '*.php' -exec php -l {} \; \
 	| grep -v 'No syntax' || true \
 	2>&1 >"$output_base/phplint.txt"
-[ -s "$output_base/phplint.txt" ] || echo "Appears Clean" >"$output_base/phplint.txt"
+[ -s "$output_base/phplint.txt" ] || echo "Linting OK" >"$output_base/phplint.txt"
 
 
 #
 # PHPStan
 echo '<h1>PHPStan...</h1>' > "$output_main"
 ../vendor/bin/phpstan analyze --error-format=junit --no-progress > "$output_base/phpstan.xml" || true
-# [ -f "report.xsl" ] || wget -q 'https://openthc.com/pub/phpunit/report.xsl'
-# xsltproc \
-# 	--nomkdir \
-# 	--output "$output_base/phpstan.html" \
-# 	report.xsl \
-# 	"$output_base/phpstan.xml"
+[ -f "phpstan.xsl" ] || wget -q 'https://openthc.com/pub/phpstan.xsl'
+xsltproc \
+	--nomkdir \
+	--output "$output_base/phpstan.html" \
+	phpstan.xsl \
+	"$output_base/phpstan.xml"
 
 
 #
@@ -82,7 +82,7 @@ cat <<HTML > "$output_main"
 <h2>${note}</h2>
 
 <p>Linting: <a href="phplint.txt">phplint.txt</a></p>
-<p>PHPStan: <a href="phpstan.xml">phpstan.xml</a></p>
+<p>PHPStan: <a href="phpstan.xml">phpstan.xml</a> and <a href="phpstan.html">phpstan.html</a></p>
 <p>PHPUnit: <a href="phpunit.txt">phpunit.txt</a>, <a href="phpunit.xml">phpunit.xml</a> and <a href="phpunit.html">phpunit.html</a></p>
 <p>Textdox: <a href="testdox.txt">testdox.txt</a>, <a href="testdox.xml">testdox.xml</a> and <a href="testdox.html">testdox.html</a></p>
 
