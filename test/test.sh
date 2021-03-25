@@ -15,11 +15,19 @@ output_base="../webroot/test-output"
 output_main="$output_base/index.html"
 mkdir -p "$output_base"
 
+search_list="
+../boot.php
+../bin/
+../lib/
+../sbin/
+../view/
+"
+
 
 #
 # Lint
 echo '<h1>Linting...</h1>' > "$output_main"
-find ../bin/ ../lib/ ../sbin/ ../view/ -type f -name '*.php' -exec php -l {} \; \
+find $search_list -type f -name '*.php' -exec php -l {} \; \
 	| grep -v 'No syntax' || true \
 	2>&1 >"$output_base/phplint.txt"
 [ -s "$output_base/phplint.txt" ] || echo "Linting OK" >"$output_base/phplint.txt"
@@ -70,13 +78,16 @@ cat <<HTML > "$output_main"
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="initial-scale=1, user-scalable=yes">
-<meta name="theme-color" content="#247420">
-<link rel="stylesheet" href="https://cdn.openthc.com/bootstrap/4.4.1/bootstrap.css" integrity="sha256-L/W5Wfqfa0sdBNIKN9cG6QA5F2qx4qICmU2VgLruv9Y=" crossorigin="anonymous">
+<meta name="theme-color" content="#069420">
+<style>
+html {
+	height: 100%;
+	font-family: sans-serif;
+}
+</style>
 <title>Test Result ${dt}</title>
 </head>
 <body>
-<div class="container mt-4">
-<div class="jumbotron">
 
 <h1>Test Result ${dt}</h1>
 <h2>${note}</h2>
@@ -86,8 +97,6 @@ cat <<HTML > "$output_main"
 <p>PHPUnit: <a href="phpunit.txt">phpunit.txt</a>, <a href="phpunit.xml">phpunit.xml</a> and <a href="phpunit.html">phpunit.html</a></p>
 <p>Textdox: <a href="testdox.txt">testdox.txt</a>, <a href="testdox.xml">testdox.xml</a> and <a href="testdox.html">testdox.html</a></p>
 
-</div>
-</div>
 </body>
 </html>
 HTML
