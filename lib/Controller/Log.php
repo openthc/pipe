@@ -1,6 +1,6 @@
 <?php
 /**
- * View the Logs from the STEM service
+ * Log Viewer
  */
 
 namespace App\Controller;
@@ -8,6 +8,7 @@ namespace App\Controller;
 class Log extends \OpenTHC\Controller\Base
 {
 	private $query_limit = 25;
+	private $query_offset = 0;
 
 	private $sql_debug;
 
@@ -16,19 +17,30 @@ class Log extends \OpenTHC\Controller\Base
 	 */
 	function __invoke($REQ, $RES, $ARG)
 	{
-		$this->_auth_check();
+		$RES = $this->_auth_check($RES);
+		if (200 != $RES->getStatusCode()) {
+			return $RES;
+		}
 
-		$res = [];
+		$this->query_offset = max(0, intval($_GET['o']));
+
+		$data = [
+			'Page' => [ 'title' => 'Log Search :: OpenTHC BONG' ],
+			'tz' => \OpenTHC\Config::get('tz'),
+			'link_newer' => http_build_query(array_merge($_GET, [ 'o' => max(0, $this->query_offset - $this->query_limit) ] )),
+			'link_older' => http_build_query(array_merge($_GET, [ 'o' => $this->query_offset + $this->query_limit ] )),
+			'log_audit' => [], //$res,
+			'sql_debug' => null,
+		];
 
 		if (0 == count($_GET)) {
 			// No Query
 		} else {
-			$res = $this->_sql_query();
+			$data['log_audit'] = $this->_sql_query();
+			$data['sql_debug'] = $this->sql_debug;
 		}
 
-		ob_start();
-		require_once(APP_ROOT . '/view/log.php');
-		$output_html = ob_get_clean();
+		$output_html = $this->render('log.php', $data);
 
 		if ('snap' == $_GET['a']) {
 			$output_snap = _ulid();
@@ -40,14 +52,14 @@ class Log extends \OpenTHC\Controller\Base
 			return $RES->withRedirect($output_link);
 		}
 
-		_exit_html($output_html);
+		return $RES->write($output_html);
 
 	}
 
 	/**
 	 * Check Authentication
 	 */
-	function _auth_check()
+	function _auth_check($RES)
 	{
 		if ('POST' == $_SERVER['REQUEST_METHOD']) {
 			$psk = \OpenTHC\Config::get('psk');
@@ -60,13 +72,14 @@ class Log extends \OpenTHC\Controller\Base
 
 		if (empty($_SESSION['acl-log-view'])) {
 
-			ob_start();
-			require_once(APP_ROOT . '/view/auth.php');
-			$output_html = ob_get_clean();
+			$output_html = $this->render('auth.php', []);
 
-			_exit_html($output_html);
+			$RES = $RES->withStatus(403);
+			$RES = $RES->write($output_html);
 
 		}
+
+		return $RES;
 
 	}
 

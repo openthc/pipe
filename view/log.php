@@ -1,55 +1,51 @@
 <?php
 /**
- *
+ * View the Audit Log
  */
 
-$tz = \OpenTHC\Config::get('tz');
-$tz = new \DateTimezone($tz);
-
-$l = $this->query_limit;
-$offset = intval($_GET['o']);
-
-$link_back = http_build_query(array_merge($_GET, [ 'o' => max(0, $offset - $l) ] ));
-$link_next = http_build_query(array_merge($_GET, [ 'o' => $offset + $l ] ));
+$tz = new \DateTimezone($data['tz']);
 
 ?>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="initial-scale=1, user-scalable=yes">
-<meta name="application-name" content="OpenTHC PIPE">
-<link rel="stylesheet" href="/css/app.css" crossorigin="anonymous">
-<title>Log Search :: OpenTHC PIPE</title>
-</head>
-<body>
+
+<h1><?= $data['Page']['title'] ?></h1>
 
 <form autocomplete="off">
 <div class="search-filter">
 	<div>
-		<input autocomplete="off" name="l" placeholder="license hash" value="<?= h($_GET['l']) ?>">
+		<input autocomplete="off" class="form-control form-control-sm" name="l" placeholder="license hash" value="<?= h($_GET['l']) ?>">
 	</div>
 	<div>
-		<input autocomplete="off" autofocus name="q" placeholder="search" value="<?= h($_GET['q']) ?>">
+		<input autocomplete="off" autofocus class="form-control form-control-sm" name="q" placeholder="search" value="<?= h($_GET['q']) ?>">
 	</div>
 	<div>
-		<input name="dt0" placeholder="after" type="date" value="<?= h($_GET['dt0']) ?>">
+		<input class="form-control form-control-sm" name="d0" type="date" value="<?= h($_GET['d0']) ?>">
 	</div>
 	<div>
-		<input name="dt1" placeholder="before" type="date" value="<?= h($_GET['dt1']) ?>">
+		<input class="form-control form-control-sm" name="t0" type="time" value="<?= h($_GET['t0']) ?>">
 	</div>
 	<div>
-		<button type="submit">Go</button>
+		<input class="form-control form-control-sm" name="d1" type="date" value="<?= h($_GET['d1']) ?>">
 	</div>
 	<div>
-		<button formtarget="_blank" name="a" type="submit" value="snap">Snap</button>
+		<input class="form-control form-control-sm" name="t1" type="time" value="<?= h($_GET['t1']) ?>">
 	</div>
-	<div style="padding: 0 0.50rem;">
-		<a href="?<?= $link_back ?>">Back</a> | <a href="?<?= $link_next ?>">Next</a>
+	<div>
+		<div class="btn-group btn-group-sm">
+			<button class="btn btn-outline-secondary" type="submit">Go <i class="fas fa-search"></i></button>
+			<button class="btn btn-outline-secondary" formtarget="_blank" name="a" type="submit" value="snap">Snap <i class="fas fa-file-export"></i></button>
+		</div>
 	</div>
+	<div>
+		<div class="btn-group btn-group-sm">
+			<a class="btn btn-outline-secondary" href="?<?= $data['link_newer'] ?>"><i class="fas fa-arrow-left"></i> Newer</a>
+			<a class="btn btn-outline-secondary" href="?<?= $data['link_older'] ?>">Older <i class="fas fa-arrow-right"></i></a>
+		</div>
+	</div>
+
 </div>
 </form>
 
-<div class="sql-debug"><?= h(trim($this->sql_debug)) ?></div>
+<div class="sql-debug"><?= h(trim($data['sql_debug'])) ?></div>
 
 <table>
 <thead>
@@ -64,7 +60,7 @@ $link_next = http_build_query(array_merge($_GET, [ 'o' => $offset + $l ] ));
 <tbody>
 <?php
 $idx = $offset;
-foreach ($res as $rec) {
+foreach ($data['log_audit'] as $rec) {
 
 	$idx++;
 
@@ -141,10 +137,8 @@ function rowOpen(row)
 	var id3 = id1.replace(/-1$/, '-3');
 
 	var tr2 = $('#' + id2);
-	// var tr3 = $('#' + id3);
 
 	tr2.show();
-	// tr3.show();
 
 	row.setAttribute('data-mode', 'open');
 
@@ -158,10 +152,8 @@ function rowShut(row)
 	var id3 = id1.replace(/-1$/, '-3');
 
 	var tr2 = $('#' + id2);
-	// var tr3 = $('#' + id3);
 
 	tr2.hide();
-	// tr3.hide();
 
 	row.setAttribute('data-mode', 'shut');
 }
@@ -197,8 +189,7 @@ $(function() {
 
 });
 </script>
-</body>
-</html>
+
 
 <?php
 /**

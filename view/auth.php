@@ -1,21 +1,11 @@
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="initial-scale=1, user-scalable=yes">
-<meta name="application-name" content="OpenTHC PIPE">
-<link rel="stylesheet" href="/css/app.css" crossorigin="anonymous">
-<title>Log Search :: OpenTHC PIPE</title>
-</head>
-<body>
+
 <form autocomplete="off" method="post">
-<div class="search-filter">
-
-	<input autocomplete="off" autofocus name="a" placeholder="- auth psk -" type="text" value="">
-
-	<button type="submit">submit</button>
-
+<div class="auth-wrap">
+<div class="input-group">
+	<input autocomplete="off" autofocus class="form-control" name="a" placeholder="- auth psk -" type="password" value="">
+	<div class="input-group-append">
+		<button class="btn btn-outline-primary" type="submit">submit</button>
+	</div>
+</div>
 </div>
 </form>
-</body>
-</html>
-
