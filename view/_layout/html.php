@@ -28,18 +28,7 @@ if (empty($_ENV['title'])) {
 <title><?= h(strip_tags($_ENV['title'])) ?></title>
 </head>
 <body>
-<?= $this->block('menu-navbar') ?>
 <?php
-
-if (!empty($_ENV['h1'])) {
-	echo '<h1>';
-	echo $_ENV['h1'];
-	if (!empty($_ENV['h1-sub'])) {
-		echo sprintf(' <small>%s</small>', $_ENV['h1-sub']);
-	}
-	echo '</h1>';
-}
-
 
 $x = Session::flash();
 if (!empty($x)) {
@@ -57,13 +46,9 @@ if (!empty($x)) {
 
 echo $this->body;
 
-echo $this->block('footer');
-
 ?>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha512-uto9mlQzrs59VwILcLiRYeLKPPbS/bT71da/OEBYEwcdNUk8jYIy+D176RYoop1Da+f9mvkYrmj5MCLZWEtQuA==" crossorigin="anonymous"></script>
-<script src="https://cdn.openthc.com/bootstrap/4.6.0/bootstrap.js" integrity="sha256-sCElQ8xaSgoxwbWp0eiXMmGZIRa0z94+ffzzO06BqXs=" crossorigin="anonymous"></script>
+<script src="https://cdn.openthc.com/zepto/1.2.0/zepto.js" integrity="sha256-vrn14y7WH7zgEElyQqm2uCGSQrX/xjYDjniRUQx3NyU=" crossorigin="anonymous"></script>
 <?= $this->foot_script ?>
 </body>
 </html>
