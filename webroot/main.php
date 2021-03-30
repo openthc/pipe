@@ -62,14 +62,16 @@ unset($con['errorHandler']);
 unset($con['phpErrorHandler']);
 
 // Engine Specific Controllers
-$app->map([ 'GET', 'POST' ], '/biotrack/{path:.*}', 'App\Controller\BioTrack')->add('OpenTHC\Middleware\Session');
+$app->map([ 'GET', 'POST' ], '/biotrack/{path:.*}', 'App\Controller\BioTrack')
+	->add('OpenTHC\Middleware\Session');
 
 $app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', 'App\Controller\LeafData');
 
 $app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{path:.*}', 'App\Controller\Metrc');
 
 // Log Access
-$app->map([ 'GET', 'POST' ], '/log', 'App\Controller\Log')->add('OpenTHC\Middleware\Session');
+$app->map([ 'GET', 'POST' ], '/log', 'App\Controller\Log')
+	->add('OpenTHC\Middleware\Session');
 
 // Engine Details
 $app->get('/engines', function() {
