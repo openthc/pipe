@@ -5,12 +5,23 @@
 
 $tz = new \DateTimezone($data['tz']);
 
+$snap_data = $_GET;
+unset($snap_data['snap-get']);
+$snap_data = base64_encode(json_encode($snap_data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+
+$snap_mode = ('snap' == $data['snap'])
+
 ?>
 
 <h1><?= $data['Page']['title'] ?></h1>
-
+<?php
+if (empty($snap_mode)) {
+?>
 <form autocomplete="off">
 <div class="search-filter">
+	<div>
+		<button class="btn btn-sm btn-secondary" name="a" type="submit" value="x"><i class="fas fa-ban"></i></button>
+	</div>
 	<div>
 		<input autocomplete="off" class="form-control form-control-sm" name="l" placeholder="license hash" value="<?= h($_GET['l']) ?>">
 	</div>
@@ -31,14 +42,15 @@ $tz = new \DateTimezone($data['tz']);
 	</div>
 	<div>
 		<div class="btn-group btn-group-sm">
-			<button class="btn btn-outline-secondary" type="submit">Go <i class="fas fa-search"></i></button>
-			<button class="btn btn-outline-secondary" formtarget="_blank" name="a" type="submit" value="snap">Snap <i class="fas fa-file-export"></i></button>
+			<button class="btn btn-secondary" type="submit">Go <i class="fas fa-search"></i></button>
+			<button class="btn btn-secondary" formtarget="_blank" name="a" type="submit" value="snap">Snap <i class="fas fa-file-export"></i></button>
 		</div>
+		<input name="snap-get" type="hidden" value="<?= $snap_data ?>">
 	</div>
 	<div>
 		<div class="btn-group btn-group-sm">
-			<a class="btn btn-outline-secondary" href="?<?= $data['link_newer'] ?>"><i class="fas fa-arrow-left"></i> Newer</a>
-			<a class="btn btn-outline-secondary" href="?<?= $data['link_older'] ?>">Older <i class="fas fa-arrow-right"></i></a>
+			<a class="btn btn-secondary" href="?<?= $data['link_newer'] ?>"><i class="fas fa-arrow-left"></i> Newer</a>
+			<a class="btn btn-secondary" href="?<?= $data['link_older'] ?>">Older <i class="fas fa-arrow-right"></i></a>
 		</div>
 	</div>
 
@@ -46,6 +58,10 @@ $tz = new \DateTimezone($data['tz']);
 </form>
 
 <div class="sql-debug"><?= h(trim($data['sql_debug'])) ?></div>
+
+<?php
+}
+?>
 
 <table>
 <thead>
@@ -91,28 +107,28 @@ foreach ($data['log_audit'] as $rec) {
 	$req = strtok($rec['req_head'], "\n");
 	$res = strtok($rec['res_head'], "\n");
 
-	printf('<tr class="tr1" id="row-%d-1">', $idx);
+	printf('<tr class="tr1" data-target="#row-%d-2" id="row-%d">', $idx, $idx);
 	printf('<td class="c"><a href="/log?id=%s">%d</a></td>', $rec['id'], $idx);
 	// echo '<td>' . _date('m/d H:i:s', $rec['req_time']) . '</td>';
 	// echo '<td>' . h($rec['req_time']) . '</td>';
 	printf('<td title="%s">%s [%0.1f s]</td>', h($rec['req_time']), $dt0->format('m/d H:i:s'), $res_wait);
 	echo '<td>' . h($req) . '</td>';
 	echo '<td>' . h($res) . '</td>';
-	echo '<td class="r">' . strlen($rec['res_body']) . ' bytes</td>';
+	echo '<td>' . strlen($rec['res_body']) . '</td>';
 	echo '</tr>';
 
-	printf('<tr class="tr2" id="row-%d-2">', $idx);
-	echo '<td></td>';
+	printf('<tr class="tr2 %s" id="row-%d-2">', ($snap_mode ? 'snap' : 'hide'), $idx);
+	echo '<td style="background:#ff0;"></td>';
 	echo '<td colspan="4">';
 	echo '<div style="align-item: flex-start; display: flex; flex-direction: row; justify-content: space-around;">';
 
-		echo '<div style="flex: 1 1 auto; padding:0.25rem;">';
+		echo '<div style="flex: 1 1 50%; padding:0.25rem;">';
 			echo '<h3>Request</h3>';
 			echo '<pre class="head">' . h(_view_data_scrub($rec['req_head'])) . '</pre>';
 			echo '<pre class="body">' . h(_view_data_scrub($rec['req_body'])) . '</pre>';
 		echo '</div>';
 
-		echo '<div style="flex: 1 1 auto; padding:0.25rem;">';
+		echo '<div style="flex: 1 1 50%; padding:0.25rem;">';
 			echo '<h3>Response</h3>';
 			echo '<pre class="head">' . h(_view_data_scrub($rec['res_head'])) . '</pre>';
 			echo '<pre class="body">' . h(_view_data_scrub($rec['res_body'])) . '</pre>';
@@ -127,16 +143,14 @@ foreach ($data['log_audit'] as $rec) {
 </tbody>
 </table>
 
-<script src="https://cdn.openthc.com/zepto/1.2.0/zepto.js" integrity="sha256-vrn14y7WH7zgEElyQqm2uCGSQrX/xjYDjniRUQx3NyU=" crossorigin="anonymous"></script>
-
+<?php
+if (empty($snap_mode)) {
+?>
 <script>
 function rowOpen(row)
 {
-	var id1 = row.id;
-	var id2 = id1.replace(/-1$/, '-2');
-	var id3 = id1.replace(/-1$/, '-3');
-
-	var tr2 = $('#' + id2);
+	var id2 = row.getAttribute('data-target');
+	var tr2 = $(id2);
 
 	tr2.show();
 
@@ -147,11 +161,8 @@ function rowOpen(row)
 
 function rowShut(row)
 {
-	var id1 = row.id;
-	var id2 = id1.replace(/-1$/, '-2');
-	var id3 = id1.replace(/-1$/, '-3');
-
-	var tr2 = $('#' + id2);
+	var id2 = row.getAttribute('data-target');
+	var tr2 = $(id2);
 
 	tr2.hide();
 
@@ -160,11 +171,11 @@ function rowShut(row)
 
 $(function() {
 
-	$('.tr1').on('click', function() {
+	$('.tr1').on('click', function(e) {
 
-		var id1 = this.id;
-		var id2 = id1.replace(/-1$/, '-2');
-		var id3 = id1.replace(/-1$/, '-3');
+		if ('A' == e.target.nodeName) {
+			return true;
+		}
 
 		var mode = this.getAttribute('data-mode');
 		if ('open' == mode) {
@@ -176,6 +187,7 @@ $(function() {
 
 	});
 
+	// Open each row by id in the hash
 	var hash = window.location.hash;
 	hash = hash.replace(/#/, '');
 	var rec_list = hash.split(',');
@@ -189,9 +201,10 @@ $(function() {
 
 });
 </script>
-
-
 <?php
+}
+
+
 /**
  * Sanatize REQ or RES
  */

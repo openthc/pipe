@@ -7,6 +7,8 @@
 }
 body {
 	font-family: sans-serif;
+	margin: 0;
+	padding: 0.5vh 0.5vw;
 }
 h1, h2, h3 {
 	margin: 0;
@@ -55,7 +57,7 @@ tr.tr1 {
 tr.tr1:hover {
 	background: #ff0;
 }
-tr.tr2 {
+tr.tr2.hide {
 	display: none;
 }
 

@@ -22,28 +22,55 @@ class Log extends \OpenTHC\Controller\Base
 			return $RES;
 		}
 
+		if (count($_GET)) {
+
+			switch ($_GET['a']) {
+				case 'snap':
+
+					$old_get = json_decode(base64_decode($_GET['snap-get']), true);
+					unset($_GET['snap-get']);
+
+					$new_get = array_merge($_GET, $old_get);
+					var_dump($old_get);
+					var_dump($_GET);
+					var_dump($new_get);
+
+					$_GET = $new_get;
+
+					break;
+
+				case 'x':
+					// Clear Filters
+					return $RES->withRedirect('/log');
+			}
+
+		}
+
 		$this->query_offset = max(0, intval($_GET['o']));
 
 		$data = [
 			'Page' => [ 'title' => 'Log Search :: OpenTHC BONG' ],
 			'tz' => \OpenTHC\Config::get('tz'),
-			'link_newer' => http_build_query(array_merge($_GET, [ 'o' => max(0, $this->query_offset - $this->query_limit) ] )),
-			'link_older' => http_build_query(array_merge($_GET, [ 'o' => $this->query_offset + $this->query_limit ] )),
+			'link_newer' => null,
+			'link_older' => null,
 			'log_audit' => [], //$res,
 			'sql_debug' => null,
 		];
 
-		if (0 == count($_GET)) {
-			// No Query
-		} else {
-			$data['log_audit'] = $this->_sql_query();
-			$data['sql_debug'] = $this->sql_debug;
-		}
-
-		$output_html = $this->render('log.php', $data);
+		$data['log_audit'] = $this->_sql_query();
+		$data['sql_debug'] = $this->sql_debug;
 
 		if ('snap' == $_GET['a']) {
+
 			$output_snap = _ulid();
+
+			$data['Page']['title'] = sprintf('OpenTHC Log Snapshot %s', $output_snap);
+			$data['snap'] = 'snap';
+
+			unset($data['sql_debug']);
+
+			$output_html = $this->render('log.php', $data);
+
 			$output_file = sprintf('%s/webroot/snap/%s.html', APP_ROOT, $output_snap);
 			$output_link = sprintf('/snap/%s.html', $output_snap);
 			$output_html = preg_replace('/<form.+<\/form>/', '', $output_html);
@@ -51,6 +78,11 @@ class Log extends \OpenTHC\Controller\Base
 			file_put_contents($output_file, $output_html);
 			return $RES->withRedirect($output_link);
 		}
+
+		$data['link_newer'] = http_build_query(array_merge($_GET, [ 'o' => max(0, $this->query_offset - $this->query_limit) ] ));
+		$data['link_older'] = http_build_query(array_merge($_GET, [ 'o' => $this->query_offset + $this->query_limit ] ));
+
+		$output_html = $this->render('log.php', $data);
 
 		return $RES->write($output_html);
 
