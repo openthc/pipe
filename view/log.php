@@ -7,6 +7,7 @@ $tz = new \DateTimezone($data['tz']);
 
 $snap_data = $_GET;
 unset($snap_data['snap-get']);
+$snap_data = array_filter($snap_data);
 $snap_data = base64_encode(json_encode($snap_data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
 $snap_mode = ('snap' == $data['snap'])
@@ -108,7 +109,11 @@ foreach ($data['log_audit'] as $rec) {
 	$res = strtok($rec['res_head'], "\n");
 
 	printf('<tr class="tr1" data-target="#row-%d-2" id="row-%d">', $idx, $idx);
-	printf('<td class="c"><a href="/log?id=%s">%d</a></td>', $rec['id'], $idx);
+	if ($snap_mode) {
+		printf('<td class="c">%d</td>', $idx);
+	} else {
+		printf('<td class="c"><a href="/log?id=%s">%d</a></td>', $rec['id'], $idx);
+	}
 	// echo '<td>' . _date('m/d H:i:s', $rec['req_time']) . '</td>';
 	// echo '<td>' . h($rec['req_time']) . '</td>';
 	printf('<td title="%s">%s [%0.1f s]</td>', h($rec['req_time']), $dt0->format('m/d H:i:s'), $res_wait);
