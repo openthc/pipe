@@ -15,46 +15,46 @@ $snap_mode = ('snap' == $data['snap'])
 ?>
 
 <h1><?= $data['Page']['title'] ?></h1>
+
 <?php
 if (empty($snap_mode)) {
 ?>
 <form autocomplete="off">
 <div class="search-filter">
 	<div>
-		<button class="btn btn-sm btn-secondary" name="a" type="submit" value="x"><i class="fas fa-ban"></i></button>
+		<input autocomplete="off" autofocus name="q" placeholder="search" value="<?= h($_GET['q']) ?>">
 	</div>
 	<div>
-		<input autocomplete="off" class="form-control form-control-sm" name="l" placeholder="license hash" value="<?= h($_GET['l']) ?>">
+		<input autocomplete="off" name="l" placeholder="license hash" value="<?= h($_GET['l']) ?>">
 	</div>
 	<div>
-		<input autocomplete="off" autofocus class="form-control form-control-sm" name="q" placeholder="search" value="<?= h($_GET['q']) ?>">
+		<input name="d0" type="date" value="<?= h($_GET['d0']) ?>">
 	</div>
 	<div>
-		<input class="form-control form-control-sm" name="d0" type="date" value="<?= h($_GET['d0']) ?>">
+		<input name="t0" type="time" value="<?= h($_GET['t0']) ?>">
 	</div>
 	<div>
-		<input class="form-control form-control-sm" name="t0" type="time" value="<?= h($_GET['t0']) ?>">
+		<input name="d1" type="date" value="<?= h($_GET['d1']) ?>">
 	</div>
 	<div>
-		<input class="form-control form-control-sm" name="d1" type="date" value="<?= h($_GET['d1']) ?>">
+		<input name="t1" type="time" value="<?= h($_GET['t1']) ?>">
 	</div>
 	<div>
-		<input class="form-control form-control-sm" name="t1" type="time" value="<?= h($_GET['t1']) ?>">
+		<button type="submit">Go</button>
 	</div>
 	<div>
-		<div class="btn-group btn-group-sm">
-			<button class="btn btn-secondary" type="submit">Go <i class="fas fa-search"></i></button>
-			<button class="btn btn-secondary" formtarget="_blank" name="a" type="submit" value="snap">Snap <i class="fas fa-file-export"></i></button>
-		</div>
+		<button formtarget="_blank" name="a" type="submit" value="snap">Snap</button>
+	</div>
+	<div>
+		<a href="?<?= $data['link_newer'] ?>">Newer</a>
+	</div>
+	<div>
+		<a href="?<?= $data['link_older'] ?>">Older</a>
+	</div>
+	<div>
 		<input name="snap-get" type="hidden" value="<?= $snap_data ?>">
+		<button name="a" type="submit" value="x">Clear</button>
 	</div>
-	<div>
-		<div class="btn-group btn-group-sm">
-			<a class="btn btn-secondary" href="?<?= $data['link_newer'] ?>"><i class="fas fa-arrow-left"></i> Newer</a>
-			<a class="btn btn-secondary" href="?<?= $data['link_older'] ?>">Older <i class="fas fa-arrow-right"></i></a>
-		</div>
-	</div>
-
 </div>
 </form>
 
@@ -123,7 +123,7 @@ foreach ($data['log_audit'] as $rec) {
 	echo '</tr>';
 
 	printf('<tr class="tr2 %s" id="row-%d-2">', ($snap_mode ? 'snap' : 'hide'), $idx);
-	echo '<td style="background:#ff0;"></td>';
+	echo '<td></td>';
 	echo '<td colspan="4">';
 	echo '<div style="align-item: flex-start; display: flex; flex-direction: row; justify-content: space-around;">';
 
