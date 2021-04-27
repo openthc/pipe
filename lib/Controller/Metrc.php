@@ -34,9 +34,7 @@ class Metrc extends \App\Controller\Base
 		}
 
 		// Resolve Path
-		$req_path = implode('/', $this->src_path);
-		$req_path = sprintf('/%s?%s', $req_path, $_SERVER['QUERY_STRING']);
-		$req_path = trim($req_path, '?');
+		$req_path = sprintf('/%s', implode('/', $this->src_path));
 
 		// A cheap-ass, incomplete filter
 		switch ($req_path) {
@@ -45,6 +43,7 @@ class Metrc extends \App\Controller\Base
 		case '/items/v1/categories':
 		case '/labtests/v1/states':
 		case '/labtests/v1/types':
+		case '/locations/v1/types':
 		case '/packages/v1/types':
 		case '/plantbatches/v1/types':
 		case '/plants/v1/additives/types':
@@ -52,6 +51,9 @@ class Metrc extends \App\Controller\Base
 		case '/sales/v1/customertypes':
 		case '/unitsofmeasure/v1/active':
 			// These don't require a licenseNumber
+			// nor do they require date attributes
+			unset($_GET['lastModifiedStart']);
+			unset($_GET['lastModifiedEnd']);
 			break;
 		default:
 			// Everything else does
@@ -79,7 +81,7 @@ class Metrc extends \App\Controller\Base
 		]);
 
 		// Forward
-		$url = $this->cre_base . $req_path;
+		$url = $this->cre_base . $req_path . '?' . http_build_query($_GET);
 		$req_head = [
 			'accept: application/json',
 			sprintf('authorization: %s', $_SERVER['HTTP_AUTHORIZATION']),
@@ -125,7 +127,18 @@ class Metrc extends \App\Controller\Base
 		], [ 'id' => $this->req_ulid ]);
 
 		// Try to be Smart with Response Code?
-		$RES = $RES->withStatus($this->res_info['http_code'] ?: 500);
+		switch ($this->res_info['http_code']) {
+			case 0: // curl error
+				$RES = $RES->withStatus(500, 'curl error [LCM-131]');
+				break;
+			case 520: // special from CloudFlare
+			case 524: // special from CloudFlare
+				$RES = $RES->withStatus($this->res_info['http_code'], 'CloudFlare Error [LCM-134]');
+				break;
+			default:
+				$RES = $RES->withStatus($this->res_info['http_code']);
+		}
+
 		$RES = $RES->withHeader('content-type', 'application/json');
 		$RES = $RES->write($this->res_body);
 
