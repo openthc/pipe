@@ -142,9 +142,9 @@ class Log extends \OpenTHC\Controller\Base
 		}
 
 		// Date Lo
-		if (!empty($_GET['dt0'])) {
+		if (!empty($_GET['d0'])) {
 
-			$dt = new \DateTime($_GET['dt0']);
+			$dt = new \DateTime($_GET['d0'] . ' ' . $_GET['t0']);
 
 			$ms = (intval($dt->format('U')) * 1000) + intval($dt->format('v'));
 			$u0 = \Edoceo\Radix\ULID::create( $ms );
@@ -156,9 +156,9 @@ class Log extends \OpenTHC\Controller\Base
 		}
 
 		// Date Hi
-		if (!empty($_GET['dt1'])) {
+		if (!empty($_GET['d1'])) {
 
-			$dt = new \DateTime($_GET['dt1']);
+			$dt = new \DateTime($_GET['d1'] . ' ' . $_GET['t1']);
 
 			$ms = (intval($dt->format('U')) * 1000) + intval($dt->format('v'));
 			$u0 = \Edoceo\Radix\ULID::create( $ms );
