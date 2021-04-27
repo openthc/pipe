@@ -44,7 +44,67 @@ echo $this->body;
 
 ?>
 
-<script src="https://cdn.openthc.com/zepto/1.2.0/zepto.js" integrity="sha256-vrn14y7WH7zgEElyQqm2uCGSQrX/xjYDjniRUQx3NyU=" crossorigin="anonymous"></script>
 <?= $this->foot_script ?>
+
+<script>
+function rowOpen(tr1)
+{
+	var id2 = tr1.getAttribute('data-target');
+	var tr2 = document.querySelector(id2);
+
+	if (tr2.classList.contains('hide')) {
+		tr2.classList.remove('hide');
+		tr1.setAttribute('data-mode', 'open');
+	}
+
+}
+
+function rowShut(tr1)
+{
+	var id2 = tr1.getAttribute('data-target');
+	var tr2 = document.querySelector(id2);
+
+	if (!tr2.classList.contains('hide')) {
+		tr2.classList.add('hide');
+		tr1.setAttribute('data-mode', 'shut');
+	}
+
+}
+
+var tab = document.querySelector('#log-table');
+tab.addEventListener('click', function(e) {
+
+	var t = e.target;
+
+	if ('A' == t.nodeName) {
+		return true;
+	}
+
+	var p = t.parentElement;
+	if (p.classList.contains('tr1')) {
+
+		var mode = p.getAttribute('data-mode');
+		if ('open' == mode) {
+			rowShut(p);
+			return false;
+		}
+
+		rowOpen(p);
+
+	}
+});
+
+// Open each row by id in the hash
+var hash = window.location.hash;
+hash = hash.replace(/#/, '');
+var rec_list = hash.split(',');
+rec_list.forEach(function(v, i) {
+	var key = `#row-${v}-1`;
+	var row = document.querySelector(key);
+	if (row) {
+		rowOpen(row);
+	}
+});
+</script>
 </body>
 </html>

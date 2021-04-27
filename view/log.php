@@ -64,7 +64,7 @@ if (empty($snap_mode)) {
 }
 ?>
 
-<table>
+<table id="log-table">
 <thead>
 	<tr>
 		<th></th>
@@ -150,63 +150,7 @@ foreach ($data['log_audit'] as $rec) {
 
 <?php
 if (empty($snap_mode)) {
-?>
-<script>
-function rowOpen(row)
-{
-	var id2 = row.getAttribute('data-target');
-	var tr2 = $(id2);
-
-	tr2.show();
-
-	row.setAttribute('data-mode', 'open');
-
-
-}
-
-function rowShut(row)
-{
-	var id2 = row.getAttribute('data-target');
-	var tr2 = $(id2);
-
-	tr2.hide();
-
-	row.setAttribute('data-mode', 'shut');
-}
-
-$(function() {
-
-	$('.tr1').on('click', function(e) {
-
-		if ('A' == e.target.nodeName) {
-			return true;
-		}
-
-		var mode = this.getAttribute('data-mode');
-		if ('open' == mode) {
-			rowShut(this);
-			return false;
-		}
-
-		rowOpen(this);
-
-	});
-
-	// Open each row by id in the hash
-	var hash = window.location.hash;
-	hash = hash.replace(/#/, '');
-	var rec_list = hash.split(',');
-	rec_list.forEach(function(v, i) {
-		var key = `#row-${v}-1`;
-		var row = document.querySelector(key);
-		if (row) {
-			rowOpen(row);
-		}
-	});
-
-});
-</script>
-<?php
+	// Had Script Include Here
 }
 
 
