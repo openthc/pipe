@@ -11,7 +11,7 @@
 
 namespace Test\A_Core;
 
-class A_CRE_Ping_Test extends \Test\Base_Case
+class C_CRE_Ping_Test extends \Test\Base_Case
 {
 	public function test_ping_engine()
 	{
