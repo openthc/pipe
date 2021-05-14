@@ -63,6 +63,8 @@ class Log extends \OpenTHC\Controller\Base
 		if ('snap' == $_GET['a']) {
 
 			$output_snap = _ulid();
+			$output_file = sprintf('%s/webroot/snap/%s.html', APP_ROOT, $output_snap);
+			$output_link = sprintf('/snap/%s.html', $output_snap);
 
 			$data['Page']['title'] = sprintf('OpenTHC Log Snapshot %s', $output_snap);
 			$data['snap'] = 'snap';
@@ -70,12 +72,11 @@ class Log extends \OpenTHC\Controller\Base
 			unset($data['sql_debug']);
 
 			$output_html = $this->render('log.php', $data);
-
-			$output_file = sprintf('%s/webroot/snap/%s.html', APP_ROOT, $output_snap);
-			$output_link = sprintf('/snap/%s.html', $output_snap);
 			$output_html = preg_replace('/<form.+<\/form>/', '', $output_html);
 			$output_html = preg_replace('/<div class="sql-debug">.+?<\/div>/', '', $output_html);
+
 			file_put_contents($output_file, $output_html);
+
 			return $RES->withRedirect($output_link);
 		}
 
