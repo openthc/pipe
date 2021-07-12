@@ -127,7 +127,7 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
-	function assertValidResponse($res)
+	function assertValidResponse($res, $code=200, $dump=null)
 	{
 		$this->assertNotEmpty($res);
 		$res = json_decode($res, true);

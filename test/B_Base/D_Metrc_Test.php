@@ -7,10 +7,19 @@ namespace Test\B_Base;
 
 class D_Metrc_Test extends \Test\Base_Case
 {
+	function test_ping()
+	{
+		$req = $this->_curl_init('/uom');
+		$res = curl_exec($req);
+		$res_info = curl_getinfo($req);
+		$res = $this->assertValidResponse($res);
+		var_dump($res);
+	}
+
 	/**
 	 *
 	 */
-	function assertValidResponse($res)
+	function assertValidResponse($res, $code=200, $dump=null)
 	{
 		$this->assertNotEmpty($res);
 		// $res = json_decode($res, true);

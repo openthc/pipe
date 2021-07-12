@@ -15,34 +15,40 @@ output_base="../webroot/test-output"
 output_main="$output_base/index.html"
 mkdir -p "$output_base"
 
-search_list="
-../boot.php
-../bin/
-../lib/
-../sbin/
-../view/
-"
-
 
 #
 # Lint
-echo '<h1>Linting...</h1>' > "$output_main"
-find $search_list -type f -name '*.php' -exec php -l {} \; \
-	| grep -v 'No syntax' || true \
-	2>&1 >"$output_base/phplint.txt"
-[ -s "$output_base/phplint.txt" ] || echo "Linting OK" >"$output_base/phplint.txt"
+if [ ! -f "$output_base/phplint.txt" ]
+then
+	echo '<h1>Linting...</h1>' > "$output_main"
+	search_list=(
+		../boot.php
+		../bin/
+		../lib/
+		../sbin/
+		../test/
+		../view/
+	)
+	find "${search_list[@]}" -type f -name '*.php' -exec php -l {} \; \
+		| grep -v 'No syntax' || true \
+		>"$output_base/phplint.txt" 2>&1
+	[ -s "$output_base/phplint.txt" ] || echo "Linting OK" >"$output_base/phplint.txt"
+fi
 
 
 #
 # PHPStan
-echo '<h1>PHPStan...</h1>' > "$output_main"
-../vendor/bin/phpstan analyze --error-format=junit --no-progress > "$output_base/phpstan.xml" || true
-[ -f "phpstan.xsl" ] || wget -q 'https://openthc.com/pub/phpstan.xsl'
-xsltproc \
-	--nomkdir \
-	--output "$output_base/phpstan.html" \
-	phpstan.xsl \
-	"$output_base/phpstan.xml"
+if [ ! -f "$output_base/phpstan.html" ]
+then
+	echo '<h1>PHPStan...</h1>' > "$output_main"
+	../vendor/bin/phpstan analyze --error-format=junit --no-progress > "$output_base/phpstan.xml" || true
+	[ -f "phpstan.xsl" ] || wget -q 'https://openthc.com/pub/phpstan.xsl'
+	xsltproc \
+		--nomkdir \
+		--output "$output_base/phpstan.html" \
+		phpstan.xsl \
+		"$output_base/phpstan.xml"
+fi
 
 
 #
@@ -54,7 +60,7 @@ echo '<h1>PHPUnit...</h1>' > "$output_main"
 	--testdox-html "$output_base/testdox.html" \
 	--testdox-text "$output_base/testdox.txt" \
 	--testdox-xml "$output_base/testdox.xml" \
-	"$@" 2>&1 | tee "$output_base/phpunit.txt" || true
+	"$@" 2>&1 | tee "$output_base/phpunit.txt"
 
 
 #
@@ -81,8 +87,8 @@ cat <<HTML > "$output_main"
 <meta name="theme-color" content="#069420">
 <style>
 html {
-	height: 100%;
 	font-family: sans-serif;
+	font-size: 1.5rem;
 }
 </style>
 <title>Test Result ${dt}</title>
