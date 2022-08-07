@@ -7,14 +7,15 @@
 			"vendor/erusev/parsedown-extra/test"
 		],
 		"psr-4": {
-			"App\\": "./lib",
-			"Custom\\": "./Custom",
-			"Test\\": "./test"
+			"OpenTHC\\Pipe\\": "./lib",
+			"OpenTHC\\Pipe\\Test\\": "./test",
+			"Custom\\": "./Custom"
 		}
 	},
 	"require": {
 		"edoceo/radix": "dev-master",
-		"openthc/common": "dev-master"
+		"openthc/common": "dev-master",
+		"openthc/cre-adapter": "dev-master"
 	},
 	"require-dev": {
 		"behat/behat": "3.10.0",
