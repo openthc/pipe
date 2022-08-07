@@ -1,6 +1,8 @@
 <?php
 /**
  * OpenTHC Pipe Application Bootstrap
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 use Edoceo\Radix\DB\SQL;
