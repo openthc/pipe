@@ -2,6 +2,8 @@
 #
 # OpenTHC Test Runner
 #
+# SPDX-License-Identifier: MIT
+#
 
 set -o errexit
 set -o nounset
@@ -20,17 +22,9 @@ cd "$d"
 
 declare -rx OUTPUT_BASE="webroot/test-output"
 declare -rx OUTPUT_MAIN="${OUTPUT_BASE}/index.html"
+declare -rx SOURCE_LIST="boot.php bin/ lib/ sbin/ test/ view/"
 
 mkdir -p "${OUTPUT_BASE}"
-
-code_list=(
-	boot.php
-	bin/
-	lib/
-	sbin/
-	test/
-	view/
-)
 
 
 #
@@ -58,7 +52,7 @@ vendor/openthc/common/test/phpunit.sh "$@"
 test_date=$(date)
 test_note=$(tail -n1 "${OUTPUT_BASE}/phpunit.txt")
 
-cat <<HTML > "$output_main"
+cat <<HTML > "${OUTPUT_MAIN}"
 <html>
 <head>
 <meta charset="utf-8">

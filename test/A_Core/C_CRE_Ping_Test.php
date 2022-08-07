@@ -1,5 +1,8 @@
 <?php
 /**
+ *
+ * SPDX-License-Identifier: MIT
+ *
  * Notes about the Auth module
  * The "program-key" cooresponds to a code that is a company object identifier
  * The "license-key" cooresponds to a code that is a license object identifier
@@ -9,10 +12,13 @@
  *
  */
 
-namespace Test\A_Core;
+namespace OpenTHC\Pipe\Test\A_Core;
 
 class C_CRE_Ping_Test extends \Test\Base_Case
 {
+	/**
+	 *
+	 */
 	public function test_ping_engine()
 	{
 		$engine_list = [
@@ -41,12 +47,15 @@ class C_CRE_Ping_Test extends \Test\Base_Case
 		// 	// print_r($cre_conf);
 		// 	// $cre_conf['service-key'] = 'TEST_SERVICE_KEY';
 		// 	// $cre_conf['license-key'] = 'TEST_LICENSE_KEY';
-		// 	// $cre = \App\CRE::factory($cre_conf);
+		// 	// $cre = \OpenTHC\Pipe\CRE::factory($cre_conf);
 		// 	// $this->assertNotEmpty($cre);
 		// 	// $this->assertTrue($cre instanceof \OpenTHC\CRE\Base);
 		// }
 	}
 
+	/**
+	 *
+	 */
 	public function test_ping_cre()
 	{
 		$cre_list = [

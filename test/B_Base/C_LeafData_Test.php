@@ -1,12 +1,17 @@
 <?php
 /**
  * LeafData PIPE Fire Test
+ *
+ * SPDX-License-Identifier: MIT
  */
 
-namespace Test\B_Base;
+namespace OpenTHC\Pipe\Test\B_Base;
 
 class C_LeafData_Test extends \Test\Base_Case
 {
+	/**
+	 *
+	 */
 	function x_test_license()
 	{
 		$req = $this->_curl_init('/mmes');
@@ -19,6 +24,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$this->assertCount(3145, $res);
 	}
 
+	/**
+	 *
+	 */
 	function test_contact()
 	{
 		$req = $this->_curl_init('/users');
@@ -28,6 +36,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_section()
 	{
 		$req = $this->_curl_init('/areas');
@@ -37,6 +48,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_product()
 	{
 		$req = $this->_curl_init('/inventory_types');
@@ -46,6 +60,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_variety()
 	{
 		$req = $this->_curl_init('/strains');
@@ -55,6 +72,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_crop()
 	{
 		$req = $this->_curl_init('/plants');
@@ -64,6 +84,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_lot()
 	{
 		$req = $this->_curl_init('/inventories');
@@ -73,6 +96,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_lot_delta()
 	{
 		$req = $this->_curl_init('/inventory_adjustments');
@@ -82,6 +108,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_lab_result()
 	{
 		$req = $this->_curl_init('/lab_results');
@@ -91,6 +120,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_b2b()
 	{
 		$req = $this->_curl_init('/inventory_transfers');
@@ -100,6 +132,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_b2c()
 	{
 		$req = $this->_curl_init('/sales');
@@ -109,6 +144,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_batch()
 	{
 		$req = $this->_curl_init('/batches');
@@ -118,6 +156,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function test_waste()
 	{
 		$req = $this->_curl_init('/disposals');
@@ -127,6 +168,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		$res = $this->assertValidResponse($res);
 	}
 
+	/**
+	 *
+	 */
 	function assertValidResponse($res, $code=200, $dump=null)
 	{
 		$this->assertNotEmpty($res);
@@ -150,6 +194,9 @@ class C_LeafData_Test extends \Test\Base_Case
 		return $ret;
 	}
 
+	/**
+	 *
+	 */
 	function _curl_init($path)
 	{
 		$path = ltrim($path, '/');

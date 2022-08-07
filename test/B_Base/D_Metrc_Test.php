@@ -1,12 +1,17 @@
 <?php
 /**
- * Metrc
+ * Metrc PIPE Fire Test
+ *
+ * SPDX-License-Identifier: MIT
  */
 
-namespace Test\B_Base;
+namespace OpenTHC\Pipe\Test\B_Base;
 
 class D_Metrc_Test extends \Test\Base_Case
 {
+	/**
+	 *
+	 */
 	function test_ping()
 	{
 		$req = $this->_curl_init('/uom');

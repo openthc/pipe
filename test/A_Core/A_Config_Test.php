@@ -1,16 +1,24 @@
 <?php
 /**
+ *
+ * SPDX-License-Identifier: MIT
  */
 
-namespace Test\A_Core;
+namespace OpenTHC\Pipe\Test\A_Core;
 
 class A_Config_Test extends \Test\Base_Case
 {
+	/**
+	 *
+	 */
 	protected function setUp() : void
 	{
 		// Nothing
 	}
 
+	/**
+	 *
+	 */
 	function test_env()
 	{
 		$x = getenv('OPENTHC_TEST_HOST');
@@ -18,6 +26,7 @@ class A_Config_Test extends \Test\Base_Case
 	}
 
 	/**
+	 *
 	 */
 	function test_psk()
 	{
@@ -26,6 +35,7 @@ class A_Config_Test extends \Test\Base_Case
 	}
 
 	/**
+	 *
 	 */
 	function test_tz()
 	{

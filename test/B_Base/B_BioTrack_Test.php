@@ -1,12 +1,17 @@
 <?php
 /**
- * LeafData PIPE Fire Test
+ * BioTrack PIPE Fire Test
+ *
+ * SPDX-License-Identifier: MIT
  */
 
-namespace Test\B_Base;
+namespace OpenTHC\Pipe\Test\B_Base;
 
 class B_BioTrack_Test extends \Test\Base_Case
 {
+	/**
+	 *
+	 */
 	function test_ping()
 	{
 		// Login and Keep Session
@@ -30,6 +35,9 @@ class B_BioTrack_Test extends \Test\Base_Case
 
 	}
 
+	/**
+	 *
+	 */
 	function assertValidResponse($res, $code=200, $dump=null)
 	{
 		$this->assertNotEmpty($res);

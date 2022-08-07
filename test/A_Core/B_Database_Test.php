@@ -1,11 +1,15 @@
 <?php
 /**
+ *
  */
 
-namespace Test\A_Core;
+namespace OpenTHC\Pipe\Test\A_Core;
 
 class B_Database_Test extends \Test\Base_Case
 {
+	/**
+	 *
+	 */
 	function test_database()
 	{
 		$cfg = \OpenTHC\Config::get('database');
