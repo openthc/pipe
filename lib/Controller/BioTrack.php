@@ -9,9 +9,9 @@
  * Return Sanatized Response
  */
 
-namespace App\Controller;
+namespace OpenTHC\Pipe\Controller;
 
-class BioTrack extends \App\Controller\Base
+class BioTrack extends \OpenTHC\Pipe\Controller\Base
 {
 	function __invoke($REQ, $RES, $ARG)
 	{

@@ -9,45 +9,57 @@ namespace OpenTHC\Pipe\Test\B_Base;
 
 class B_BioTrack_Test extends \Test\Base_Case
 {
+
+	/**
+	 *
+	 */
+	protected function setUp() : void
+	{
+		$this->_cre = \OpenTHC\CRE::getEngine('openthc/biotrack/bunk');
+	}
+
 	/**
 	 *
 	 */
 	function test_ping()
 	{
 		// Login and Keep Session
-
-		$req = $this->_curl_init('/sync_status');
-		curl_setopt($req, CURLOPT_CUSTOMREQUEST, 'POST');
-
-		$req_body = json_encode([
-			'action' => 'sync_status',
-		]);
-
-		curl_setopt($req, CURLOPT_POSTFIELDS, $req_body);
-
-		$req_head[] = 'content-type: application/json';
-		curl_setopt($req, CURLOPT_HTTPHEADER, $req_head);
-
-		$res = curl_exec($req);
-		var_dump($res);
-		$res_info = curl_getinfo($req);
+		$req = $this->_curl_init('/ping');
+		$res = [];
+		$res['body'] = curl_exec($req);
+		$res['info'] = curl_getinfo($req);
 		$res = $this->assertValidResponse($res);
-
 	}
 
 	/**
 	 *
 	 */
-	function assertValidResponse($res, $code=200, $dump=null)
+	function assertValidResponse($res, $code=200, $dump=null) : array
 	{
-		$this->assertNotEmpty($res);
+		$this->raw = $res['body'];
 
-		$res = json_decode($res, true);
-		$this->assertNotEmpty($res);
-		$this->assertCount(2, $res);
+		$hrc = $res['info']['http_code'];
 
-		$ret = $res['data'];
+		if (empty($dump)) {
+			if ($code != $hrc) {
+				$dump = "HTTP $hrc != $code";
+			}
+		}
+
+		if (!empty($dump)) {
+			echo "\n<<< $dump <<< $hrc <<<\n{$this->raw}\n###\n";
+		}
+
+		$this->assertEquals($code, $hrc);
+		$type = $res['info']['content_type'];
+		$type = strtok($type, ';');
+		$this->assertEquals('application/json', $type);
+
+		$ret = \json_decode($this->raw, true);
+
 		$this->assertIsArray($ret);
+		$this->assertArrayHasKey('data', $ret);
+		$this->assertArrayHasKey('meta', $ret);
 
 		return $ret;
 	}
@@ -57,9 +69,10 @@ class B_BioTrack_Test extends \Test\Base_Case
 	 */
 	function _curl_init($path)
 	{
+		$base = rtrim($this->_cre['server'], '/');
 		$path = ltrim($path, '/');
 
-		$url = sprintf('https://%s/biotrack/wa/test/%s', getenv('OPENTHC_TEST_HOST'), $path);
+		$url = sprintf('%s/%s', $base , $path);
 		$req = _curl_init($url);
 
 		$head = [
