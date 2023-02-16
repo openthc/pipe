@@ -13,5 +13,6 @@
 --ignore-dir=webroot/dox
 --ignore-dir=webroot/lib
 --ignore-dir=webroot/sdk
+--ignore-dir=webroot/snap
 
 --ignore-file=is:composer.lock
