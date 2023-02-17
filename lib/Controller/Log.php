@@ -3,7 +3,7 @@
  * Log Viewer
  */
 
-namespace App\Controller;
+namespace OpenTHC\Pipe\Controller;
 
 class Log extends \OpenTHC\Controller\Base
 {
