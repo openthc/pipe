@@ -144,6 +144,13 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 	 */
 	function _check_cre($RES)
 	{
+		switch ($this->req_host) {
+			case 'sandbox-api-mt.metrc.com':
+				// Montana uses Colorado sandbox
+				$this->req_host = 'sandbox-api-co.metrc.com';
+				break;
+		}
+
 		// Requested System
 		switch ($this->req_host) {
 		case 'ak':
@@ -167,6 +174,7 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 		case 'api-la.metrc.com':
 		case 'api-ma.metrc.com':
 		case 'api-md.metrc.com':
+		case 'api-me.metrc.com':
 		case 'api-mi.metrc.com':
 		case 'api-mo.metrc.com':
 		case 'api-mt.metrc.com':
@@ -174,12 +182,13 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 		case 'api-oh.metrc.com':
 		case 'api-ok.metrc.com':
 		case 'api-or.metrc.com':
-			$this->cre_base = sprintf('https://%s', $this->req_host);
-			break;
 		case 'sandbox-api-ak.metrc.com':
 		case 'sandbox-api-ca.metrc.com':
 		case 'sandbox-api-co.metrc.com':
+		case 'sandbox-api-ma.metrc.com':
 		case 'sandbox-api-md.metrc.com':
+		case 'sandbox-api-me.metrc.com':
+		case 'sandbox-api-nv.metrc.com':
 		case 'sandbox-api-ok.metrc.com':
 		case 'sandbox-api-or.metrc.com':
 			$this->cre_base = sprintf('https://%s', $this->req_host);

@@ -175,6 +175,10 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 			case 'hicsts.hawaii.gov':
 				$this->cre_base = 'https://hicsts.hawaii.gov/serverjson.asp';
 				break;
+			case 'il':
+			case 'mcmonitoring.agr.illinois.gov':
+				$this->cre_base = 'https://mcmonitoring.agr.illinois.gov/serverjson.asp';
+				break;
 			case 'nm':
 			case 'mcp-tracking.nmhealth.org':
 				$this->cre_base = 'https://mcp-tracking.nmhealth.org/serverjson.asp';

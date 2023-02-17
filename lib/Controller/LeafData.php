@@ -19,23 +19,19 @@ class LeafData extends \OpenTHC\Pipe\Controller\Base
 	{
 		parent::__invoke($REQ, $RES, $ARG);
 
-		// Auth Headers
-		$RES = $this->_check_auth($RES);
-		if (200 != $RES->getStatusCode()) {
-			return $RES;
-		}
-
-		// Our special end-point
+		// Our special end-point (before error-check of check_auth)
 		$chk = basename($ARG['path']);
 		if ('ping' == $chk) {
 			return $this->sendPong($RES);
 		}
 
-		// cre
-		$RES = $this->_check_cre($RES);
+		// Auth Headers
+		$RES = $this->_check_auth($RES);
+
 		if (200 != $RES->getStatusCode()) {
 			return $RES;
 		}
+
 
 		// Resolve Path
 		// Clean these if the Client Added Them
@@ -128,7 +124,7 @@ class LeafData extends \OpenTHC\Pipe\Controller\Base
 		if (empty($lic) || empty($key)) {
 			return $RES->withJSON([
 				'data' => null,
-				'meta' => [ 'detail' => 'License or Key missing [CSL-025]' ]
+				'meta' => [ 'note' => 'License or Key missing [CSL-025]' ]
 			], 400);
 		}
 
