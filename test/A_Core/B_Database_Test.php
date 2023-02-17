@@ -1,11 +1,11 @@
 <?php
 /**
- *
+ * SPDX-License-Identifier: MIT
  */
 
 namespace OpenTHC\Pipe\Test\A_Core;
 
-class B_Database_Test extends \Test\Base_Case
+class B_Database_Test extends \OpenTHC\Pipe\Test\Base_Case
 {
 	/**
 	 *

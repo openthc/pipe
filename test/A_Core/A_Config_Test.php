@@ -6,7 +6,7 @@
 
 namespace OpenTHC\Pipe\Test\A_Core;
 
-class A_Config_Test extends \Test\Base_Case
+class A_Config_Test extends \OpenTHC\Pipe\Test\Base_Case
 {
 	/**
 	 *

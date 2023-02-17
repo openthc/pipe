@@ -1,6 +1,8 @@
 <?php
 /**
  * Test Bootstrap
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 require_once(dirname(__DIR__) . '/boot.php');

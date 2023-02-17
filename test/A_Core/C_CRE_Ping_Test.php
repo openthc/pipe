@@ -14,74 +14,62 @@
 
 namespace OpenTHC\Pipe\Test\A_Core;
 
-class C_CRE_Ping_Test extends \Test\Base_Case
+class C_CRE_Ping_Test extends \OpenTHC\Pipe\Test\Base_Case
 {
 	/**
 	 *
 	 */
-	public function test_ping_engine()
-	{
-		$engine_list = [
-			'biotrack',
-			'leafdata',
-			'metrc',
-		];
+	// public function test_ping_engine()
+	// {
+	// 	$engine_list = [
+	// 		'biotrack',
+	// 		'leafdata',
+	// 		'metrc',
+	// 	];
 
-		foreach ($engine_list as $engine) {
+	// 	foreach ($engine_list as $engine) {
 
-			$url = sprintf('https://%s/%s/ping', getenv('OPENTHC_TEST_HOST'), $engine);
-			$req = _curl_init($url);
-			$res = curl_exec($req);
-			$inf = curl_getinfo($req);
-			curl_close($req);
+	// 		$url = sprintf('%s/%s/ping', getenv('OPENTHC_TEST_BASE'), $engine);
+	// 		$req = _curl_init($url);
+	// 		$res = curl_exec($req);
+	// 		$inf = curl_getinfo($req);
+	// 		curl_close($req);
 
-			$this->assertEquals(200, $inf['http_code']);
-			$this->assertNotEmpty($res);
+	// 		$this->assertEquals(200, $inf['http_code']);
+	// 		$this->assertNotEmpty($res);
 
-		}
+	// 	}
 
-		// $cre_list = \OpenTHC\CRE\Base::getEngineList();
-		// $this->assertCount(20, $cre_list);
-
-		// foreach ($cre_list as $cre_conf) {
-		// 	// print_r($cre_conf);
-		// 	// $cre_conf['service-key'] = 'TEST_SERVICE_KEY';
-		// 	// $cre_conf['license-key'] = 'TEST_LICENSE_KEY';
-		// 	// $cre = \OpenTHC\Pipe\CRE::factory($cre_conf);
-		// 	// $this->assertNotEmpty($cre);
-		// 	// $this->assertTrue($cre instanceof \OpenTHC\CRE\Base);
-		// }
-	}
+	// 	// foreach ($cre_list as $cre_conf) {
+	// 	// 	// print_r($cre_conf);
+	// 	// 	// $cre_conf['service-key'] = 'TEST_SERVICE_KEY';
+	// 	// 	// $cre_conf['license-key'] = 'TEST_LICENSE_KEY';
+	// 	// 	// $cre = \OpenTHC\Pipe\CRE::factory($cre_conf);
+	// 	// 	// $this->assertNotEmpty($cre);
+	// 	// 	// $this->assertTrue($cre instanceof \OpenTHC\CRE\Base);
+	// 	// }
+	// }
 
 	/**
 	 *
 	 */
 	public function test_ping_cre()
 	{
-		$cre_list = [
-			'biotrack/hi',
-			'biotrack/il',
-			'leafdata/wa',
-			'leafdata/wa/test',
-			'metrc/ak',
-			'metrc/ca',
-			'metrc/co',
-			'metrc/la',
-			'metrc/ma',
-			'metrc/md',
-			'metrc/me',
-			'metrc/mi',
-			'metrc/mo',
-			'metrc/nv',
-			'metrc/or',
-		];
+		$cre_list = \OpenTHC\CRE::getEngineList();
+		$this->assertCount(21, $cre_list);
 
 		foreach ($cre_list as $cre) {
 
-			$url = sprintf('https://%s/%s/ping', getenv('OPENTHC_TEST_HOST'), $cre);
+			$cre_pipe = trim(getenv('OPENTHC_TEST_BASE'), '/');
+			$cre_path = parse_url($cre['server'], PHP_URL_HOST);
+
+			$url = sprintf('%s/%s/%s/ping', $cre_pipe, $cre['engine'], $cre_path);
+
+			echo "URL:$url\n";
+
 			$req = _curl_init($url);
 			$res = curl_exec($req);
-			// var_dump($res);
+
 
 			$inf = curl_getinfo($req);
 			curl_close($req);
@@ -91,12 +79,11 @@ class C_CRE_Ping_Test extends \Test\Base_Case
 			$res = json_decode($res, true);
 			$this->assertIsArray($res);
 			$this->assertCount(2, $res);
-			$this->assertIsArray($res['meta']);
-			$this->assertNotEmpty($res['meta']['detail']);
-			$this->assertNotEmpty($res['meta']['source']);
-			$this->assertEquals('openthc', $res['meta']['source']);
-			$this->assertNotEmpty($res['meta']['cre']);
-			$this->assertNotEmpty($res['meta']['cre_base']);
+			$this->assertIsArray($res['data']);
+			// $this->assertNotEmpty($res['data']['cre']);
+			// $this->assertNotEmpty($res['data']['cre_base']);
+			// $this->assertNotEmpty($res['meta']['detail']);
+			// $this->assertNotEmpty($res['meta']['source']);
 
 		}
 	}

@@ -1,14 +1,16 @@
 <?php
 /**
- *
-*/
+ * SPDX-License-Identifier: MIT
+ */
 
 namespace OpenTHC\Pipe\Test;
 
 class Base_Case extends \PHPUnit\Framework\TestCase
 {
+	protected $_cre;
 	protected $_pid;
 	protected $_tmp_file = '/tmp/pipe-test-case.dat';
+
 
 	public function __construct($name = null, array $data = [], $dataName = '')
 	{
@@ -26,7 +28,7 @@ class Base_Case extends \PHPUnit\Framework\TestCase
 	 * @param $res, Response Object
 	 * @return void
 	 */
-	function assertValidResponse($res, $code=200, $dump=null)
+	function assertValidResponse($res, $code=200, $dump=null) : array
 	{
 		$this->raw = $res->getBody()->getContents();
 
@@ -65,7 +67,7 @@ class Base_Case extends \PHPUnit\Framework\TestCase
 	{
 		// create our http client (Guzzle)
 		$c = new \GuzzleHttp\Client(array(
-			'base_uri' => sprintf('https://%s/', getenv('OPENTHC_TEST_HOST')),
+			'base_uri' => rtrim(getenv('OPENTHC_TEST_BASE'), '/'),
 			'allow_redirects' => false,
 			'debug' => $_ENV['debug-http'],
 			'request.options' => array(

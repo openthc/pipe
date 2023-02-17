@@ -7,8 +7,17 @@
 
 namespace OpenTHC\Pipe\Test\B_Base;
 
-class D_Metrc_Test extends \Test\Base_Case
+class D_Metrc_Test extends \OpenTHC\Pipe\Test\Base_Case
 {
+
+	/**
+	 *
+	 */
+	protected function setUp() : void
+	{
+		$this->_cre = \OpenTHC\CRE::getEngine('openthc/metrc/bunk');
+	}
+
 	/**
 	 *
 	 */
@@ -24,7 +33,7 @@ class D_Metrc_Test extends \Test\Base_Case
 	/**
 	 *
 	 */
-	function assertValidResponse($res, $code=200, $dump=null)
+	function assertValidResponse($res, $code=200, $dump=null) : array
 	{
 		$this->assertNotEmpty($res);
 		// $res = json_decode($res, true);
@@ -52,9 +61,10 @@ class D_Metrc_Test extends \Test\Base_Case
 	 */
 	function _curl_init($path)
 	{
+		$base = rtrim($this->_cre['server'], '/');
 		$path = ltrim($path, '/');
 
-		$url = sprintf('https://%s/metrc/sandbox-api-co.metrc.com/%s', getenv('OPENTHC_TEST_HOST'), $path);
+		$url = sprintf('%s/%s', $base, $path);
 		$req = _curl_init($url);
 
 		$head = [
