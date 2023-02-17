@@ -1,6 +1,6 @@
 <?php
 /**
- * Metrc Passthru
+ * Metrc PIPE
  *
  * SPDX-License-Identifier: MIT
  */
@@ -16,23 +16,6 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 	{
 		parent::__invoke($REQ, $RES, $ARG);
 
-		// Our special end-point
-		$chk = basename($ARG['path']);
-		if ('ping' == $chk) {
-
-			$this->_check_cre($RES);
-
-			return $RES->withJSON([
-				'data' => 'PONG',
-				'meta' => [
-					'detail' => 'Responding to a Test Ping',
-					'source' => 'openthc',
-					'cre' => $this->cre,
-					'cre_base' => $this->cre_base,
-				]
-			]);
-		}
-
 		$RES = $this->_check_cre($RES);
 		if (200 != $RES->getStatusCode()) {
 			return $RES;
@@ -40,6 +23,12 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 
 		// Resolve Path
 		$req_path = sprintf('/%s', implode('/', $this->req_path));
+
+		// Our special end-point
+		$chk = basename($req_path);
+		if ('ping' == $chk) {
+			return $this->sendPong($RES);
+		}
 
 		// A cheap-ass, incomplete filter
 		switch ($req_path) {
@@ -170,7 +159,7 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 		case 'nv':
 		case 'oh':
 		case 'or':
-			$this->cre_base = sprintf('https://api-%s.metrc.com', $this->cre);
+			$this->cre_base = sprintf('https://api-%s.metrc.com', $this->req_host);
 			break;
 		case 'api-ak.metrc.com':
 		case 'api-ca.metrc.com':
@@ -185,18 +174,20 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 		case 'api-oh.metrc.com':
 		case 'api-ok.metrc.com':
 		case 'api-or.metrc.com':
-			$this->cre_base = sprintf('https://%s', $this->cre);
+			$this->cre_base = sprintf('https://%s', $this->req_host);
 			break;
+		case 'sandbox-api-ak.metrc.com':
+		case 'sandbox-api-ca.metrc.com':
 		case 'sandbox-api-co.metrc.com':
 		case 'sandbox-api-md.metrc.com':
 		case 'sandbox-api-ok.metrc.com':
 		case 'sandbox-api-or.metrc.com':
-			$this->cre_base = sprintf('https://%s', $this->cre);
+			$this->cre_base = sprintf('https://%s', $this->req_host);
 			break;
 		default:
 			return $RES->withJSON([
 				'data' => null,
-				'meta' => [ 'detail' => 'CRE Not Found [LCM-055]' ],
+				'meta' => [ 'note' => 'CRE Not Found [LCM-055]' ],
 			], 404);
 		}
 

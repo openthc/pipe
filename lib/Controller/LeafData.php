@@ -19,27 +19,16 @@ class LeafData extends \OpenTHC\Pipe\Controller\Base
 	{
 		parent::__invoke($REQ, $RES, $ARG);
 
-		// Our special end-point
-		$chk = basename($ARG['path']);
-		if ('ping' == $chk) {
-
-			$this->_check_cre($RES);
-
-			return $RES->withJSON([
-				'data' => 'PONG',
-				'meta' => [
-					'detail' => 'Responding to a Test Ping',
-					'source' => 'openthc',
-					'cre' => $this->cre,
-					'cre_base' => $this->cre_base,
-				]
-			]);
-		}
-
 		// Auth Headers
 		$RES = $this->_check_auth($RES);
 		if (200 != $RES->getStatusCode()) {
 			return $RES;
+		}
+
+		// Our special end-point
+		$chk = basename($ARG['path']);
+		if ('ping' == $chk) {
+			return $this->sendPong($RES);
 		}
 
 		// cre

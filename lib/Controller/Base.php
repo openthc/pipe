@@ -9,7 +9,6 @@ namespace OpenTHC\Pipe\Controller;
 
 class Base extends \OpenTHC\Controller\Base
 {
-	protected $cre;
 	protected $cre_base;
 
 	// Request Stuff
@@ -37,6 +36,24 @@ class Base extends \OpenTHC\Controller\Base
 		$this->req_ulid = _ulid();
 		$this->req_host = $ARG['host'];
 		$this->req_path = explode('/', $ARG['path']);
+	}
+
+	/**
+	 *
+	 */
+	function sendPong($RES)
+	{
+		return $RES->withJSON([
+			'data' => [
+				'cre_base' => $this->cre_base,
+				'req_host' => $this->req_host,
+				'req_path' => $req_path,
+			],
+			'meta' => [
+				'note' => 'PONG',
+			]
+		]);
+
 	}
 
 	/**

@@ -26,7 +26,7 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 		$dts = new \DateTime();
 		$req_path = sprintf('/%s', implode('/', $this->req_path));
 
-		// Capture Request Headers
+		// Capture Request Headers?
 
 		$dbc = _dbc();
 		$dbc->insert('log_audit', [
@@ -44,22 +44,7 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 
 		// Our special end-point
 		if ('ping' == $this->req_path[0]) {
-			return $RES->withJSON([
-				'data' => 'PONG',
-				'meta' => [
-					'detail' => 'Responding to a Test Ping',
-					'source' => 'openthc',
-					'cre' => $ARG['path'],
-				]
-			]);
-		}
-
-		// Deny
-		if (count($_GET) != 0) {
-			return $RES->withJSON(array(
-				'success' => 0,
-				'meta' => [ 'note' => 'No Query String parameters are accepted [CSB-040]' ],
-			), 400);
+			return $this->sendPong($RES);
 		}
 
 		if ('POST' != $_SERVER['REQUEST_METHOD']) {
@@ -186,6 +171,10 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 	function _check_cre($RES)
 	{
 		switch ($this->req_host) {
+			case 'hi':
+			case 'hicsts.hawaii.gov':
+				$this->cre_base = 'https://hicsts.hawaii.gov/serverjson.asp';
+				break;
 			case 'nm':
 			case 'mcp-tracking.nmhealth.org':
 				$this->cre_base = 'https://mcp-tracking.nmhealth.org/serverjson.asp';
