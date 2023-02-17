@@ -1,15 +1,20 @@
 <?php
 /**
- * LeafData passthru
+ * LeafData PIPE
+ *
+ * SPDX-License-Identifier: MIT
  */
 
-namespace App\Controller;
+namespace OpenTHC\Pipe\Controller;
 
-class LeafData extends \App\Controller\Base
+class LeafData extends \OpenTHC\Pipe\Controller\Base
 {
 	// Default
 	protected $cre_base = 'https://bunk.openthc.dev/leafdata/v2017';
 
+	/**
+	 *
+	 */
 	function __invoke($REQ, $RES, $ARG)
 	{
 		parent::__invoke($REQ, $RES, $ARG);
@@ -45,13 +50,13 @@ class LeafData extends \App\Controller\Base
 
 		// Resolve Path
 		// Clean these if the Client Added Them
-		if ('api' == $this->src_path[0]) {
-			array_shift($this->src_path); // drop it
+		if ('api' == $this->req_path[0]) {
+			array_shift($this->req_path); // drop it
 		}
-		if ('v1' == $this->src_path[0]) {
-			array_shift($this->src_path); // drop it
+		if ('v1' == $this->req_path[0]) {
+			array_shift($this->req_path); // drop it
 		}
-		$req_path = implode('/', $this->src_path);
+		$req_path = implode('/', $this->req_path);
 		$req_path = sprintf('/%s?%s', $req_path, $_SERVER['QUERY_STRING']);
 		$req_path = trim($req_path, '?');
 
@@ -147,9 +152,9 @@ class LeafData extends \App\Controller\Base
 	function _check_cre($RES)
 	{
 		$cre = [];
-		$cre[] = array_shift($this->src_path);
-		if ('test' == $this->src_path[0]) {
-			$cre[] = array_shift($this->src_path);
+		$cre[] = array_shift($this->req_path);
+		if ('test' == $this->req_path[0]) {
+			$cre[] = array_shift($this->req_path);
 		}
 
 		$this->cre = implode('/', $cre);

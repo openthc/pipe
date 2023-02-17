@@ -1,18 +1,19 @@
 <?php
 /**
+ * PIPE Base Controller
  *
+ * SPDX-License-Identifier: MIT
  */
 
-namespace App\Controller;
+namespace OpenTHC\Pipe\Controller;
 
 class Base extends \OpenTHC\Controller\Base
 {
 	protected $cre;
 	protected $cre_base;
-	protected $cre_host;
 
-	protected $src_path;
-
+	// Request Stuff
+	protected $req_host;
 	protected $req_path;
 	protected $req_head;
 	protected $req_ulid;
@@ -20,10 +21,22 @@ class Base extends \OpenTHC\Controller\Base
 	protected $res_info;
 	protected $res_body;
 
+	/**
+	 *
+	 */
 	function __invoke($REQ, $RES, $ARG)
 	{
+		if ( ! empty($_SERVER['HTTP_OPENTHC_COMPANY'])) {
+			$this->company_id = $_SERVER['HTTP_OPENTHC_COMPANY'];
+		}
+
+		if ( ! empty($_SERVER['HTTP_OPENTHC_LICENSE'])) {
+			$this->license_id = $_SERVER['HTTP_OPENTHC_LICENSE'];
+		}
+
 		$this->req_ulid = _ulid();
-		$this->src_path = explode('/', $ARG['path']);
+		$this->req_host = $ARG['host'];
+		$this->req_path = explode('/', $ARG['path']);
 	}
 
 	/**

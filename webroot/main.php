@@ -1,6 +1,8 @@
 <?php
 /**
  * OpenTHC PIPE Front Controller
+ *
+ * SPDX-License-Identifier: MIT
  */
 
  // Early Error Handler
@@ -62,26 +64,33 @@ unset($con['errorHandler']);
 unset($con['phpErrorHandler']);
 
 // Engine Specific Controllers
-$app->map([ 'GET', 'POST' ], '/biotrack/{path:.*}', 'App\Controller\BioTrack')
+// $app->get('/biotrack');
+$app->map([ 'GET', 'POST' ], '/biotrack/{host}[/{path:.*}]', 'OpenTHC\Pipe\Controller\BioTrack')
 	->add('OpenTHC\Middleware\Session');
 
-$app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{path:.*}', 'App\Controller\LeafData');
+// $app->get('/leafdata');
+$app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{host}/{path:.*}', 'OpenTHC\Pipe\Controller\LeafData');
 
-$app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{path:.*}', 'App\Controller\Metrc');
+// $app->get('/metrc');
+$app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{host}/{path:.*}', 'OpenTHC\Pipe\Controller\Metrc');
+
+// $app->get('/qbench');
+// $app->get('/qbench/{host}/{path:.*}', 'OpenTHC\Pipe\Controller\QBench');
+
 
 // Log Access
-$app->map([ 'GET', 'POST' ], '/log', 'App\Controller\Log')
+$app->map([ 'GET', 'POST' ], '/log', 'OpenTHC\Pipe\Controller\Log')
 	->add('OpenTHC\Middleware\Session');
 
 // Engine Details
-$app->get('/engines', function() {
+$app->get('/service/list', function() {
 	$out_text = [];
-	$cre_list = \App\CRE::getEngineList();
-	ksort($cre_list);
+	$cre_list = \OpenTHC\Pipe\CRE::getEngineList();
+	// ksort($cre_list);
 	foreach ($cre_list as $cre) {
 		$cre['hostname'] = parse_url($cre['server'], PHP_URL_HOST);
-		$out_text[] = sprintf('% 20s    %s', $cre['code'], $cre['server']);
-		$out_text[] = '                        /' . $cre['engine'] . '/' . $cre['hostname'];;
+		$out_text[] = sprintf('% 20s    /%s/%s', $cre['code'], $cre['engine'], $cre['hostname']);
+		$out_text[] = '                        ' . $cre['server'];
 		$out_text[] = '';
 	}
 	$out_text = implode("\n", $out_text);

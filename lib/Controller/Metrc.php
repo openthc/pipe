@@ -1,12 +1,17 @@
 <?php
 /**
  * Metrc Passthru
+ *
+ * SPDX-License-Identifier: MIT
  */
 
-namespace App\Controller;
+namespace OpenTHC\Pipe\Controller;
 
-class Metrc extends \App\Controller\Base
+class Metrc extends \OpenTHC\Pipe\Controller\Base
 {
+	/**
+	 *
+	 */
 	function __invoke($REQ, $RES, $ARG)
 	{
 		parent::__invoke($REQ, $RES, $ARG);
@@ -34,7 +39,7 @@ class Metrc extends \App\Controller\Base
 		}
 
 		// Resolve Path
-		$req_path = sprintf('/%s', implode('/', $this->src_path));
+		$req_path = sprintf('/%s', implode('/', $this->req_path));
 
 		// A cheap-ass, incomplete filter
 		switch ($req_path) {
@@ -150,10 +155,8 @@ class Metrc extends \App\Controller\Base
 	 */
 	function _check_cre($RES)
 	{
-		$this->cre = array_shift($this->src_path);
-
 		// Requested System
-		switch ($this->cre) {
+		switch ($this->req_host) {
 		case 'ak':
 		case 'ca':
 		case 'co':
@@ -168,7 +171,7 @@ class Metrc extends \App\Controller\Base
 		case 'oh':
 		case 'or':
 			$this->cre_base = sprintf('https://api-%s.metrc.com', $this->cre);
-		break;
+			break;
 		case 'api-ak.metrc.com':
 		case 'api-ca.metrc.com':
 		case 'api-co.metrc.com':
@@ -183,7 +186,7 @@ class Metrc extends \App\Controller\Base
 		case 'api-ok.metrc.com':
 		case 'api-or.metrc.com':
 			$this->cre_base = sprintf('https://%s', $this->cre);
-		break;
+			break;
 		case 'sandbox-api-co.metrc.com':
 		case 'sandbox-api-md.metrc.com':
 		case 'sandbox-api-ok.metrc.com':
