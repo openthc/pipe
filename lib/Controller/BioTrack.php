@@ -95,7 +95,7 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 
 		// Assign NONCE
 		if (empty($src_json['nonce'])) {
-			$src_json['nonce'] = $_SERVER['UNIQUE_ID'];
+			$src_json['nonce'] = _ulid();
 		}
 
 
