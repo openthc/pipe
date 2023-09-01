@@ -63,6 +63,12 @@ $con = $app->getContainer();
 unset($con['errorHandler']);
 unset($con['phpErrorHandler']);
 
+// Authentication
+$app->group('/auth', 'OpenTHC\Pipe\Module\Auth')
+	// ->add('OpenTHC\Bong\Middleware\Auth')
+	->add('OpenTHC\Middleware\Session');
+
+
 // Engine Specific Controllers
 // $app->get('/biotrack');
 $app->map([ 'GET', 'POST' ], '/biotrack/{host}[/{path:.*}]', 'OpenTHC\Pipe\Controller\BioTrack')
