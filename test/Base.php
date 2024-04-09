@@ -8,57 +8,12 @@ namespace OpenTHC\Pipe\Test;
 class Base_Case extends \PHPUnit\Framework\TestCase
 {
 	protected $_cre;
-	protected $_pid;
 	protected $_tmp_file = '/tmp/pipe-test-case.dat';
 
-
-	public function __construct($name = null, array $data = [], $dataName = '')
-	{
-		parent::__construct($name, $data, $dataName);
-		$this->_pid = getmypid();
-	}
 
 	protected function setUp() : void
 	{
 		$this->httpClient = $this->_api();
-	}
-
-	/**
-	 * Intends to become an assert wrapper for a bunch of common response checks
-	 * @param $res, Response Object
-	 * @return void
-	 */
-	function assertValidResponse($res, $code=200, $dump=null) : array
-	{
-		$this->raw = $res->getBody()->getContents();
-
-		$hrc = $res->getStatusCode();
-
-		if (empty($dump)) {
-			if ($code != $hrc) {
-				$dump = "HTTP $hrc != $code";
-			}
-		}
-
-		if (!empty($dump)) {
-			echo "\n<<< $dump <<< $hrc <<<\n{$this->raw}\n###\n";
-		}
-
-		$this->assertEquals($code, $res->getStatusCode());
-		$type = $res->getHeaderLine('content-type');
-		$type = strtok($type, ';');
-		$this->assertEquals('application/json', $type);
-
-		$ret = \json_decode($this->raw, true);
-
-		$this->assertIsArray($ret);
-		// $this->assertArrayHasKey('data', $ret);
-		// $this->assertArrayHasKey('meta', $ret);
-
-		$this->assertArrayNotHasKey('status', $ret);
-		$this->assertArrayNotHasKey('result', $ret);
-
-		return $ret;
 	}
 
 	/**
