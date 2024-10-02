@@ -1,15 +1,18 @@
 {
   "name": "@openthc/pipe",
-  "version": "420.23.244",
   "description": "OpenTHC PIPE",
+  "author": "OpenTHC, Inc.",
+  "version": "420.24.276",
+  "homepage": "https://openthc.org/pipe",
+  "license": "MIT",
   "main": "main.js",
   "directories": {
     "lib": "lib",
     "test": "test"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "6.4.2",
-    "bootstrap": "5.3.2",
+    "@fortawesome/fontawesome-free": "6.6.0",
+    "bootstrap": "5.3.3",
     "jquery": "3.7.1"
   },
   "scripts": {
@@ -19,10 +22,7 @@
     "type": "git",
     "url": "git+https://gitlab.com/openthc/pipe.git"
   },
-  "author": "OpenTHC, Inc.",
-  "license": "NONE",
   "bugs": {
     "url": "https://gitlab.com/openthc/pipe/issues"
-  },
-  "homepage": "https://openthc.org/pipe"
+  }
 }

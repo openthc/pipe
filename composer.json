@@ -1,19 +1,21 @@
 {
 	"name": "openthc/pipe",
 	"description": "OpenTHC CRE API Proxy Service",
-	"license": "GPL-3.0-only",
+	"version": "420.24.276",
+	"license": "MIT",
 	"autoload": {
 		"exclude-from-classmap": [
 			"vendor/erusev/parsedown-extra/test"
 		],
 		"psr-4": {
 			"OpenTHC\\Pipe\\": "./lib",
-			"OpenTHC\\Pipe\\Test\\": "./test",
-			"Custom\\": "./Custom"
+			"OpenTHC\\Pipe\\Test\\": "./test"
 		}
 	},
 	"require": {
+		"edoceo/lowline": "2022.0.280",
 		"edoceo/radix": "2021.0.0",
+		"league/oauth2-client": "2.7.0",
 		"openthc/common": "dev-main",
 		"openthc/cre-adapter": "dev-main"
 	},
