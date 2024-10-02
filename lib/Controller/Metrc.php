@@ -71,7 +71,7 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 			'id' => $this->req_ulid,
 			'lic_hash' => md5($_SERVER['HTTP_AUTHORIZATION']),
 			'req_time' => date_format(new \DateTime(), \DateTime::RFC3339_EXTENDED),
-			'req_head' => sprintf('%s %s HTTP/1.1', $_SERVER['REQUEST_METHOD'], $req_path),
+			'req_name' => sprintf('%s %s HTTP/1.1', $_SERVER['REQUEST_METHOD'], $req_path),
 		]);
 
 		// Forward
@@ -115,7 +115,7 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 		$dbc->update('log_audit', [
 			'req_head' => $this->req_head,
 			'res_time' => date_format(new \DateTime(), \DateTime::RFC3339_EXTENDED),
-			'res_info' => json_encode($this->res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+			'res_meta' => json_encode($this->res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
 			'res_head' => $this->res_head,
 			'res_body' => $this->res_body,
 		], [ 'id' => $this->req_ulid ]);

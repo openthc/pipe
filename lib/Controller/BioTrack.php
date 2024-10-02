@@ -23,24 +23,42 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 	{
 		parent::__invoke($REQ, $RES, $ARG);
 
-		$dts = new \DateTime();
-		$req_path = sprintf('/%s', implode('/', $this->req_path));
-
-		// Capture Request Headers?
-
-		$dbc = _dbc();
-		$dbc->insert('log_audit', [
-			'id' => $this->req_ulid,
-			'lic_hash' => sprintf('%s/%s', $this->company_id, $this->license_id),
-			'req_time' => $dts->format(\DateTime::RFC3339_EXTENDED),
-			'req_head' => sprintf('%s %s HTTP/1.1', $_SERVER['REQUEST_METHOD'], $req_path),
-		]);
-
 		// Validate the CRE
 		$RES = $this->_check_cre($RES);
 		if (200 != $RES->getStatusCode()) {
 			return $RES;
 		}
+
+		// Good JSON?
+		$src_json = file_get_contents('php://input');
+		$src_json = json_decode($src_json, true);
+		if (empty($src_json)) {
+			return $RES->withJSON(array(
+				'data' => null,
+				'meta' => [
+					'note' => 'Error Decoding Input [CSB-034]',
+					'error' => json_last_error_msg(),
+				]
+			), 400);
+		}
+
+		$dts = new \DateTime();
+		$req_name = [];
+		$req_name[] = $_SERVER['REQUEST_METHOD'];
+		$req_name[] = sprintf('/%s', implode('/', $this->req_path));
+		if ( ! empty($src_json['action'])) {
+			$req_name[] = sprintf('#%s', $src_json['action']);
+		}
+
+		// Capture Request Headers?
+		$dbc = _dbc();
+		$dbc->insert('log_audit', [
+			'id' => $this->req_ulid,
+			// 'license_id' => '',
+			// 'lic_hash' => sprintf('%s/%s', $this->company_id, $this->license_id),
+			'req_time' => $dts->format(\DateTime::RFC3339_EXTENDED),
+			'req_name' => implode('', $req_name)
+		]);
 
 		// Our special end-point
 		if ('ping' == $this->req_path[0]) {
@@ -70,21 +88,7 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 		default:
 			return $RES->withJSON(array(
 				'data' => null,
-				'meta' => [ 'detail' => 'Specify "content-type: text/JSON" [CSB-067]' ]
-			), 400);
-		}
-
-
-		// Good JSON?
-		$src_json = file_get_contents('php://input');
-		$src_json = json_decode($src_json, true);
-		if (empty($src_json)) {
-			return $RES->withJSON(array(
-				'data' => null,
-				'meta' => [
-					'note' => 'Error Decoding Input [CSB-034]',
-					'error' => json_last_error_msg(),
-				]
+				'meta' => [ 'note' => 'Specify "content-type: text/JSON" [CSB-067]' ]
 			), 400);
 		}
 
@@ -95,7 +99,7 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 
 		// Assign NONCE
 		if (empty($src_json['nonce'])) {
-			$src_json['nonce'] = _ulid();
+			$src_json['nonce'] = \Edoceo\Radix\ULID::create();
 		}
 
 
@@ -148,7 +152,7 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 		$dbc->update('log_audit', [
 			'req_head' => $this->req_head,
 			'res_time' => $res_time->format(\DateTime::RFC3339_EXTENDED),
-			'res_info' => json_encode($this->res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+			'res_meta' => json_encode($this->res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
 			'res_head' => $this->res_head,
 			'res_body' => $this->res_body,
 		], [ 'id' => $this->req_ulid ]);
