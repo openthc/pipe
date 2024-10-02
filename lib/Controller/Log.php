@@ -17,11 +17,6 @@ class Log extends \OpenTHC\Controller\Base
 	 */
 	function __invoke($REQ, $RES, $ARG)
 	{
-		$RES = $this->_auth_check($RES);
-		if (200 != $RES->getStatusCode()) {
-			return $RES;
-		}
-
 		if (count($_GET)) {
 
 			switch ($_GET['a']) {
@@ -86,33 +81,6 @@ class Log extends \OpenTHC\Controller\Base
 		$output_html = $this->render('log.php', $data);
 
 		return $RES->write($output_html);
-
-	}
-
-	/**
-	 * Check Authentication
-	 */
-	function _auth_check($RES)
-	{
-		if ('POST' == $_SERVER['REQUEST_METHOD']) {
-			$psk = \OpenTHC\Config::get('psk');
-			if (!empty($psk) && !empty($_POST['a'])) {
-				if ($_POST['a'] == $psk) {
-					$_SESSION['acl-log-view'] = true;
-				}
-			}
-		}
-
-		if (empty($_SESSION['acl-log-view'])) {
-
-			$output_html = $this->render('auth.php', []);
-
-			$RES = $RES->withStatus(403);
-			$RES = $RES->write($output_html);
-
-		}
-
-		return $RES;
 
 	}
 

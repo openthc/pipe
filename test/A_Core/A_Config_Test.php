@@ -28,15 +28,6 @@ class A_Config_Test extends \OpenTHC\Pipe\Test\Base_Case
 	/**
 	 *
 	 */
-	function test_psk()
-	{
-		$x = \OpenTHC\Config::get('psk');
-		$this->assertNotEmpty($x);
-	}
-
-	/**
-	 *
-	 */
 	function test_tz()
 	{
 		$x = \OpenTHC\Config::get('tz');
