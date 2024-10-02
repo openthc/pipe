@@ -1,5 +1,5 @@
 --
--- Schema for OpenTHC Pipe
+-- PostgreSQL Schema for OpenTHC Pipe
 --
 
 CREATE USER openthc_pipe_root WITH ENCRYPTED PASSWORD 'openthc_pipe_root';
@@ -11,14 +11,15 @@ CREATE DATABASE openthc_pipe WITH OWNER openthc_pipe_root;
 
 CREATE TABLE log_audit (
 	id character varying(26) not null primary key,
-	lic_hash character varying(32) not null,
+	license_id text,
 	req_time timestamp with time zone not null default now(),
 	res_time timestamp with time zone,
+	req_name text,
 	req_head text,
 	req_body text,
-	res_info jsonb,
 	res_head text,
-	res_body text
+	res_body text,
+	res_meta jsonb,
 );
 
 ALTER TABLE log_audit owner TO openthc_pipe_root;
