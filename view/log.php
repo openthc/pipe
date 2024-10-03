@@ -14,62 +14,69 @@ $snap_mode = ('snap' == $data['snap'])
 
 ?>
 
+<div class="container-fluid">
 <h1><?= $data['Page']['title'] ?></h1>
+</div>
 
 <?php
 if (empty($snap_mode)) {
 ?>
+<div class="container-fluid">
+
 <form autocomplete="off">
 <div class="search-filter">
 	<div>
-		<input autocomplete="off" autofocus name="q" placeholder="search" value="<?= h($_GET['q']) ?>">
+		<input autocomplete="off" autofocus class="form-control" name="q" placeholder="search" value="<?= h($_GET['q']) ?>">
 	</div>
 	<div>
-		<input autocomplete="off" name="l" placeholder="license hash" value="<?= h($_GET['l']) ?>">
+		<input autocomplete="off" class="form-control" name="l" placeholder="license hash" value="<?= h($_GET['l']) ?>">
 	</div>
 	<div>
-		<input name="d0" type="date" value="<?= h($_GET['d0']) ?>">
+		<input class="form-control" name="d0" type="date" value="<?= h($_GET['d0']) ?>">
 	</div>
 	<div>
-		<input name="t0" type="time" value="<?= h($_GET['t0']) ?>">
+		<input class="form-control" name="t0" type="time" value="<?= h($_GET['t0']) ?>">
 	</div>
 	<div>
-		<input name="d1" type="date" value="<?= h($_GET['d1']) ?>">
+		<input class="form-control" name="d1" type="date" value="<?= h($_GET['d1']) ?>">
 	</div>
 	<div>
-		<input name="t1" type="time" value="<?= h($_GET['t1']) ?>">
+		<input class="form-control" name="t1" type="time" value="<?= h($_GET['t1']) ?>">
 	</div>
 	<div>
-		<button type="submit">Go</button>
+		<button class="btn btn-primary" type="submit">Go</button>
 	</div>
 	<div>
-		<button formtarget="_blank" name="a" type="submit" value="snap">Snap</button>
+		<button class="btn btn-secondary" formtarget="_blank" name="a" type="submit" value="snap">Snap</button>
 	</div>
 	<div>
-		<a href="?<?= $data['link_newer'] ?>">Newer</a>
+		<a class="btn btn-secondary" href="?<?= $data['link_newer'] ?>">Newer</a>
 	</div>
 	<div>
-		<a href="?<?= $data['link_older'] ?>">Older</a>
+		<a class="btn btn-secondary" href="?<?= $data['link_older'] ?>">Older</a>
 	</div>
 	<div>
 		<input name="snap-get" type="hidden" value="<?= $snap_data ?>">
-		<button name="a" type="submit" value="x">Clear</button>
+		<button class="btn btn-secondary" name="a" type="submit" value="x">Clear</button>
 	</div>
 </div>
 </form>
 
 <div class="sql-debug"><?= h(trim($data['sql_debug'])) ?></div>
 
+</div>
+
 <?php
 }
 ?>
 
-<table id="log-table">
-<thead>
+<div class="container-fluid">
+<table class="table table-sm table-bordered table-hover" id="log-table">
+<thead class="table-dark">
 	<tr>
 		<th></th>
 		<th>Date</th>
-		<th>Path</th>
+		<th>Request</th>
 		<th>Status</th>
 		<th>Size</th>
 	</tr>
@@ -105,20 +112,20 @@ foreach ($data['log_audit'] as $rec) {
 		$rec['res_body'] = json_encode($rec['res_body'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	}
 
-	$req = strtok($rec['req_head'], "\n");
+	// $req = strtok($rec['req_head'], "\n");
 	$res = strtok($rec['res_head'], "\n");
 
 	printf('<tr class="tr1" data-target="#row-%d-2" id="row-%d">', $idx, $idx);
 	if ($snap_mode) {
 		printf('<td class="c">%d</td>', $idx);
 	} else {
-		printf('<td class="c"><a href="/log?id=%s">%d</a></td>', $rec['id'], $idx);
+		printf('<td class="c"><a href="/log/view?id=%s">%d</a></td>', $rec['id'], $idx);
 	}
 	// echo '<td>' . _date('m/d H:i:s', $rec['req_time']) . '</td>';
 	// echo '<td>' . h($rec['req_time']) . '</td>';
-	printf('<td title="%s">%s [%0.1f s]</td>', h($rec['req_time']), $dt0->format('m/d H:i:s'), $res_wait);
-	echo '<td>' . h($req) . '</td>';
-	echo '<td>' . h($res) . '</td>';
+	printf('<td title="%s">%s [%0.1f s]</td>', __h($rec['req_time']), $dt0->format('m/d H:i:s'), $res_wait);
+	echo '<td>' . __h($rec['req_name']) . '</td>';
+	echo '<td>' . __h($res) . '</td>';
 	echo '<td>' . strlen($rec['res_body']) . '</td>';
 	echo '</tr>';
 
@@ -129,14 +136,14 @@ foreach ($data['log_audit'] as $rec) {
 
 		echo '<div style="flex: 1 1 50%; padding:0.25rem;">';
 			echo '<h3>Request</h3>';
-			echo '<pre class="head">' . h(_view_data_scrub($rec['req_head'])) . '</pre>';
-			echo '<pre class="body">' . h(_view_data_scrub($rec['req_body'])) . '</pre>';
+			echo '<pre class="head">' . __h(_view_data_scrub($rec['req_head'])) . '</pre>';
+			echo '<pre class="body">' . __h(_view_data_scrub($rec['req_body'])) . '</pre>';
 		echo '</div>';
 
 		echo '<div style="flex: 1 1 50%; padding:0.25rem;">';
 			echo '<h3>Response</h3>';
-			echo '<pre class="head">' . h(_view_data_scrub($rec['res_head'])) . '</pre>';
-			echo '<pre class="body">' . h(_view_data_scrub($rec['res_body'])) . '</pre>';
+			echo '<pre class="head">' . __h(_view_data_scrub($rec['res_head'])) . '</pre>';
+			echo '<pre class="body">' . __h(_view_data_scrub($rec['res_body'])) . '</pre>';
 		echo '</div>';
 
 	echo '</div>';
@@ -148,6 +155,8 @@ foreach ($data['log_audit'] as $rec) {
 </tbody>
 </table>
 
+</div>
+
 <?php
 if (empty($snap_mode)) {
 	// Had Script Include Here
@@ -155,7 +164,7 @@ if (empty($snap_mode)) {
 
 
 /**
- * Sanatize REQ or RES
+ * Sanatize String w/RegEx (sloppy)
  */
 function _view_data_scrub($x)
 {

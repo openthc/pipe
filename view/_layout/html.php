@@ -20,8 +20,10 @@ if (empty($_ENV['title'])) {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="google" content="notranslate">
+<link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+<link rel="stylesheet" href="/vendor/bootstrap/bootstrap.min.css">
 <link rel="stylesheet" href="/css/app.css">
-<title><?= h(strip_tags($_ENV['title'])) ?></title>
+<title>PIPE || <?= __h(strip_tags($_ENV['title'])) ?></title>
 </head>
 <body>
 <?php
