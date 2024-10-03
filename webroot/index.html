@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -42,7 +42,7 @@ p {
 
 <h1>PIPE</h1>
 <p>Proxy Intermediary for Payload Examination</p>
-<p>More information at <a href="https://openthc.com/pipe">openthc.com/pipe</a></p>
+<p>More information at <a href="https://openthc.org/pipe">openthc.org/pipe</a></p>
 
 <script>
 var usp = new URLSearchParams(window.location.search);
@@ -52,8 +52,10 @@ if (usp.has('h')) {
 		h.innerText = usp.get('h');
 	}
 }
+
+// Redirect in about one second
 if (usp.has('r')) {
-	debugger;
+
 	var r = usp.get('r');
 
 	var f = document.querySelector('footer');
@@ -61,7 +63,10 @@ if (usp.has('r')) {
 		f.innerText = 'Sending you to: ' + r;
 	}
 
-	window.location = r;
+	setTimeout(function() {
+		window.location = r;
+	}, 1234);
+
 }
 </script>
 
