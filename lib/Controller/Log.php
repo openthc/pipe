@@ -44,7 +44,7 @@ class Log extends \OpenTHC\Controller\Base
 		$this->query_offset = max(0, intval($_GET['o']));
 
 		$data = [
-			'Page' => [ 'title' => 'Log Search :: OpenTHC BONG' ],
+			'Page' => [ 'title' => 'Log Search' ],
 			'tz' => \OpenTHC\Config::get('tz'),
 			'link_newer' => null,
 			'link_older' => null,
