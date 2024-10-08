@@ -1,6 +1,8 @@
 <?php
 /**
  * OpenTHC HTML Layout
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 use Edoceo\Radix\Session;
@@ -16,7 +18,7 @@ if (empty($_ENV['title'])) {
 <meta charset="utf-8">
 <meta name="application-name" content="OpenTHC">
 <meta name="viewport" content="initial-scale=1, user-scalable=yes">
-<meta name="theme-color" content="#003100">
+<meta name="theme-color" content="#069420">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="google" content="notranslate">
@@ -25,7 +27,7 @@ if (empty($_ENV['title'])) {
 <link rel="stylesheet" href="/css/app.css">
 <title>PIPE || <?= __h(strip_tags($_ENV['title'])) ?></title>
 </head>
-<body>
+<body data-bs-theme="light">
 <?php
 
 $x = Session::flash();
@@ -73,6 +75,19 @@ function rowShut(tr1)
 
 }
 
+// Open each row by id in the hash
+var hash = window.location.hash;
+hash = hash.replace(/#/, '');
+var rec_list = hash.split(',');
+rec_list.forEach(function(v, i) {
+	var key = `#row-${v}-1`;
+	var row = document.querySelector(key);
+	if (row) {
+		rowOpen(row);
+	}
+});
+
+
 var tab = document.querySelector('#log-table');
 tab.addEventListener('click', function(e) {
 
@@ -96,17 +111,65 @@ tab.addEventListener('click', function(e) {
 	}
 });
 
-// Open each row by id in the hash
-var hash = window.location.hash;
-hash = hash.replace(/#/, '');
-var rec_list = hash.split(',');
-rec_list.forEach(function(v, i) {
-	var key = `#row-${v}-1`;
-	var row = document.querySelector(key);
-	if (row) {
-		rowOpen(row);
-	}
-});
+var btnSnap = document.querySelector('.btn-snap');
+if (btnSnap) {
+	btnSnap.addEventListener('click', function() {
+
+		// var output_dom = document.cloneNode(true);
+
+		var source_html = '';
+		try {
+			var x = new XMLSerializer().serializeToString(document);
+			source_html = x.toString();
+		} catch (e) {
+			source_html = '-exception-';
+		}
+
+		var form = new FormData();
+		form.set('source-html', source_html);
+		// form.append('file', e.dataTransfer);
+		fetch('/log/snap', {
+			method: 'POST',
+			body: form,
+		}).then(function(res) {
+			return res.json();
+		}).then(function(res) {
+			console.log(res);
+			window.open(res.data);
+		});
+		// These Shortcuts Encoded Funny on POST
+		// }).then(res => {
+		// 	return res.json();
+		// }).then(res => {
+		// 	debugger;
+		// 	console.log(res);
+		// 	window.open(res.data);
+		// });
+		// $.get('/help/bug', function(res) {
+		// 	res = $(res);
+		// 	$(document.body).append(res);
+		// 	$('#modal-support-form').modal('show');
+		// 	$('#modal-support-form').on('hidden.bs.modal', function() {
+		// 			res.remove();
+		// 	});
+		// 	$('#modal-support-form #source-html').val(source_html);
+		// });
+
+
+		// Clone DOM
+
+
+
+		// Remove Script
+		// Remove Form
+		// POST
+		// fetch('/log/snap', {
+		// 	method: 'POST',
+		// 	body: htmlSnapshot;
+		// });
+
+	});
+}
 </script>
 </body>
 </html>

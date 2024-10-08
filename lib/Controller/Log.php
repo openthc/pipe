@@ -1,6 +1,8 @@
 <?php
 /**
  * Log Viewer
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 namespace OpenTHC\Pipe\Controller;
@@ -20,23 +22,9 @@ class Log extends \OpenTHC\Controller\Base
 		if (count($_GET)) {
 
 			switch ($_GET['a']) {
-				case 'snap':
-
-					$old_get = json_decode(base64_decode($_GET['snap-get']), true);
-					unset($_GET['snap-get']);
-
-					$new_get = array_merge($_GET, $old_get);
-					var_dump($old_get);
-					var_dump($_GET);
-					var_dump($new_get);
-
-					$_GET = $new_get;
-
-					break;
-
-				case 'x':
-					// Clear Filters
-					return $RES->withRedirect('/log');
+			case 'x':
+				// Clear Filters
+				return $RES->withRedirect('/log');
 			}
 
 		}
@@ -55,32 +43,41 @@ class Log extends \OpenTHC\Controller\Base
 		$data['log_audit'] = $this->_sql_query();
 		$data['sql_debug'] = $this->sql_debug;
 
-		if ('snap' == $_GET['a']) {
-
-			$output_snap = _ulid();
-			$output_file = sprintf('%s/webroot/snap/%s.html', APP_ROOT, $output_snap);
-			$output_link = sprintf('/snap/%s.html', $output_snap);
-
-			$data['Page']['title'] = sprintf('OpenTHC Log Snapshot %s', $output_snap);
-			$data['snap'] = 'snap';
-
-			unset($data['sql_debug']);
-
-			$output_html = $this->render('log.php', $data);
-			$output_html = preg_replace('/<form.+<\/form>/', '', $output_html);
-			$output_html = preg_replace('/<div class="sql-debug">.+?<\/div>/', '', $output_html);
-
-			file_put_contents($output_file, $output_html);
-
-			return $RES->withRedirect($output_link);
-		}
-
 		$data['link_newer'] = http_build_query(array_merge($_GET, [ 'o' => max(0, $this->query_offset - $this->query_limit) ] ));
 		$data['link_older'] = http_build_query(array_merge($_GET, [ 'o' => $this->query_offset + $this->query_limit ] ));
 
 		$output_html = $this->render('log.php', $data);
 
 		return $RES->write($output_html);
+
+	}
+
+	function snap($REQ, $RES, $ARG)
+	{
+		$output_snap = _ulid();
+		$output_link = sprintf('/output/snap-%s.html', $output_snap);
+		$output_file = sprintf('%s/webroot%s', APP_ROOT, $output_link);
+
+		// $data['Page']['title'] = sprintf('OpenTHC Log Snapshot %s', $output_snap);
+		// $data['snap'] = 'snap';
+		$output_note = sprintf('<body><div class="container-fluid mt-3"><div class="alert alert-warning">View Snapshot %s</div></div>', $output_snap);
+
+		$output_html = $_POST['source-html'];
+		$output_html = preg_replace('/<title>.+?<\/title>/', sprintf('<title>PIPE || Snapshot %s</title>', $output_snap), $output_html);
+		// $output_html = preg_replace('/<body>/', $output_note, $output_html);
+		$output_html = preg_replace('/<h1>.+?<\/h1>/', sprintf('<h1>Snapshot %s', $output_snap), $output_html);
+		$output_html = preg_replace('/<form.+<\/form>/ms', '', $output_html);
+		$output_html = preg_replace('/<div class="sql-debug.+?<\/div>/ms', '', $output_html);
+		// $output_html = preg_replace('/<script>.+?<\/script>/ms', '', $output_html);
+
+		file_put_contents($output_file, $output_html);
+
+		return $RES->withJSON([
+			'data' => $output_link,
+			'meta' => [ 'note' => 'Done' ]
+		], 201);
+
+		// return $RES->withRedirect($output_link);
 
 	}
 

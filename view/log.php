@@ -1,6 +1,8 @@
 <?php
 /**
  * View the Audit Log
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 $tz = new \DateTimezone($data['tz']);
@@ -26,43 +28,42 @@ if (empty($snap_mode)) {
 <form autocomplete="off">
 <div class="search-filter">
 	<div>
-		<input autocomplete="off" autofocus class="form-control" name="q" placeholder="search" value="<?= h($_GET['q']) ?>">
+		<input autocomplete="off" autofocus class="form-control" name="q" placeholder="search" value="<?= __h($_GET['q']) ?>">
 	</div>
 	<div>
-		<input autocomplete="off" class="form-control" name="l" placeholder="license hash" value="<?= h($_GET['l']) ?>">
+		<input autocomplete="off" class="form-control" name="l" placeholder="license hash" value="<?= __h($_GET['l']) ?>">
 	</div>
 	<div>
-		<input class="form-control" name="d0" type="date" value="<?= h($_GET['d0']) ?>">
+		<input class="form-control" name="d0" type="date" value="<?= __h($_GET['d0']) ?>">
 	</div>
 	<div>
-		<input class="form-control" name="t0" type="time" value="<?= h($_GET['t0']) ?>">
+		<input class="form-control" name="t0" type="time" value="<?= __h($_GET['t0']) ?>">
 	</div>
 	<div>
-		<input class="form-control" name="d1" type="date" value="<?= h($_GET['d1']) ?>">
+		<input class="form-control" name="d1" type="date" value="<?= __h($_GET['d1']) ?>">
 	</div>
 	<div>
-		<input class="form-control" name="t1" type="time" value="<?= h($_GET['t1']) ?>">
+		<input class="form-control" name="t1" type="time" value="<?= __h($_GET['t1']) ?>">
 	</div>
 	<div>
-		<button class="btn btn-primary" type="submit">Go</button>
+		<button class="btn btn-primary" type="submit">Go <i class="fa-solid fa-magnifying-glass"></i></button>
 	</div>
 	<div>
-		<button class="btn btn-secondary" formtarget="_blank" name="a" type="submit" value="snap">Snap</button>
+		<a class="btn btn-secondary" href="?<?= $data['link_newer'] ?>">Newer <i class="fa-solid fa-angles-right"></i></a>
 	</div>
 	<div>
-		<a class="btn btn-secondary" href="?<?= $data['link_newer'] ?>">Newer</a>
+		<a class="btn btn-secondary" href="?<?= $data['link_older'] ?>">Older <i class="fa-solid fa-angles-left"></i></a>
 	</div>
 	<div>
-		<a class="btn btn-secondary" href="?<?= $data['link_older'] ?>">Older</a>
+		<button class="btn btn-secondary btn-snap" type="button" value="snap">Snap <i class="fa-solid fa-copy"></i></button>
 	</div>
 	<div>
-		<input name="snap-get" type="hidden" value="<?= $snap_data ?>">
-		<button class="btn btn-secondary" name="a" type="submit" value="x">Clear</button>
+		<button class="btn btn-secondary" name="a" type="submit" value="x">Clear <i class="fa-solid fa-delete-left"></i></button>
 	</div>
 </div>
 </form>
 
-<div class="sql-debug"><?= h(trim($data['sql_debug'])) ?></div>
+<div class="sql-debug bg-success-subtle"><?= h(trim($data['sql_debug'])) ?></div>
 
 </div>
 
@@ -130,23 +131,27 @@ foreach ($data['log_audit'] as $rec) {
 	echo '</tr>';
 
 	printf('<tr class="tr2 %s" id="row-%d-2">', ($snap_mode ? 'snap' : 'hide'), $idx);
-	echo '<td></td>';
+	echo '<td class="bg-secondary"></td>';
 	echo '<td colspan="4">';
-	echo '<div style="align-item: flex-start; display: flex; flex-direction: row; justify-content: space-around;">';
 
-		echo '<div style="flex: 1 1 50%; padding:0.25rem;">';
-			echo '<h3>Request</h3>';
-			echo '<pre class="head">' . __h(_view_data_scrub($rec['req_head'])) . '</pre>';
-			echo '<pre class="body">' . __h(_view_data_scrub($rec['req_body'])) . '</pre>';
+	echo '<div class="row g-1">';
+		echo '<div class="col-md-6">';
+			echo '<pre class="text-bg-dark">' . __h(_view_data_scrub($rec['req_head'])) . '</pre>';
 		echo '</div>';
-
-		echo '<div style="flex: 1 1 50%; padding:0.25rem;">';
-			echo '<h3>Response</h3>';
-			echo '<pre class="head">' . __h(_view_data_scrub($rec['res_head'])) . '</pre>';
-			echo '<pre class="body">' . __h(_view_data_scrub($rec['res_body'])) . '</pre>';
+		echo '<div class="col-md-6">';
+			echo '<pre class="text-bg-dark">' . __h(_view_data_scrub($rec['res_head'])) . '</pre>';
 		echo '</div>';
-
 	echo '</div>';
+
+	echo '<div class="row g-1">';
+		echo '<div class="col-md-6">';
+			echo '<pre class="bg-body-secondary">' . __h(_view_data_scrub($rec['req_body'])) . '</pre>';
+		echo '</div>';
+		echo '<div class="col-md-6">';
+			echo '<pre class="bg-body-secondary">' . __h(_view_data_scrub($rec['res_body'])) . '</pre>';
+		echo '</div>';
+	echo '</div>';
+
 	echo '</td>';
 	echo '</tr>';
 
@@ -157,12 +162,8 @@ foreach ($data['log_audit'] as $rec) {
 
 </div>
 
+
 <?php
-if (empty($snap_mode)) {
-	// Had Script Include Here
-}
-
-
 /**
  * Sanatize String w/RegEx (sloppy)
  */
@@ -179,6 +180,6 @@ function _view_data_scrub($x)
 	$x = preg_replace('/"vehicle_license_plate":\s*"[^"]+"/im', '"vehicle_license_plate":"**redacted**"', $x);
 	$x = preg_replace('/"vehicle_vin":\s*"[^"]+"/im', '"vehicle_license_plate":"**redacted**"', $x);
 
-	return $x;
+	return trim($x);
 
 }

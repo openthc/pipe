@@ -86,6 +86,11 @@ $app->map([ 'GET', 'POST' ], '/log', 'OpenTHC\Pipe\Controller\Log')
 	->add('OpenTHC\Pipe\Middleware\Auth')
 	->add('OpenTHC\Middleware\Session');
 
+// Snapshot
+$app->post('/log/snap', 'OpenTHC\Pipe\Controller\Log:snap')
+	->add('OpenTHC\Pipe\Middleware\Auth')
+	->add('OpenTHC\Middleware\Session');
+
 // Engine Details
 $app->get('/service/list', function() {
 	$out_text = [];
@@ -100,13 +105,6 @@ $app->get('/service/list', function() {
 	$out_text = implode("\n", $out_text);
 	_exit_text($out_text);
 });
-
-
-// Custom Middleware?
-$f = sprintf('%s/Custom/boot.php', APP_ROOT);
-if (is_file($f)) {
-	require_once($f);
-}
 
 
 // Run the App
