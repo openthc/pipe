@@ -19,7 +19,7 @@ CREATE TABLE log_audit (
 	req_body text,
 	res_head text,
 	res_body text,
-	res_meta jsonb,
+	res_meta jsonb
 );
 
 ALTER TABLE log_audit owner TO openthc_pipe_root;

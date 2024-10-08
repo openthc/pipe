@@ -32,7 +32,7 @@ $cfg['openthc'] = [
 		'origin' => 'https://sso.openthc.example.com',
 		'public' => '/* SSO SERVICE PUBLIC KEY */',
 		'context' => '',
-		'client-id' => '010PENTHCX0000SVC00000P1PE',
+		'client-id' => '/* PIPE SERVICE ULID */',
 		'client-pk' => '/* PIPE SERVICE PUBLIC KEY */',
 		'client-sk' => '/* PIPE SERVICE SECRET KEY */',
 	]
