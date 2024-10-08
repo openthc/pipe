@@ -65,7 +65,6 @@ unset($con['phpErrorHandler']);
 
 // Authentication
 $app->group('/auth', 'OpenTHC\Pipe\Module\Auth')
-	// ->add('OpenTHC\Bong\Middleware\Auth')
 	->add('OpenTHC\Middleware\Session');
 
 
@@ -74,8 +73,6 @@ $app->group('/auth', 'OpenTHC\Pipe\Module\Auth')
 $app->map([ 'GET', 'POST' ], '/biotrack/{host}[/{path:.*}]', 'OpenTHC\Pipe\Controller\BioTrack')
 	->add('OpenTHC\Middleware\Session');
 
-// $app->get('/leafdata');
-$app->map([ 'GET', 'POST', 'DELETE' ], '/leafdata/{host}/{path:.*}', 'OpenTHC\Pipe\Controller\LeafData');
 
 // $app->get('/metrc');
 $app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{host}/{path:.*}', 'OpenTHC\Pipe\Controller\Metrc');
@@ -86,6 +83,7 @@ $app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{host}/{path:.*}', 'OpenTH
 
 // Log Access
 $app->map([ 'GET', 'POST' ], '/log', 'OpenTHC\Pipe\Controller\Log')
+	->add('OpenTHC\Pipe\Middleware\Auth')
 	->add('OpenTHC\Middleware\Session');
 
 // Engine Details
