@@ -5,9 +5,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-namespace OpenTHC\Pipe\Test\B_Base;
+namespace OpenTHC\Pipe\Test\CRE;
 
-class B_BioTrack_Test extends \OpenTHC\Pipe\Test\Base_Case
+class BioTrack_Test extends \OpenTHC\Pipe\Test\Base
 {
 
 	/**

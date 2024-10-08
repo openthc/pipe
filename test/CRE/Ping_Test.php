@@ -12,9 +12,9 @@
  *
  */
 
-namespace OpenTHC\Pipe\Test\A_Core;
+namespace OpenTHC\Pipe\Test\CRE;
 
-class C_CRE_Ping_Test extends \OpenTHC\Pipe\Test\Base_Case
+class Ping_Test extends \OpenTHC\Pipe\Test\Base
 {
 	/**
 	 *
@@ -29,7 +29,7 @@ class C_CRE_Ping_Test extends \OpenTHC\Pipe\Test\Base_Case
 
 	// 	foreach ($engine_list as $engine) {
 
-	// 		$url = sprintf('%s/%s/ping', getenv('OPENTHC_TEST_BASE'), $engine);
+	// 		$url = sprintf('%s/%s/ping', OPENTHC_TEST_ORIGIN, $engine);
 	// 		$req = _curl_init($url);
 	// 		$res = curl_exec($req);
 	// 		$inf = curl_getinfo($req);
@@ -56,25 +56,22 @@ class C_CRE_Ping_Test extends \OpenTHC\Pipe\Test\Base_Case
 	public function test_ping_cre()
 	{
 		$cre_list = \OpenTHC\CRE::getEngineList();
-		$this->assertCount(21, $cre_list);
+		$this->assertCount(99, $cre_list);
 
 		foreach ($cre_list as $cre) {
 
-			$cre_pipe = trim(getenv('OPENTHC_TEST_BASE'), '/');
+			$cre_pipe = trim(OPENTHC_TEST_ORIGIN, '/');
 			$cre_path = parse_url($cre['server'], PHP_URL_HOST);
 
 			$url = sprintf('%s/%s/%s/ping', $cre_pipe, $cre['engine'], $cre_path);
 
-			echo "URL:$url\n";
-
 			$req = _curl_init($url);
 			$res = curl_exec($req);
-
 
 			$inf = curl_getinfo($req);
 			curl_close($req);
 
-			$this->assertEquals(200, $inf['http_code']);
+			$this->assertEquals(200, $inf['http_code'], sprintf('Failed Fetching %s', $url));
 			$this->assertNotEmpty($res);
 			$res = json_decode($res, true);
 			$this->assertIsArray($res);

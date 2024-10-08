@@ -5,7 +5,7 @@
 
 namespace OpenTHC\Pipe\Test;
 
-class Base_Case extends \PHPUnit\Framework\TestCase
+class Base extends \PHPUnit\Framework\TestCase
 {
 	protected $_cre;
 	protected $_tmp_file = '/tmp/pipe-test-case.dat';
@@ -22,7 +22,7 @@ class Base_Case extends \PHPUnit\Framework\TestCase
 	{
 		// create our http client (Guzzle)
 		$c = new \GuzzleHttp\Client(array(
-			'base_uri' => rtrim(getenv('OPENTHC_TEST_BASE'), '/'),
+			'base_uri' => rtrim(OPENTHC_TEST_ORIGIN, '/'),
 			'allow_redirects' => false,
 			'debug' => $_ENV['debug-http'],
 			'request.options' => array(
@@ -51,26 +51,6 @@ class Base_Case extends \PHPUnit\Framework\TestCase
 	{
 		$res = $this->httpClient->post($u, [ 'json' => $a ]);
 		return $res;
-	}
-
-
-	/**
-	*/
-	protected function _data_stash_get()
-	{
-		if (is_file($this->_tmp_file)) {
-			$x = file_get_contents($this->_tmp_file);
-			$x = json_decode($x, true);
-			return $x;
-		}
-	}
-
-
-	/**
-	*/
-	protected function _data_stash_put($d)
-	{
-		file_put_contents($this->_tmp_file, json_encode($d));
 	}
 
 }

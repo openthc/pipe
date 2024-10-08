@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: MIT
  */
 
-namespace OpenTHC\Pipe\Test\A_Core;
+namespace OpenTHC\Pipe\Test\Core;
 
-class A_Config_Test extends \OpenTHC\Pipe\Test\Base_Case
+class Config_Test extends \OpenTHC\Pipe\Test\Base
 {
 	/**
 	 *
@@ -21,7 +21,7 @@ class A_Config_Test extends \OpenTHC\Pipe\Test\Base_Case
 	 */
 	function test_env()
 	{
-		$x = getenv('OPENTHC_TEST_BASE');
+		$x = defined('OPENTHC_TEST_ORIGIN');
 		$this->assertNotEmpty($x);
 	}
 
