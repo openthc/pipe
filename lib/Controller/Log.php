@@ -58,17 +58,14 @@ class Log extends \OpenTHC\Controller\Base
 		$output_link = sprintf('/output/snap-%s.html', $output_snap);
 		$output_file = sprintf('%s/webroot%s', APP_ROOT, $output_link);
 
-		// $data['Page']['title'] = sprintf('OpenTHC Log Snapshot %s', $output_snap);
-		// $data['snap'] = 'snap';
-		$output_note = sprintf('<body><div class="container-fluid mt-3"><div class="alert alert-warning">View Snapshot %s</div></div>', $output_snap);
-
 		$output_html = $_POST['source-html'];
 		$output_html = preg_replace('/<title>.+?<\/title>/', sprintf('<title>PIPE || Snapshot %s</title>', $output_snap), $output_html);
-		// $output_html = preg_replace('/<body>/', $output_note, $output_html);
-		$output_html = preg_replace('/<h1>.+?<\/h1>/', sprintf('<h1>Snapshot %s', $output_snap), $output_html);
-		$output_html = preg_replace('/<form.+<\/form>/ms', '', $output_html);
-		$output_html = preg_replace('/<div class="sql-debug.+?<\/div>/ms', '', $output_html);
-		// $output_html = preg_replace('/<script>.+?<\/script>/ms', '', $output_html);
+		$output_html = preg_replace('/<h1>.+?<\/h1>/', sprintf('<h1 class="alert alert-warning mt-3">Snapshot %s</h1>', $output_snap), $output_html);
+
+		// Handled client-side
+		// $output_html = preg_replace('/<form.+<\/form>/ms', '', $output_html);
+		// $output_html = preg_replace('/<div class="sql-debug.+?<\/div>/ms', '', $output_html);
+		// $output_html = preg_replace('/<script id="btn-snap.+?<\/script>/ms', '', $output_html);
 
 		file_put_contents($output_file, $output_html);
 

@@ -50,7 +50,7 @@ echo $this->body;
 
 <?= $this->foot_script ?>
 
-<script>
+<script id="tr-open-shut">
 function rowOpen(tr1)
 {
 	var id2 = tr1.getAttribute('data-target');
@@ -110,16 +110,24 @@ tab.addEventListener('click', function(e) {
 
 	}
 });
+</script>
 
+<script id="btn-snap-script">
 var btnSnap = document.querySelector('.btn-snap');
 if (btnSnap) {
 	btnSnap.addEventListener('click', function() {
 
-		// var output_dom = document.cloneNode(true);
+		var output_dom = document.cloneNode(true);
+
+		var rem_node = output_dom.querySelector('#search-filter-wrap');
+		rem_node.remove();
+
+		var rem_node = output_dom.querySelector('#btn-snap-script');
+		rem_node.remove();
 
 		var source_html = '';
 		try {
-			var x = new XMLSerializer().serializeToString(document);
+			var x = new XMLSerializer().serializeToString(output_dom);
 			source_html = x.toString();
 		} catch (e) {
 			source_html = '-exception-';
