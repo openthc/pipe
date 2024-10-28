@@ -187,6 +187,10 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 			case 'mcp-tracking.nmhealth.org':
 				$this->cre_base = 'https://mcp-tracking.nmhealth.org/serverjson.asp';
 				break;
+			// New Mexico - BioTrack v3
+			case 'v3.api.nm.trace.biotrackthc.net':
+				$this->cre_base = 'https://v3.api.nm.trace.biotrackthc.net/';
+				break;
 			default:
 				return $RES->withJSON([
 					'data' => null,
