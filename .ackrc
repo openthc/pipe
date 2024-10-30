@@ -20,8 +20,6 @@
 --ignore-dir=var/
 --ignore-dir=vendor/
 --ignore-dir=webroot/assets/
---ignore-dir=webroot/css/
---ignore-dir=webroot/doc/
 --ignore-dir=webroot/img/
 --ignore-dir=webroot/lib/
 --ignore-dir=webroot/openapi-ui/
@@ -29,7 +27,6 @@
 --ignore-dir=webroot/pub/
 --ignore-dir=webroot/redoc/
 --ignore-dir=webroot/sdk/
---ignore-dir=webroot/test-output/
 --ignore-dir=webroot/vendor/
 
 
