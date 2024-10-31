@@ -55,10 +55,7 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 				// Fatal?
 				return $RES->withJSON([
 					'data' => null,
-					'meta' => [
-						'origin' => 'openthc',
-						'detail' => 'The License Number parameter must be supplied [LCM-093]'
-					]
+					'meta' => [ 'note' => 'The License Number parameter must be supplied [LCM-058]' ]
 				], 400);
 			}
 
@@ -69,7 +66,7 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 		$dbc = _dbc();
 		$dbc->insert('log_audit', [
 			'id' => $this->req_ulid,
-			'lic_hash' => md5($_SERVER['HTTP_AUTHORIZATION']),
+			'license_id' => $this->license_id, // $_GET['licenseNumber'],
 			'req_time' => date_format(new \DateTime(), \DateTime::RFC3339_EXTENDED),
 			'req_name' => sprintf('%s %s HTTP/1.1', $_SERVER['REQUEST_METHOD'], $req_path),
 		]);
