@@ -29,50 +29,6 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 			return $RES;
 		}
 
-		// Good JSON?
-		$src_json = file_get_contents('php://input');
-		$src_json = json_decode($src_json, true);
-		if (empty($src_json)) {
-			return $RES->withJSON(array(
-				'data' => null,
-				'meta' => [
-					'note' => 'Error Decoding Input [CSB-034]',
-					'error' => json_last_error_msg(),
-				]
-			), 400);
-		}
-
-		$dts = new \DateTime();
-		$req_name = [];
-		$req_name[] = $_SERVER['REQUEST_METHOD'];
-		$req_name[] = sprintf('/%s', implode('/', $this->req_path));
-		if ( ! empty($src_json['action'])) {
-			$req_name[] = sprintf('#%s', $src_json['action']);
-		}
-
-		// Capture Request Headers?
-		$dbc = _dbc();
-		$dbc->insert('log_audit', [
-			'id' => $this->req_ulid,
-			// 'license_id' => '',
-			// 'lic_hash' => sprintf('%s/%s', $this->company_id, $this->license_id),
-			'req_time' => $dts->format(\DateTime::RFC3339_EXTENDED),
-			'req_name' => implode('', $req_name)
-		]);
-
-		// Our special end-point
-		if ('ping' == $this->req_path[0]) {
-			return $this->sendPong($RES);
-		}
-
-		if ('POST' != $_SERVER['REQUEST_METHOD']) {
-			return $RES->withJSON(array(
-				'success' => 0,
-				'meta' => [ 'note' => 'Only a POST is allowed here [CSB-045]' ],
-			), 405);
-		}
-
-
 		// Detect Content Type
 		$type = strtok($_SERVER['CONTENT_TYPE'], ';');
 		switch ($type) {
@@ -92,6 +48,53 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 			), 400);
 		}
 
+		// Good JSON?
+		$src_json = file_get_contents('php://input');
+		$src_json = json_decode($src_json, true);
+		if (empty($src_json)) {
+			return $RES->withJSON(array(
+				'data' => null,
+				'meta' => [
+					'note' => 'Error Decoding Input [CSB-034]',
+					'error' => json_last_error_msg(),
+				]
+			), 400);
+		}
+
+		switch ($this->req_host) {
+		case 'v3.api.nm.trace.biotrackthc.net':
+			return $this->v2022($RES, $src_json);
+		}
+
+		$dts = new \DateTime();
+		$req_name = [];
+		$req_name[] = $_SERVER['REQUEST_METHOD'];
+		$req_name[] = sprintf('/%s', implode('/', $this->req_path));
+		if ( ! empty($src_json['action'])) {
+			$req_name[] = sprintf('#%s', $src_json['action']);
+		}
+
+		// Capture Request Headers?
+		$dbc = _dbc();
+		$dbc->insert('log_audit', [
+			'id' => $this->req_ulid,
+			'license_id' => $this->license_id,
+			// 'lic_hash' => sprintf('%s/%s', $this->company_id, $this->license_id),
+			'req_time' => $dts->format(\DateTime::RFC3339_EXTENDED),
+			'req_name' => implode('', $req_name)
+		]);
+
+		// Our special end-point
+		if ('ping' == $this->req_path[0]) {
+			return $this->sendPong($RES);
+		}
+
+		if ('POST' != $_SERVER['REQUEST_METHOD']) {
+			return $RES->withJSON(array(
+				'success' => 0,
+				'meta' => [ 'note' => 'Only a POST is allowed here [CSB-045]' ],
+			), 405);
+		}
 
 		// API Version Check
 		$src_json['API'] = '4.0';
@@ -194,11 +197,66 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 			default:
 				return $RES->withJSON([
 					'data' => null,
-					'meta' => [ 'detail' => 'CRE Not Found [LCM-055]' ],
+					'meta' => [ 'note' => 'CRE Not Found [LCB-055]' ],
 				], 404);
 		}
 
 		return $RES;
+	}
+
+	protected function v2022($RES, $src_json)
+	{
+		$req_name = [];
+		$req_name[] = $_SERVER['REQUEST_METHOD'];
+		$req_name[] = sprintf('/%s', implode('/', $this->req_path));
+
+		$req_body = json_encode($src_json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+		// Capture Request Headers?
+		$dts = new \DateTime();
+
+		$dbc = _dbc();
+		$dbc->insert('log_audit', [
+			'id' => $this->req_ulid,
+			'license_id' => $this->license_id,
+			// 'lic_hash' => sprintf('%s/%s', $this->company_id, $this->license_id),
+			'req_time' => $dts->format(\DateTime::RFC3339_EXTENDED),
+			'req_name' => implode('', $req_name),
+			'req_body' => $req_body,
+		]);
+
+		// Send to BioTrack
+		$url = $this->cre_base . implode('/', $this->req_path);
+		$req_head = [
+			'accept: application/json',
+			'content-type: application/json',
+			sprintf('authorization: %s', $_SERVER['HTTP_AUTHORIZATION']), //sprintf('Bearer %s', $sid)
+		];
+		$req = $this->curl_init($url, $req_head);
+
+		curl_setopt($req, CURLOPT_CUSTOMREQUEST, $_SERVER['REQUEST_METHOD']);
+		curl_setopt($req, CURLOPT_POSTFIELDS, $req_body);
+		curl_setopt($req, CURLOPT_HTTPHEADER, $req_head);
+
+		$this->curl_exec($req);
+
+		// Update Log
+		$res_time = new \DateTime();
+		$dbc->update('log_audit', [
+			'req_head' => $this->req_head,
+			'res_time' => $res_time->format(\DateTime::RFC3339_EXTENDED),
+			'res_meta' => json_encode($this->res_info, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+			'res_head' => $this->res_head,
+			'res_body' => $this->res_body,
+		], [ 'id' => $this->req_ulid ]);
+
+		// Return
+		$RES = $RES->withStatus($this->res_info['http_code']);
+		$RES = $RES->withHeader('content-type', 'application/json');
+		$RES = $RES->write($this->res_body);
+
+		return $RES;
+
 	}
 
 }
