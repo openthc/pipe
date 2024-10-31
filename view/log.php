@@ -39,10 +39,10 @@ $tz = new \DateTimezone($data['tz']);
 		<button class="btn btn-primary" type="submit">Go <i class="fa-solid fa-magnifying-glass"></i></button>
 	</div>
 	<div>
-		<a class="btn btn-secondary" href="?<?= $data['link_newer'] ?>">Newer <i class="fa-solid fa-angles-right"></i></a>
+		<a class="btn btn-secondary" href="?<?= $data['link_newer'] ?>"><i class="fa-solid fa-angles-left"></i> Newer</a>
 	</div>
 	<div>
-		<a class="btn btn-secondary" href="?<?= $data['link_older'] ?>">Older <i class="fa-solid fa-angles-left"></i></a>
+		<a class="btn btn-secondary" href="?<?= $data['link_older'] ?>">Older <i class="fa-solid fa-angles-right"></i></a>
 	</div>
 	<div>
 		<button class="btn btn-secondary btn-snap" type="button" value="snap">Snap <i class="fa-solid fa-copy"></i></button>
@@ -53,7 +53,7 @@ $tz = new \DateTimezone($data['tz']);
 </div>
 </form>
 
-<div class="sql-debug bg-success-subtle"><?= h(trim($data['sql_debug'])) ?></div>
+<div class="sql-debug bg-success-subtle"><?= __h(trim($data['sql_debug'])) ?></div>
 
 </div>
 
