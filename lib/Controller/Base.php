@@ -25,13 +25,35 @@ class Base extends \OpenTHC\Controller\Base
 	 */
 	function __invoke($REQ, $RES, $ARG)
 	{
-		if ( ! empty($_SERVER['HTTP_OPENTHC_COMPANY'])) {
+		// Contact
+		if ( ! empty($_SERVER['HTTP_OPENTHC_CONTACT_ID'])) {
+			$this->contact_id = $_SERVER['HTTP_OPENTHC_CONTACT_ID'];
+		} elseif ( ! empty($_SERVER['HTTP_OPENTHC_CONTACT'])) {
+			$this->contact_id = $_SERVER['HTTP_OPENTHC_CONTACT'];
+		}
+		// if (empty($this->contact_id)) {
+		// 	throw new \Exception('Invalid Request [PCB-035]', 403);
+		// }
+
+		// Company
+		if ( ! empty($_SERVER['HTTP_OPENTHC_COMPANY_ID'])) {
+			$this->company_id = $_SERVER['HTTP_OPENTHC_COMPANY_ID'];
+		} elseif ( ! empty($_SERVER['HTTP_OPENTHC_COMPANY'])) {
 			$this->company_id = $_SERVER['HTTP_OPENTHC_COMPANY'];
 		}
+		if (empty($this->company_id)) {
+			throw new \Exception('Invalid Request [PCB-045]', 403);
+		}
 
-		if ( ! empty($_SERVER['HTTP_OPENTHC_LICENSE'])) {
+		// License
+		if ( ! empty($_SERVER['HTTP_OPENTHC_LICENSE_ID'])) {
+			$this->license_id = $_SERVER['HTTP_OPENTHC_LICENSE_ID'];
+		} elseif ( ! empty($_SERVER['HTTP_OPENTHC_LICENSE'])) {
 			$this->license_id = $_SERVER['HTTP_OPENTHC_LICENSE'];
 		}
+		// if (empty($this->license_id)) {
+		// 	throw new \Exception('Invalid Request [PCB-055]', 403);
+		// }
 
 		$this->req_ulid = _ulid();
 		$this->req_host = $ARG['host'];
@@ -53,7 +75,6 @@ class Base extends \OpenTHC\Controller\Base
 				'note' => 'PONG',
 			]
 		]);
-
 	}
 
 	/**
