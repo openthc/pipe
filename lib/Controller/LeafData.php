@@ -151,13 +151,13 @@ class LeafData extends \OpenTHC\Pipe\Controller\Base
 			case 'pa/test':
 				return $RES->withJSON([
 					'data' => null,
-					'meta' => [ 'detail' => 'Not Implemented [ACL-161]' ],
+					'meta' => [ 'note' => 'Not Implemented [ACL-161]' ],
 				], 501);
 			case 'ut':
 			case 'ut/test':
 				return $RES->withJSON([
 					'data' => null,
-					'meta' => [ 'detail' => 'Not Implemented [ACL-167]' ],
+					'meta' => [ 'note' => 'Not Implemented [ACL-167]' ],
 				], 501);
 			case 'wa':
 			case 'wa-live':
@@ -171,10 +171,7 @@ class LeafData extends \OpenTHC\Pipe\Controller\Base
 			default:
 				return $RES->withJSON([
 					'data' => null,
-					'meta' => [
-						'source' => 'openthc',
-						'detail' => 'Invalid CRE [CSL-033]',
-					]
+					'meta' => [ 'note' => 'Invalid CRE [CSL-033]' ]
 				], 400);
 		}
 
