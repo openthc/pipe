@@ -15,7 +15,8 @@ class Metrc_Test extends \OpenTHC\Pipe\Test\Base
 	 */
 	protected function setUp() : void
 	{
-		$this->_cre = \OpenTHC\CRE::getEngine('openthc/metrc/bunk');
+		parent::setup();
+		$this->_cre = \OpenTHC\CRE::getEngine('usa/ma');
 	}
 
 	/**
@@ -23,11 +24,12 @@ class Metrc_Test extends \OpenTHC\Pipe\Test\Base
 	 */
 	function test_ping()
 	{
-		$req = $this->_curl_init('/uom');
-		$res = curl_exec($req);
-		$res_info = curl_getinfo($req);
+		// $cre_pipe = trim(OPENTHC_TEST_ORIGIN, '/');
+		$cre_host = parse_url($this->_cre['server'], PHP_URL_HOST);
+
+		$res = $this->httpClient->get(sprintf('/metrc/%s/ping', $cre_host));
 		$res = $this->assertValidResponse($res);
-		var_dump($res);
+		// var_dump($res);
 	}
 
 }

@@ -172,12 +172,37 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 
 	}
 
+	function ping($REQ, $RES, $ARG)
+	{
+		parent::__invoke($REQ, $RES, $ARG);
+
+		// Validate the CRE
+		$RES = $this->_check_cre($RES);
+		if (200 != $RES->getStatusCode()) {
+			return $RES;
+		}
+
+		return $this->sendPong($RES);
+	}
+
 	/**
 	 * Parse the System from the Path, Mutates $this
 	 */
 	function _check_cre($RES)
 	{
 		switch ($this->req_host) {
+			case 'ar':
+			case 'arstems.arkansas.gov':
+				$this->cre_base = 'https://arstems.arkansas.gov/serverjson.asp';
+				break;
+			case 'ct':
+			case 'trace.ct.biotr.ac':
+				$this->cre_base = 'https://trace.ct.biotr.ac/serverjson.asp';
+				break;
+			case 'de':
+			case 'delaware.biotrackthc.net':
+				$this->cre_base = 'https://delaware.biotrackthc.net/serverjson.asp';
+				break;
 			case 'hi':
 			case 'hicsts.hawaii.gov':
 				$this->cre_base = 'https://hicsts.hawaii.gov/serverjson.asp';
@@ -186,6 +211,10 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 			case 'mcmonitoring.agr.illinois.gov':
 				$this->cre_base = 'https://mcmonitoring.agr.illinois.gov/serverjson.asp';
 				break;
+			case 'nd':
+			case 'mminventory.health.nd.gov':
+				$this->cre_base = 'https://mminventory.health.nd.gov/serverjson.asp';
+				break;
 			case 'nm':
 			case 'mcp-tracking.nmhealth.org':
 				$this->cre_base = 'https://mcp-tracking.nmhealth.org/serverjson.asp';
@@ -193,6 +222,14 @@ class BioTrack extends \OpenTHC\Pipe\Controller\Base
 			// New Mexico - BioTrack v3
 			case 'v3.api.nm.trace.biotrackthc.net':
 				$this->cre_base = 'https://v3.api.nm.trace.biotrackthc.net/';
+				break;
+			case 'ny':
+			case 'mmp-sts.health.ny.gov':
+				$this->cre_base = 'https://mmp-sts.health.ny.gov/serverjson.asp';
+				break;
+			case 'pr':
+			case 'cannabispr.biotrackthc.net':
+				$this->cre_base = 'https://cannabispr.biotrackthc.net/serverjson.asp';
 				break;
 			default:
 				return $RES->withJSON([

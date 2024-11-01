@@ -5,7 +5,7 @@
 
 namespace OpenTHC\Pipe\Test;
 
-class Base extends \PHPUnit\Framework\TestCase
+class Base extends \OpenTHC\Test\Base //\PHPUnit\Framework\TestCase
 {
 	protected $_cre;
 	protected $_tmp_file = '/tmp/pipe-test-case.dat';
@@ -25,11 +25,16 @@ class Base extends \PHPUnit\Framework\TestCase
 			'base_uri' => rtrim(OPENTHC_TEST_ORIGIN, '/'),
 			'allow_redirects' => false,
 			'debug' => $_ENV['debug-http'],
+			'cookies' => true,
+			'http_errors' => false,
+			'headers' => [
+				'openthc-contact-id' => $_ENV['OPENTHC_TEST_CONTACT_ID'],
+				'openthc-company-id' => $_ENV['OPENTHC_TEST_COMPANY_ID'],
+				'openthc-license-id' => $_ENV['OPENTHC_TEST_LICENSE_ID'],
+			],
 			'request.options' => array(
 				'exceptions' => false,
 			),
-			'http_errors' => false,
-			'cookies' => true,
 		));
 
 		return $c;
@@ -51,6 +56,24 @@ class Base extends \PHPUnit\Framework\TestCase
 	{
 		$res = $this->httpClient->post($u, [ 'json' => $a ]);
 		return $res;
+	}
+
+	/**
+	 *
+	 */
+	function assertValidResponse($res, $code_expect=200, $type_expect='application/json', $dump=null) : array
+	{
+		$ret = parent::assertValidResponse($res, $code_expect, $type_expect, $dump);
+
+		switch ($type_expect) {
+		case 'application/json':
+			$this->assertIsArray($ret);
+			// $this->assertArrayHasKey('data', $ret);
+			// $this->assertArrayHasKey('meta', $ret);
+			break;
+		}
+
+		return $ret;
 	}
 
 }

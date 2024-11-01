@@ -68,7 +68,8 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 			'id' => $this->req_ulid,
 			'license_id' => $this->license_id, // $_GET['licenseNumber'],
 			'req_time' => date_format(new \DateTime(), \DateTime::RFC3339_EXTENDED),
-			'req_name' => sprintf('%s %s HTTP/1.1', $_SERVER['REQUEST_METHOD'], $req_path),
+			'req_name'
+			=> sprintf('%s %s HTTP/1.1', $_SERVER['REQUEST_METHOD'], $req_path),
 		]);
 
 		// Forward
@@ -153,32 +154,48 @@ class Metrc extends \OpenTHC\Pipe\Controller\Base
 		case 'ak':
 		case 'ca':
 		case 'co':
+		case 'dc':
+		case 'gu':
 		case 'la':
 		case 'ma':
 		case 'md':
 		case 'me':
 		case 'mi':
+		case 'mn':
 		case 'mo':
+		case 'ms':
 		case 'mt':
+		case 'nj':
 		case 'nv':
 		case 'oh':
 		case 'or':
+		case 'ri':
+		case 'sd':
+		case 'wv':
 			$this->cre_base = sprintf('https://api-%s.metrc.com', $this->req_host);
 			break;
 		case 'api-ak.metrc.com':
 		case 'api-ca.metrc.com':
 		case 'api-co.metrc.com':
+		case 'api-dc.metrc.com':
+		case 'api-gu.metrc.com':
 		case 'api-la.metrc.com':
 		case 'api-ma.metrc.com':
 		case 'api-md.metrc.com':
 		case 'api-me.metrc.com':
 		case 'api-mi.metrc.com':
+		case 'api-mn.metrc.com':
 		case 'api-mo.metrc.com':
+		case 'api-ms.metrc.com':
 		case 'api-mt.metrc.com':
+		case 'api-nj.metrc.com':
 		case 'api-nv.metrc.com':
 		case 'api-oh.metrc.com':
 		case 'api-ok.metrc.com':
 		case 'api-or.metrc.com':
+		case 'api-ri.metrc.com':
+		case 'api-sd.metrc.com':
+		case 'api-wv.metrc.com':
 		case 'sandbox-api-ak.metrc.com':
 		case 'sandbox-api-ca.metrc.com':
 		case 'sandbox-api-co.metrc.com':

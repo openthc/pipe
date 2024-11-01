@@ -70,12 +70,17 @@ $app->group('/auth', 'OpenTHC\Pipe\Module\Auth')
 
 // Engine Specific Controllers
 // $app->get('/biotrack');
+$app->get('/biotrack/{host}/ping', 'OpenTHC\Pipe\Controller\BioTrack:ping')
+	->add('OpenTHC\Middleware\Session');
+
 $app->map([ 'GET', 'POST' ], '/biotrack/{host}[/{path:.*}]', 'OpenTHC\Pipe\Controller\BioTrack')
 	->add('OpenTHC\Middleware\Session');
 
 
 // $app->get('/metrc');
 $app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/metrc/{host}/{path:.*}', 'OpenTHC\Pipe\Controller\Metrc');
+
+// $app->map([ 'GET', 'POST', 'PUT', 'DELETE' ], '/openthc/{host}/{path:.*}', 'OpenTHC\Pipe\Controller\OpenTHC');
 
 // $app->get('/qbench');
 // $app->get('/qbench/{host}/{path:.*}', 'OpenTHC\Pipe\Controller\QBench');
@@ -97,9 +102,20 @@ $app->get('/service/list', function() {
 	$cre_list = \OpenTHC\Pipe\CRE::getEngineList();
 	// ksort($cre_list);
 	foreach ($cre_list as $cre) {
+
+		unset($cre['class']);
+		unset($cre['epoch']);
+
 		$cre['hostname'] = parse_url($cre['server'], PHP_URL_HOST);
-		$out_text[] = sprintf('% 20s    /%s/%s', $cre['code'], $cre['engine'], $cre['hostname']);
-		$out_text[] = '                        ' . $cre['server'];
+		$cre_path = [];
+		$cre_path[] = $cre['engine'];
+		$cre_path[] = $cre['hostname'];
+		$cre['path'] = implode('/', $cre_path);
+
+		$out_text[] = sprintf('%- 10s  %s', $cre['id'], $cre['name']);
+		$out_text[] = '            ' . sprintf('e:%s s:%s', $cre['engine'], $cre['server']);
+		$out_text[] = '            ' . sprintf('p:%s', $cre['path']);
+		$out_text[] = '            ' . json_encode($cre, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		$out_text[] = '';
 	}
 	$out_text = implode("\n", $out_text);
