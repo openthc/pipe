@@ -13,13 +13,12 @@
 		}
 	},
 	"require": {
-		"league/oauth2-client": "2.7.0",
 		"openthc/common": "dev-main",
 		"openthc/cre-adapter": "dev-main"
 	},
 	"require-dev": {
 		"phpmd/phpmd": "2.15.0",
-		"phpstan/phpstan": "1.11.8",
+		"phpstan/phpstan": "2.1.8",
 		"phpunit/phpunit": "9.6.20"
 	}
 }
