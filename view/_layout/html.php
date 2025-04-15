@@ -19,7 +19,6 @@ if (empty($_ENV['title'])) {
 <meta name="application-name" content="OpenTHC">
 <meta name="viewport" content="initial-scale=1, user-scalable=yes">
 <meta name="theme-color" content="#069420">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="google" content="notranslate">
 <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
