@@ -23,8 +23,6 @@
 	verbose="false"
 	>
 
-	<coverage />
-
 	<php>
 
 		<const name="OPENTHC_TEST_ORIGIN" value="https://pipe.openthc.example.com" />
@@ -43,5 +41,7 @@
 			<file>CRE/Metrc_Test.php</file>
 		</testsuite>
 	</testsuites>
+
+	<coverage />
 
 </phpunit>

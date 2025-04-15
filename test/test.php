@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 /**
  * OpenTHC PIPE Test Runner
@@ -8,6 +8,14 @@
 
 require_once(dirname(__DIR__) . '/boot.php');
 
+// Default Option
+if (empty($_SERVER['argv'][1])) {
+	$_SERVER['argv'][1] = 'phpunit';
+	$_SERVER['argc'] = count($_SERVER['argv']);
+}
+
+
+// Command Line
 $doc = <<<DOC
 OpenTHC PIPE Test Runner
 
@@ -26,70 +34,72 @@ Options:
 DOC;
 
 $res = \Docopt::handle($doc, [
-	'help' => true,
+	'exit' => false,
 	'optionsFirst' => true,
 ]);
-$arg = $res->args;
-var_dump($arg);
-if ('all' == $arg['<command>']) {
-	$arg['phplint'] = true;
-	$arg['phpstan'] = true;
-	$arg['phpunit'] = true;
+var_dump($res);
+$cli_args = $res->args;
+var_dump($cli_args);
+if ('all' == $cli_args['<command>']) {
+	$cli_args['phplint'] = true;
+	$cli_args['phpstan'] = true;
+	$cli_args['phpunit'] = true;
 } else {
-	$cmd = $arg['<command>'];
-	$arg[$cmd] = true;
-	unset($arg['<command>']);
+	$cmd = $cli_args['<command>'];
+	$cli_args[$cmd] = true;
+	unset($cli_args['<command>']);
 }
-var_dump($arg);
+var_dump($cli_args);
 
-$dt0 = new \DateTime();
 
-define('OPENTHC_TEST_OUTPUT_BASE', \OpenTHC\Test\Helper::output_path_init());
+// Test Config
+$cfg = [];
+$cfg['base'] = APP_ROOT;
+$cfg['site'] = 'pipe';
+
+$test_helper = new \OpenTHC\Test\Helper($cfg);
+$cfg['output'] = $test_helper->output_path;
 
 
 // PHPLint
-if ($arg['phplint']) {
-	$tc = new \OpenTHC\Test\Facade\PHPLint([
-		'output' => OPENTHC_TEST_OUTPUT_BASE
-	]);
+if ($cli_args['phplint']) {
+	$tc = new \OpenTHC\Test\Facade\PHPLint($cfg);
 	$res = $tc->execute();
 	var_dump($res);
 }
 
 
 // PHPStan
-if ($arg['phpstan']) {
-	$tc = new OpenTHC\Test\Facade\PHPStan([
-		'output' => OPENTHC_TEST_OUTPUT_BASE
-	]);
+if ($cli_args['phpstan']) {
+	$tc = new \OpenTHC\Test\Facade\PHPStan($cfg);
 	$res = $tc->execute();
 	var_dump($res);
 }
 
 
 // PHPUnit
-if ($arg['phpunit']) {
+if ($cli_args['phpunit']) {
 
-	$cfg = [
-		'output' => OPENTHC_TEST_OUTPUT_BASE
-	];
+	$cfg_file_list = [];
+	$cfg_file_list[] = sprintf('%s/phpunit.xml', __DIR__);
+	$cfg_file_list[] = sprintf('%s/phpunit.xml.dist', __DIR__);
+	foreach ($cfg_file_list as $f) {
+		if (is_file($f)) {
+			$cfg['--configuration'] = $f;
+			break;
+		}
+	}
 
 	if ( ! empty($cli_args['--filter'])) {
 		$cfg['--filter'] = $cli_args['--filter'];
 	}
 
-	$tc = new OpenTHC\Test\Facade\PHPUnit($cfg);
+	$tc = new \OpenTHC\Test\Facade\PHPUnit($cfg);
 	$res = $tc->execute();
 	var_dump($res);
 }
 
 
-// Done
-\OpenTHC\Test\Helper::index_create('');
-
-
-// Output Information
-$origin = \OpenTHC\Config::get('openthc/pipe/origin');
-$output = str_replace(sprintf('%s/webroot/', APP_ROOT), '', OPENTHC_TEST_OUTPUT_BASE);
-
-echo "TEST COMPLETE\n  $origin/$output\n";
+// Output
+$res = $test_helper->index_create($res['data']);
+echo "TEST COMPLETE\n  $res\n";
