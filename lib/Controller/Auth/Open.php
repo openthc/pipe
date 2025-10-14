@@ -67,7 +67,7 @@ class Open extends \OpenTHC\Controller\Auth\oAuth2
 	private function validateCRE()
 	{
 		$cre_want = strtolower(trim($_POST['cre']));
-		$cre_info = \OpenTHC\CRE::getEngine($cre_want);
+		$cre_info = \OpenTHC\CRE::getConfig($cre_want);
 
 		if ( ! empty($cre_info)) {
 			return $cre_info;
