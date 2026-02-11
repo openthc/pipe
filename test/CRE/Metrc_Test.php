@@ -16,7 +16,7 @@ class Metrc_Test extends \OpenTHC\Pipe\Test\Base
 	protected function setUp() : void
 	{
 		parent::setup();
-		$this->_cre = \OpenTHC\CRE::getConfig('usa/ma');
+		$this->_cre = \OpenTHC\CRE::getConfig('usa-ma');
 	}
 
 	/**

@@ -37,9 +37,7 @@ $res = \Docopt::handle($doc, [
 	'exit' => false,
 	'optionsFirst' => true,
 ]);
-var_dump($res);
 $cli_args = $res->args;
-var_dump($cli_args);
 if ('all' == $cli_args['<command>']) {
 	$cli_args['phplint'] = true;
 	$cli_args['phpstan'] = true;
@@ -49,7 +47,6 @@ if ('all' == $cli_args['<command>']) {
 	$cli_args[$cmd] = true;
 	unset($cli_args['<command>']);
 }
-var_dump($cli_args);
 
 
 // Test Config

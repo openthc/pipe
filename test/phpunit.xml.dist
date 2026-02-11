@@ -9,7 +9,7 @@
 	backupStaticAttributes="false"
 	bootstrap="../boot.php"
 	cacheResult="false"
-	colors="true"
+	colors="false"
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
@@ -17,18 +17,21 @@
 	stopOnError="true"
 	stopOnFailure="true"
 	stopOnRisky="true"
-	timeoutForSmallTests="1"
-	timeoutForMediumTests="10"
-	timeoutForLargeTests="60"
+	timeoutForSmallTests="2"
+	timeoutForMediumTests="8"
+	timeoutForLargeTests="32"
 	verbose="false"
 	>
 
 	<php>
 
-		<const name="OPENTHC_TEST_ORIGIN" value="https://pipe.openthc.example.com" />
+		<!-- PHPUnit populates $_ENV with these -->
+		<!-- And one can overwrite these values from standard process environment vars -->
 
-		<!-- If defined, it will spew debug -->
-		<!-- <const name="OPENTHC_TEST_HTTP_DEBUG" value="0" /> -->
+		<env name="OPENTHC_TEST_ORIGIN" value="https://pipe.openthc.example.com" />
+
+		<!-- If truthy, it will spew debug -->
+		<env name="OPENTHC_TEST_HTTP_DEBUG" value="" />
 
 	</php>
 
@@ -42,6 +45,7 @@
 		</testsuite>
 	</testsuites>
 
-	<coverage />
+	<!-- XDEBUG_MODE=coverage (environment variable) or xdebug.mode=coverage (PHP configuration setting) has to be set -->
+	<!-- <coverage /> -->
 
 </phpunit>

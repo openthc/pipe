@@ -16,8 +16,7 @@ class BioTrack_Test extends \OpenTHC\Pipe\Test\Base
 	protected function setUp() : void
 	{
 		parent::setUp();
-		$this->_cre = \OpenTHC\CRE::getConfig('usa/nm');
-		// 'openthc/biotrack/bunk');
+		$this->_cre = \OpenTHC\CRE::getConfig('usa-nm');
 	}
 
 	/**
