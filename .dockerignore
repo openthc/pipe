@@ -27,5 +27,5 @@ test/phpunit.xml
 var/
 vendor/
 webroot/pub/
-webroot/test-output/
+webroot/output/
 webroot/vendor/

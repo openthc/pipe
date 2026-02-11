@@ -1,0 +1,35 @@
+pipe.openthc.dev {
+
+	root * /opt/openthc/pipe/webroot/
+	log
+	encode
+	import common404
+	file_server
+
+	@static_paths {
+		path /img/* /output/* /pub/* /vendor/*
+	}
+
+	handle @static_paths {
+		file_server
+	}
+
+	handle {
+
+		try_files {path} {path}/ /main.php
+		# index index.html index.php
+
+		# php_fastcgi unix//run/php/php8.2-fpm.sock
+		php_fastcgi unix//run/php/php7.4-fpm.sock
+
+	}
+
+	# {
+	# 	try_files {path} {path}/index.html {path}/index.php /main.php
+	# }
+
+	handle_errors {
+		respond "{err.status_code} {err.status_text}"
+	}
+
+}
