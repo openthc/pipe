@@ -11,12 +11,12 @@ ENV OPENTHC_SERVER_NAME="pipe.docker.openthc.org"
 #
 # Install
 COPY ./ /opt/openthc/pipe
-RUN /opt/openthc/pipe/make.sh
+RUN rm /opt/openthc/pipe/composer.lock \
+	&& /opt/openthc/pipe/make.sh
 
 #
 # Configure
-COPY ./docker/apache2.conf  /etc/apache2/sites-enabled/000-default.conf
-COPY ./docker/xdebug.ini    /etc/php/7.4/mods-available/xdebug.ini
+COPY ./docker/Caddyfile      /etc/caddy/Caddyfile
 COPY ./docker/init.sh       /init.sh
 # COPY ./docker/cre-openthc.yaml   /opt/openthc/app/etc/cre/openthc.yaml
 

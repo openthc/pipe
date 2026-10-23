@@ -27,7 +27,7 @@ set_error_handler(function($en, $em, $ef=null, $el=null, $ec=null) {
 
 	exit(1);
 
-}, (E_ALL & ~ E_NOTICE));
+}, (E_ALL & ~ E_NOTICE & ~ E_WARNING & ~ E_DEPRECATED));
 
 // Early Exception Handler
 set_exception_handler(function($ex) {

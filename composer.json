@@ -10,8 +10,8 @@
 		}
 	},
 	"require": {
-		"openthc/common": "v2026.288.1",
-		"openthc/cre-adapter": "420.26.288"
+		"openthc/common": "v2026.289.0",
+		"openthc/cre-adapter": "420.26.294"
 	},
 	"require-dev": {
 		"phpmd/phpmd": "2.15.0",

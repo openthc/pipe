@@ -18,14 +18,9 @@ composer install --no-ansi --no-progress --classmap-authoritative
 
 npm install --no-audit --no-fund
 
-php <<PHP
-<?php
-define('APP_ROOT', __DIR__);
-require_once(APP_ROOT . '/vendor/autoload.php');
-\OpenTHC\Make::install_bootstrap();
-\OpenTHC\Make::install_fontawesome();
-\OpenTHC\Make::install_jquery();
-PHP
+vendor/openthc/common/lib/make.sh install_bootstrap
+vendor/openthc/common/lib/make.sh install_fontawesome
+vendor/openthc/common/lib/make.sh install_jquery
 
 # lodash
 # mkdir -p webroot/vendor/lodash/

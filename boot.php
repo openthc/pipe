@@ -10,7 +10,7 @@ use Edoceo\Radix\DB\SQL;
 define('APP_ROOT', __DIR__);
 define('APP_VERSION', '420.24.276');
 
-error_reporting(E_ALL & ~ E_NOTICE);
+error_reporting(E_ALL & ~ E_NOTICE & ~ E_WARNING & ~ E_DEPRECATED);
 
 openlog('openthc-pipe', LOG_ODELAY|LOG_PID, LOG_LOCAL0);
 
